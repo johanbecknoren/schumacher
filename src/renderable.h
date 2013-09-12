@@ -11,7 +11,6 @@ class Renderable {
     virtual IntersectionPoint *getIntersectionPoint(Ray *ray) const = 0;
 
  protected:
-    Renderable(){};
     AABB *boundingBox;
     virtual void createAABB() = 0;
 };
