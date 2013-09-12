@@ -1,12 +1,13 @@
 #include <iostream>
-//#include "renderable.h"
+#include "octree.h"
 #include "sphere.h"
-#include "AABB.h"
 
 int main() {
 
 	std::cout << "Creating AABB!\n";
-	AABB bb(glm::vec3(-1.0f), glm::vec3(1.0f), glm::vec3(0.0f));
-
+	AABB bb(glm::vec3(-10.0f), glm::vec3(10.0f), glm::vec3(0.0f));
+  Octree tree(&bb);
+  Sphere *sphere = new Sphere(1.0f, glm::vec3(0.0f));
+  tree.addObject(sphere);
 	return 0;
 }

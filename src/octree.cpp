@@ -20,11 +20,17 @@ Octree::Octree(AABB *sceneBoundingBox) {
     root = new Node(0, sceneBoundingBox);
 }
 
+Octree::~Octree() {
+    // TODO: Fix destructor
+}
+
 void Octree::addChild(Node *parent, int octant) {
-    Node *child = parent->getChild(octant);
-    if(child == NULL) {
-        // TODO: FIX THIS!!! SETTING BOUNDINGBOX TO NULL
-        child = new Node(parent->getDepth() + 1, NULL);
+    if(parent != NULL) {
+      Node *child = parent->getChild(octant);
+      if(child == NULL) {
+          // TODO: FIX THIS!!! SETTING BOUNDINGBOX TO NULL
+          child = new Node(parent->getDepth() + 1, NULL);
+      }
     }
 }
 

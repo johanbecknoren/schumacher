@@ -37,11 +37,13 @@ class Octree {
 public:
     Octree(AABB *sceneBoundingBox);
     ~Octree();
+
+    void addObject(Renderable *object);
+
+private:
+    void findIntersection(Ray *ray) const;
     void addChild(Node *parent, int octant);
     void addLeaf(Renderable *renderable);
-    void addObject(Renderable *object);
-    void findIntersection(Ray *ray) const;
-private:
     void iterateRay(Ray *ray, Node *node);
     void createBoundingBox(const Node *node, const int octant);
     void subdivideBoundingBox(Node *parent, Renderable *object);
