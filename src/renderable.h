@@ -4,7 +4,7 @@ class Renderable {
     Renderable();
     virtual ~Renderable();
     AABB *getBoundingBox() { return boundingBox; };
- private:
+ protected:
     AABB *boundingBox;
     virtual void createAABB() = 0;
 };
