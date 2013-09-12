@@ -5,23 +5,56 @@ Node::Node(int nodeDepth) {
     parent = NULL;
 }
 
+Leaf::Leaf(Renderable *object) {
+    renderable = object;
+}
 
 Octree::Octree() {
     root = new Node(0);
+}
+
+void Octree::addChild(Node *parent, int octant) {
+    Node *child = parent->getChild(octant); 
+    if(child == NULL) {
+        child = new Node(parent->getDepth() + 1);
+
+    }
+}
+
+ Octree::createBoundingBox(const Node *node, const int octant) {
+    const AABB *box = node->getBoundingBox();
+    glm::vec3 lowerLeft;
+    glm::vec3 upperRight;
+    switch(octant) {
+        case 0: {
+
+        } break;
+        case default: {
+
+        } break;
+    }
 }
 
 void Octree::addObject(Renderable *object) {
     // Get bounding box.
 }
 // Calculate sub bounding box in specified octant
-void Octree::subdivideBoundingBox(const Node *parent, int octant) {
+void Octree::subdivideBoundingBox(const Node *parent, Renderable *object) {
     const AABB *parentBox = parent->getBoundingBox();
-    const glm::vec3 lowerLeft = parentBox->getLowerBack();
-    const glm::vec3 upperRight = parentBox->getUpperRightFront();
+    const AABB *objectBox = object->getBoundingBox();
+
+    const glm::vec3 lowerLeft = objectBox->getLowerBack();
+    const glm::vec3 upperRight = objectBox->getUpperRightFront();
+
     int q1 = parentBox->getQuadrant(lowerLeft);
     int q2 = parentBox->getQuadrant(upperRight);
-    // check if bounding box is in quadrant
+    // If whole boundingbox is in same quadrant,
+    // add node and continue subdividing.
     if(q1 == q2) {
+        addChild(parent, q1);
         
+    }
+    else {
+        parent->addLeaf(object);
     }
 }
