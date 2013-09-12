@@ -7,6 +7,7 @@ public:
     Leaf(Renderable *renderable);
     ~Leaf();
     void setNextSibling(Leaf *sibling) { nextSibling = sibling; };
+    const Renderable *getRenderable() const { return renderable; };
 private:
     Renderable *renderable;
     Leaf *nextSibling;
@@ -14,12 +15,13 @@ private:
 
 class Node {
 public:
-    Node(int nodeDepth);
+    Node(int nodeDepth, AABB *boundingBox);
     ~Node();
     const AABB *getBoundingBox() const { return boundingBox; };
     Node *getChild(const int octant) { return childs[octant]; };
     const int getDepth() const { return depth; };
     void addLeaf(Node *parent, Renderable *renderable);
+    Leaf *getFirstLeaf() { return firstLeaf; };
 private:
     AABB *boundingBox;
     Node *parent;
@@ -33,12 +35,15 @@ private:
 
 class Octree {
 public:
-    Octree();
+    Octree(AABB *sceneBoundingBox);
     ~Octree();
     void addChild(Node *parent, int octant);
     void addLeaf(Renderable *renderable);
     void addObject(Renderable *object);
+    void findIntersection(Ray *ray) const;
 private:
+    void iterateRay(Ray *ray, Node *node);
+    void createBoundingBox(const Node *node, const int octant);
     void subdivideBoundingBox(Node *parent, Renderable *object);
     Node *root;
 };
