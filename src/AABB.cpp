@@ -39,7 +39,7 @@ float AABB::getIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDire
 	float tmin = glm::max( glm::max( glm::min(t1,t2), glm::min(t3,t4)), glm::min(t5,t6) );
 	float tmax = glm::min( glm::min( glm::max(t1,t2), glm::max(t3,t4)), glm::max(t5,t6) );
 
-	if(tmax < 0) { // Ray intersection, but whole AABB is behind us
+	if(tmax < 0.0f) { // Ray intersection, but whole AABB is behind us
 		t = tmax;
 		return -1.0f;
 	}
