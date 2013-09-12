@@ -19,6 +19,38 @@ bool AABB::isInside(const glm::vec3& p) {
 			&& (p[2] > _lowerLeftBack[2] && p[2] < _upperRightFront[2]);
 }
 
+int AABB::getQuadrant(const glm::vec3& p) {
+	glm::vec3 diff = p - this->_origin; // vector from origin to point p;
+	
+	if(diff.x < 0.0f) {
+		if(diff.y < 0.0f) {
+			if(diff.z < 0.0f)
+				return 0;
+			else
+				return 2;
+		} else { // y >= 0.0
+			if(diff.z < 0.0f)
+				return 4;
+			else
+				return 6;
+		}
+	} else { // x >= 0.0
+		if(diff.y < 0.0f) {
+			if(diff.z < 0.0f)
+				return 1;
+			else
+				return 3;
+		} else { // y >= 0.0
+			if(diff.z < 0.0f)
+				return 5;
+			else
+				return 7;
+		}
+	}
+
+//	return 0;
+}
+
 float AABB::getIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection) {
 	/* Algorithm from http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms */
 	glm::vec3 direction = glm::normalize(rayDirection);
