@@ -11,7 +11,7 @@ public:
 	AABB(const glm::vec3&, const glm::vec3&, const glm::vec3&);
 	~AABB(){};
 	bool isInside(const glm::vec3&);
-	int getQuadrant(const glm::vec3&);
+	int getQuadrant(const glm::vec3&) const;
 	float getIntersection(const Ray&);
 
 	glm::vec3 getOrigin() const { return _origin; };

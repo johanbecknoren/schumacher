@@ -9,19 +9,24 @@ Leaf::Leaf(Renderable *object) {
     renderable = object;
 }
 
+void Node::addLeaf(Node *parent, Renderable *renderable) {
+    Leaf *newLeaf = new Leaf(renderable);
+    newLeaf->setNextSibling(parent->firstLeaf);
+    parent->firstLeaf = newLeaf;
+}
+
 Octree::Octree() {
     root = new Node(0);
 }
 
 void Octree::addChild(Node *parent, int octant) {
-    Node *child = parent->getChild(octant); 
+    Node *child = parent->getChild(octant);
     if(child == NULL) {
         child = new Node(parent->getDepth() + 1);
-
     }
 }
 
- Octree::createBoundingBox(const Node *node, const int octant) {
+void createBoundingBox(const Node *node, const int octant) {
     const AABB *box = node->getBoundingBox();
     glm::vec3 lowerLeft;
     glm::vec3 upperRight;
@@ -29,7 +34,7 @@ void Octree::addChild(Node *parent, int octant) {
         case 0: {
 
         } break;
-        case default: {
+        default: {
 
         } break;
     }
@@ -39,11 +44,11 @@ void Octree::addObject(Renderable *object) {
     // Get bounding box.
 }
 // Calculate sub bounding box in specified octant
-void Octree::subdivideBoundingBox(const Node *parent, Renderable *object) {
+void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
     const AABB *parentBox = parent->getBoundingBox();
     const AABB *objectBox = object->getBoundingBox();
 
-    const glm::vec3 lowerLeft = objectBox->getLowerBack();
+    const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
     const glm::vec3 upperRight = objectBox->getUpperRightFront();
 
     int q1 = parentBox->getQuadrant(lowerLeft);
@@ -55,6 +60,6 @@ void Octree::subdivideBoundingBox(const Node *parent, Renderable *object) {
         
     }
     else {
-        parent->addLeaf(object);
+        parent->addLeaf(parent, object);
     }
 }

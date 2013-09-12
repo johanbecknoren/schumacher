@@ -19,7 +19,7 @@ bool AABB::isInside(const glm::vec3& p) {
 			&& (p[2] > _lowerLeftBack[2] && p[2] < _upperRightFront[2]);
 }
 
-int AABB::getQuadrant(const glm::vec3& p) {
+int AABB::getQuadrant(const glm::vec3& p) const {
 	glm::vec3 diff = p - this->_origin; // vector from origin to point p;
 	
 	if(diff.x < 0.0f) {
