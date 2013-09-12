@@ -1,5 +1,6 @@
 #include <iostream>
-#include "renderable.h"
+//#include "renderable.h"
+#include "sphere.h"
 #include "AABB.h"
 
 int main() {
