@@ -3,7 +3,7 @@ project(schumacher)
 
 IF(UNIX)
 	MESSAGE(STATUS "La till c++11!")
-	SET(CMAKE_CXX_FLAGS "-std=c++11 -fpermissive")
+	SET(CMAKE_CXX_FLAGS "-std=c++11")
 ENDIF(UNIX)
 
 FILE(GLOB HEADERS  ./*.h*)
