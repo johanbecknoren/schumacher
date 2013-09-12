@@ -51,22 +51,22 @@ int AABB::getQuadrant(const glm::vec3& p) {
 //	return 0;
 }
 
-float AABB::getIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection) {
+float AABB::getIntersection(const Ray& ray) {
 	/* Algorithm from http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms */
-	glm::vec3 direction = glm::normalize(rayDirection);
+	glm::vec3 direction = glm::normalize(ray.getDirection());
 	glm::vec3 dirfrac;
 	float t;
 	
-	dirfrac.x = 1.0f / rayDirection.x;
-	dirfrac.y = 1.0f / rayDirection.y;
-	dirfrac.z = 1.0f / rayDirection.z;
+	dirfrac.x = 1.0f / direction.x;
+	dirfrac.y = 1.0f / direction.y;
+	dirfrac.z = 1.0f / direction.z;
 
-	float t1 = (_lowerLeftBack.x - rayOrigin.x)*dirfrac.x;
-	float t2 = (_upperRightFront.x - rayOrigin.x)*dirfrac.x;
-	float t3 = (_lowerLeftBack.y - rayOrigin.y)*dirfrac.y;
-	float t4 = (_upperRightFront.y - rayOrigin.y)*dirfrac.y;
-	float t5 = (_lowerLeftBack.z - rayOrigin.z)*dirfrac.z;
-	float t6 = (_upperRightFront.z - rayOrigin.z)*dirfrac.z;
+	float t1 = (_lowerLeftBack.x - ray.getOrigin().x)*dirfrac.x;
+	float t2 = (_upperRightFront.x - ray.getOrigin().x)*dirfrac.x;
+	float t3 = (_lowerLeftBack.y - ray.getOrigin().y)*dirfrac.y;
+	float t4 = (_upperRightFront.y - ray.getOrigin().y)*dirfrac.y;
+	float t5 = (_lowerLeftBack.z - ray.getOrigin().z)*dirfrac.z;
+	float t6 = (_upperRightFront.z - ray.getOrigin().z)*dirfrac.z;
 
 	float tmin = glm::max( glm::max( glm::min(t1,t2), glm::min(t3,t4)), glm::min(t5,t6) );
 	float tmax = glm::min( glm::min( glm::max(t1,t2), glm::max(t3,t4)), glm::max(t5,t6) );
