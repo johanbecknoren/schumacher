@@ -20,7 +20,7 @@ list(APPEND schumacher_INCLUDE_DIRS
 )
 
 include_directories(	
-	${shadows_INCLUDE_DIRS}
+	${schumacher_INCLUDE_DIRS}
 	)
 
 link_directories(
@@ -44,3 +44,5 @@ endif(WIN32)
 if(UNIX)
 	target_link_libraries(schumacher assimp freeimage GL glfw glut GLEW GLU)
 endif(UNIX)
+
+
