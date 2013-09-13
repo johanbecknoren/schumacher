@@ -13,13 +13,13 @@ AABB::AABB(const glm::vec3& lLB, const glm::vec3& uRF, const glm::vec3& o = glm:
 }
 
 // Check if point is inside AABB
-bool AABB::isInside(const glm::vec3& p) {
+bool AABB::isInside(const glm::vec3& p) const {
 	return (p[0] > _lowerLeftBack[0] && p[0] < _upperRightFront[0])
 			&& (p[1] > _lowerLeftBack[1] && p[1] < _upperRightFront[1])
 			&& (p[2] > _lowerLeftBack[2] && p[2] < _upperRightFront[2]);
 }
 
-int AABB::getQuadrant(const glm::vec3& p) {
+int AABB::getQuadrant(const glm::vec3& p) const {
 	glm::vec3 diff = p - this->_origin; // vector from origin to point p;
 	
 	if(diff.x < 0.0f) {

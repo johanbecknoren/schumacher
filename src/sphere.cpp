@@ -11,3 +11,7 @@ void Sphere::createAABB() {
 	glm::vec3 uRF(_position.x+_radius, _position.y+_radius, _position.z+_radius);
 	this->boundingBox = new AABB(lLB, uRF, _position);
 }
+
+IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
+        return new IntersectionPoint();
+}
