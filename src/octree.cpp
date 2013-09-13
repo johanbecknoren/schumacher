@@ -40,10 +40,10 @@ void Octree::print(Node *node) const {
 					leaf = leaf->getNextSibling();
 			} while(leaf != NULL); 
 		}
-		else {
-			std::cout << "No leafs\n";
+		
+		for(int i = 0; i < 8; ++i) {
+			print(node->getChild(i));
 		}
-
 }
 
 void Octree::addChild(Node *parent, int octant) {

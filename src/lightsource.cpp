@@ -11,9 +11,9 @@ Lightsource::Lightsource(const glm::vec3& lLB, const glm::vec3& uRF, const glm::
 }
 
 void Lightsource::createAABB() {
-	this->boundingBox = new AABB(_lowerLeftBack, _upperRightFront, _position);
+	this->_boundingBox = new AABB(_lowerLeftBack, _upperRightFront, _position);
 }
 
 IntersectionPoint* Lightsource::getIntersection(Ray *r, bool getIntersectionNormals) {
-	return this->boundingBox->getIntersection(r,getIntersectionNormals);
+	return this->_boundingBox->getIntersection(r,getIntersectionNormals);
 }
