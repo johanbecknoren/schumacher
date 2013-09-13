@@ -53,5 +53,7 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 			return NULL;
 		}
 			
-	}
+	} else { // Description of this plz
+    return NULL;
+  }
 }
