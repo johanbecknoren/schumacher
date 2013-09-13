@@ -8,7 +8,7 @@
 class AABB {
 public:
 	AABB();
-	AABB(const glm::vec3&, const glm::vec3&, const glm::vec3&);
+	AABB(const glm::vec3&, const glm::vec3&, const glm::vec3 o = glm::vec3(0.0f));
 	~AABB(){};
 	bool isInside(const glm::vec3&) const;
 	int getQuadrant(const glm::vec3&) const;
