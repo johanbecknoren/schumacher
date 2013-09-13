@@ -4,6 +4,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include "Ray.h"
+#include "intersectionpoint.h"
 
 class AABB {
 public:
@@ -12,7 +13,7 @@ public:
 	~AABB(){};
 	bool isInside(const glm::vec3&) const;
 	int getQuadrant(const glm::vec3&) const;
-	float getIntersection(const Ray&);
+	IntersectionPoint* getIntersection(const Ray&);
 
 	glm::vec3 getOrigin() const { return _origin; };
 	glm::vec3 getLowerLeftBack() const { return _lowerLeftBack; };

@@ -53,7 +53,8 @@ int AABB::getQuadrant(const glm::vec3& p) const {
 //	return 0;
 }
 
-float AABB::getIntersection(const Ray& ray) {
+// Returnera IntersectionPoint här istället?
+IntersectionPoint* AABB::getIntersection(const Ray& ray) {
 	/* Algorithm from http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms */
 	glm::vec3 direction = glm::normalize(ray.getDirection());
 	glm::vec3 dirfrac;
@@ -75,15 +76,22 @@ float AABB::getIntersection(const Ray& ray) {
 
 	if(tmax < 0.0f) { // Ray intersection, but whole AABB is behind us
 		t = tmax;
-		return -1.0f;
+		return NULL;
 	}
 
 	if(tmin > tmax) { // No intersection
 		t = tmax;
-		return -1.0f;
+		return NULL;
 	}
 
 	t = tmin; // Store length of ray until intersection in t
+	
+	glm::vec3 intP = ray.getOrigin() + glm::normalize(ray.getDirection())*t; // intersection point
+	glm::vec3 tempNormal = _origin - intP;
+	glm::vec3 surfNormal = glm::vec3(0.0f);
 
-	return t;
+	
+
+	//return t;
+	return new IntersectionPoint(intP, surfNormal);
 }

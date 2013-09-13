@@ -13,11 +13,13 @@ void Sphere::createAABB() {
 }
 
 IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
+	/*Algorithm from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection*/
+
 	float A,B,C,t;
-	float d = boundingBox->getIntersection(*ray);
+	IntersectionPoint* d = boundingBox->getIntersection(*ray);
 	glm::vec3 dir = ray->getDirection();
 //	std::cout << "Sphere intersection distance: " << d << std::endl;
-	if(d > 0.0f) {// Intersection with AABB exists
+	if(d != NULL) {// Intersection with AABB exists
 		A = glm::dot(dir, dir);
 		B = 2 * glm::dot((ray->getOrigin() - _position), dir);
 		C = glm::dot((ray->getOrigin() - _position), (ray->getOrigin() - _position)) - _radius*_radius;

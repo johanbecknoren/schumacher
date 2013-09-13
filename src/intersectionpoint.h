@@ -8,6 +8,9 @@ public:
 		_point = p;
 		_surfaceNormal = n;
 	};
+
+	glm::vec3 getPoint() const { return _point; }
+	glm::vec3 getNormal() const { return _surfaceNormal; }
 private:
     glm::vec3 _point;
     glm::vec3 _surfaceNormal;
