@@ -3,6 +3,7 @@
 #include "sphere.h"
 #include "camera.h"
 #include "material.h"
+#include "lightsource.h"
 
 int main() {
 	IntersectionPoint *ip = new IntersectionPoint();
