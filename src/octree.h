@@ -6,32 +6,31 @@ class Leaf {
 public:
     Leaf(Renderable *renderable);
     ~Leaf();
-    void setNextSibling(Leaf *sibling) { nextSibling = sibling; };
-    const Renderable *getRenderable() const { return renderable; };
+    void setNextSibling(Leaf *sibling) { _nextSibling = sibling; };
+	Leaf *getNextSibling() { return _nextSibling; };
+    const Renderable *getRenderable() const { return _renderable; };
 private:
-    Renderable *renderable;
-    Leaf *nextSibling;
+    Renderable *_renderable;
+    Leaf *_nextSibling;
 };
 
 class Node {
 public:
     Node(int nodeDepth, AABB *boundingBox);
     ~Node();
-    const AABB *getBoundingBox() const { return boundingBox; };
-    Node *getChild(const int octant) { return childs[octant]; };
-    const int getDepth() const { return depth; };
+    const AABB *getBoundingBox() const { return _boundingBox; };
+    Node *getChild(const int octant) { return _childs[octant]; };
+    const int getDepth() const { return _depth; };
     void addLeaf(Node *parent, Renderable *renderable);
-    Leaf *getFirstLeaf() { return firstLeaf; };
+    Leaf *getFirstLeaf() { return _firstLeaf; };
 private:
-    AABB *boundingBox;
-    Node *parent;
-    Node *childs[8];
-    Node *nextSibling;
-    Leaf *firstLeaf;
-    int depth;
+    AABB *_boundingBox;
+    Node *_parent;
+    Node *_childs[8];
+    Node *_nextSibling;
+    Leaf *_firstLeaf;
+    int _depth;
 };
-
-
 
 class Octree {
 public:
@@ -39,6 +38,7 @@ public:
     ~Octree();
 
     void addObject(Renderable *object);
+	void print() const;
 
 private:
     void findIntersection(Ray *ray) const;
@@ -47,7 +47,8 @@ private:
     void iterateRay(Ray *ray, Node *node);
     AABB *createBoundingBox(const Node *node, const int octant);
     void subdivideBoundingBox(Node *parent, Renderable *object);
-    Node *root;
+	void print(Node *node) const ;
+    Node *_root;
 };
 
 #endif

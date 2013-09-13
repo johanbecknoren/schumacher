@@ -6,12 +6,13 @@
 
 class Renderable {
  public:
-    virtual ~Renderable() { delete boundingBox; };
-    AABB *getBoundingBox() { return boundingBox; };
+    virtual ~Renderable() { delete _boundingBox; };
+    AABB *getBoundingBox() { return _boundingBox; };
     virtual IntersectionPoint *getIntersectionPoint(Ray *ray) const = 0;
-
+	std::string getName() const { return _name; };
  protected:
-    AABB *boundingBox;
+	std::string _name;
+    AABB *_boundingBox;
     virtual void createAABB() = 0;
 };
 

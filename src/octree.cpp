@@ -1,35 +1,56 @@
 #include "octree.h"
 
 Node::Node(int nodeDepth, AABB *nodeBoundingBox) {
-	boundingBox = nodeBoundingBox;
-	parent = NULL;
-	depth = nodeDepth;
+	_boundingBox = nodeBoundingBox;
+	_parent = NULL;
+	_depth = nodeDepth;
 }
 
 Leaf::Leaf(Renderable *object) {
-	renderable = object;
+	_renderable = object;
 }
 
 void Node::addLeaf(Node *parent, Renderable *renderable) {
 	Leaf *newLeaf = new Leaf(renderable);
-	newLeaf->setNextSibling(parent->firstLeaf);
-	parent->firstLeaf = newLeaf;
+	newLeaf->setNextSibling(parent->_firstLeaf);
+	parent->_firstLeaf = newLeaf;
 }
 
 Octree::Octree(AABB *sceneBoundingBox) {
-	root = new Node(0, sceneBoundingBox);
+	_root = new Node(0, sceneBoundingBox);
 }
 
 Octree::~Octree() {
 	// TODO: Fix destructor
 }
 
+void Octree::print() const {
+	std::cout << "Printing octree \n"; 
+	print(_root);
+}
+
+void Octree::print(Node *node) const {
+		std::cout << "====== D" << node->getDepth() << " ======" << std::endl;
+		Leaf *leaf = node->getFirstLeaf();
+		if (leaf != NULL) {
+			std::cout << "L:";
+			do {
+					std::cout << leaf->getRenderable()->getName() << " ";
+					leaf = leaf->getNextSibling();
+			} while(leaf != NULL); 
+		}
+		else {
+			std::cout << "No leafs\n";
+		}
+
+}
+
 void Octree::addChild(Node *parent, int octant) {
 	if(parent != NULL) {
-	  Node *child = parent->getChild(octant);
-	  if(child == NULL) {
-		  child = new Node(parent->getDepth() + 1, createBoundingBox(parent, octant));
-	  }
+		Node *child = parent->getChild(octant);
+		if(child == NULL) {
+			child = new Node(parent->getDepth() + 1, createBoundingBox(parent, octant));
+		}
 	}
 }
 
@@ -57,10 +78,12 @@ AABB *Octree::createBoundingBox(const Node *node, const int octant) {
 	glm::vec3 upperRight = box->getUpperRightFront();
 	switch(octant) {
 		case 0: {
-
+			glm::vec3 diff = upperRight - lowerLeft;
+			upperRight = lowerLeft + diff / 2.0f;
+			return new AABB(lowerLeft, upperRight);
 		} break;
 		default: {
-
+			
 		} break;
 	}
 	return new AABB(glm::vec3(-1), glm::vec3(1));
@@ -68,7 +91,7 @@ AABB *Octree::createBoundingBox(const Node *node, const int octant) {
 
 void Octree::addObject(Renderable *object) {
 	// Start recursive add to find where in tree to add object
-	subdivideBoundingBox(root, object);
+	subdivideBoundingBox(_root, object);
 }
 // Calculate sub bounding box in specified octant
 void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
