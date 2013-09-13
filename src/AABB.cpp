@@ -1,4 +1,5 @@
 #include "AABB.h"
+#include <vector>
 
 AABB::AABB() {
 	this->_lowerLeftBack = glm::vec3(-1.0f);
@@ -90,7 +91,20 @@ IntersectionPoint* AABB::getIntersection(const Ray& ray) {
 	glm::vec3 tempNormal = _origin - intP;
 	glm::vec3 surfNormal = glm::vec3(0.0f);
 
-	
+	// TODO: Räkna ut korrekt normal för kollisionen
+	std::vector<glm::vec3> midpoints;
+	midpoints.push_back(glm::vec3(0.0f, _lowerLeftBack.y, 0.0f) - _origin);
+	midpoints.push_back(glm::vec3(0.0f, _upperRightFront.y, 0.0f) - _origin);
+	midpoints.push_back(glm::vec3(_lowerLeftBack.x, 0.0f, 0.0f) - _origin);
+	midpoints.push_back(glm::vec3(_upperRightFront.x, 0.0f, 0.0f) - _origin);
+	midpoints.push_back(glm::vec3(0.0f, 0.0f, _lowerLeftBack.z) - _origin);
+	midpoints.push_back(glm::vec3(0.0f, 0.0f, _upperRightFront.z) - _origin);
+
+	for(int i=0; i<midpoints.size(); ++i) {
+		glm::vec3 planeVec = intP - midpoints.at(i);
+		if( abs(glm::dot(glm::cross(planeVec, intP), planeVec)) < 0.001f)
+			surfNormal = glm::normalize(midpoints.at(i));
+	}
 
 	//return t;
 	return new IntersectionPoint(intP, surfNormal);
