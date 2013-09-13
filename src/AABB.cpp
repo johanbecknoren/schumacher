@@ -91,7 +91,7 @@ IntersectionPoint* AABB::getIntersection(const Ray& ray) {
 	glm::vec3 tempNormal = _origin - intP;
 	glm::vec3 surfNormal = glm::vec3(0.0f);
 
-	// TODO: Räkna ut korrekt normal för kollisionen
+	// TODO: Räkna ut korrekt normal för kollisionen. Tror det är korrekt nu
 	std::vector<glm::vec3> midpoints;
 	midpoints.push_back(glm::vec3(0.0f, _lowerLeftBack.y, 0.0f) - _origin);
 	midpoints.push_back(glm::vec3(0.0f, _upperRightFront.y, 0.0f) - _origin);
