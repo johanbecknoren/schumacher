@@ -16,7 +16,7 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 	/*Algorithm from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection*/
 
 	float A,B,C,t;
-	IntersectionPoint* d = boundingBox->getIntersection(*ray);
+	IntersectionPoint* d = boundingBox->getIntersection(ray);
 	glm::vec3 dir = glm::normalize(ray->getDirection());
 
 	if(d != NULL) {// Intersection with AABB exists
