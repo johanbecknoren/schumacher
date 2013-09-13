@@ -10,7 +10,7 @@ public:
 	Ray(const glm::vec3&, const glm::vec3&);
 	~Ray(){};
 	
-	glm::vec3 getOrigin() const { return _origin; };
+	glm::vec3 getOrigin() const { return _origin; } ;
 	glm::vec3 getDirection() const { return _direction; };
 private:
 	glm::vec3 _origin;
