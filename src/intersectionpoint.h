@@ -9,6 +9,8 @@ public:
 		_surfaceNormal = n;
 	};
 
+	~IntersectionPoint() {};
+
 	glm::vec3 getPoint() const { return _point; }
 	glm::vec3 getNormal() const { return _surfaceNormal; }
 private:

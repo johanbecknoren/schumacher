@@ -7,5 +7,5 @@ Ray::Ray() {
 
 Ray::Ray(const glm::vec3& o, const glm::vec3 &dir) {
 	this->_origin = o;
-	this->_direction = dir;
+	this->_direction = glm::normalize(dir);
 }
