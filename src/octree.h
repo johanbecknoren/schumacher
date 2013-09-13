@@ -45,7 +45,7 @@ private:
     void addChild(Node *parent, int octant);
     void addLeaf(Renderable *renderable);
     void iterateRay(Ray *ray, Node *node);
-    void createBoundingBox(const Node *node, const int octant);
+    AABB *createBoundingBox(const Node *node, const int octant);
     void subdivideBoundingBox(Node *parent, Renderable *object);
     Node *root;
 };

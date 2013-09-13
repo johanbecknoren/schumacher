@@ -27,10 +27,10 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 		float sqrtTerm = B*B - 4*A*C;
 
 		if(sqrtTerm >= 0.0f) { // Positive, real, roots
-			float t0, t1;	
+			float t0, t1;
 			t0 = (-B - sqrtTerm) / (2*A);
 			t1 = (-B + sqrtTerm) / (2*A);
-			
+
 			if(t0 > t1) { // If t1 smaller than t0, swap them
 				float temp;
 				temp = t0;
@@ -49,11 +49,14 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 			glm::vec3 intP = ray->getOrigin() + glm::normalize(ray->getDirection())*t;
 			glm::vec3 surfNormal = glm::normalize(intP - _position);
 
-    		return new IntersectionPoint(intP, surfNormal);
+      return new IntersectionPoint(intP, surfNormal);
 
-		} else { // Imaginary roots, no intersections
+		}
+    else { // Imaginary roots, no intersections
 			return NULL;
 		}
-			
-	}
+  }
+  else { // Description of this plz
+    return NULL;
+  }
 }
