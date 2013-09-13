@@ -38,6 +38,8 @@ int main() {
 		std::cout << "main.cpp - No intersection!\n";
 
 	tree.addObject(sphere);
+	std::cout << "main.cpp -  \n";
 	tree.print();
+	std::cout << " --- \n ";
 	return 0;
 }

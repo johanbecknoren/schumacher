@@ -27,6 +27,7 @@ Octree::~Octree() {
 void Octree::print() const {
 	std::cout << "Printing octree \n"; 
 	print(_root);
+	std::cout << std::endl;
 }
 
 void Octree::print(Node *node) const {
