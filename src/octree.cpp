@@ -40,9 +40,12 @@ void Octree::print(Node *node) const {
 					leaf = leaf->getNextSibling();
 			} while(leaf != NULL); 
 		}
-		
+
 		for(int i = 0; i < 8; ++i) {
+      if (node->getChild(i) != NULL)
+      {
 			print(node->getChild(i));
+      }
 		}
 }
 
