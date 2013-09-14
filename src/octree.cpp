@@ -36,7 +36,7 @@ void Octree::print(Node *node) const {
 	if (leaf != NULL) {
 		std::cout << "L:";
 		do {
-				std::cout << leaf->getRenderable()->getName() << " ";
+				std::cout << leaf->getRenderable()->asString() << " ";
 				leaf = leaf->getNextSibling();
 		} while(leaf != NULL); 
 	}

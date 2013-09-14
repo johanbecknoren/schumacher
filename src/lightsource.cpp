@@ -6,6 +6,7 @@ Lightsource::Lightsource(const glm::vec3& lLB, const glm::vec3& uRF, const glm::
 	_position = p;
 	_intensity = i;
 	_color = c;
+	_name = "Lightsource";
 
 	createAABB();
 }

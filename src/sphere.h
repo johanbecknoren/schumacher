@@ -10,6 +10,7 @@ public:
     ~Sphere() {};
 	virtual void createAABB();
     virtual IntersectionPoint *getIntersectionPoint(Ray *ray) const;
+	virtual std::string asString() const;
 private:
 	  float _radius;
 	  glm::vec3 _position;

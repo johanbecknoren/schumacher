@@ -1,5 +1,5 @@
 #include "sphere.h"
-
+#include <sstream>
 Sphere::Sphere(const float &radius, const glm::vec3 &position) {
 	_radius = radius;
 	_position = position;
@@ -11,6 +11,12 @@ void Sphere::createAABB() {
 	glm::vec3 lLB(_position.x-_radius, _position.y-_radius, _position.z-_radius);
 	glm::vec3 uRF(_position.x+_radius, _position.y+_radius, _position.z+_radius);
 	this->_boundingBox = new AABB(lLB, uRF, _position);
+}
+
+std::string Sphere::asString() const {
+	std::stringstream s;
+	s << _name << " p:[" << _position.x << " " << _position.y << " " << _position.z << "] r:" << _radius;
+	return s.str(); 
 }
 
 IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
