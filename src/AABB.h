@@ -18,6 +18,7 @@ public:
 	glm::vec3 getOrigin() const { return _origin; };
 	glm::vec3 getLowerLeftBack() const { return _lowerLeftBack; };
 	glm::vec3 getUpperRightFront() const { return _upperRightFront; }
+	void print() const;
 private:
 	glm::vec3 _origin;
 	glm::vec3 _lowerLeftBack;

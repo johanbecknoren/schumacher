@@ -143,7 +143,9 @@ AABB *Octree::createBoundingBox(const Node *node, const int octant) {
 		} break;
 	}
 	upperRight = lowerLeft + diff;
-	return new AABB(lowerLeft, upperRight);
+	AABB *bb = new AABB(lowerLeft, upperRight);
+	bb->print();
+	return bb;
 }
 
 void Octree::addObject(Renderable *object) {
@@ -158,12 +160,13 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 
 	const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
 	const glm::vec3 upperRight = objectBox->getUpperRightFront();
-
+	objectBox->print();
 	int q1 = parentBox->getQuadrant(lowerLeft);
 	int q2 = parentBox->getQuadrant(upperRight);
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
 	// FOR NOW, ADD ALL OBJECTS TO BASE OF TREE
+	std::cout << "octree.cpp - q1:" << q1 << " q2:" << q2 << std::endl;
 	if(q1 != -1 && q2 != -1 && q1 == q2) {
 		addChild(parent, q1);
 		std::cout << "octree.cpp - Added child in quadrant:"
