@@ -143,7 +143,8 @@ AABB *Octree::createBoundingBox(const Node *node, const int octant) {
 		} break;
 	}
 	upperRight = lowerLeft + diff;
-	AABB *bb = new AABB(lowerLeft, upperRight);
+	glm::vec3 origin = (lowerLeft + upperRight) / 2.0f;
+	AABB *bb = new AABB(lowerLeft, upperRight, origin);
 	bb->print();
 	return bb;
 }
