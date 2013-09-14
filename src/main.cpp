@@ -16,7 +16,7 @@ int main() {
 
 	std::cout<<"main.cpp - getQuadrant, AABB: "<<bb.getQuadrant(point)<<"\n";
 	Octree tree(&bb);
-	Sphere *sphere = new Sphere(1.0f, glm::vec3(0.0f));
+	Sphere *sphere = new Sphere(0.2f, glm::vec3(0.5f));
 
 	ip = bb.getIntersection(r,true);
 	if(ip!=NULL) {
