@@ -31,19 +31,22 @@ void Octree::print() const {
 }
 
 void Octree::print(Node *node) const {
-		std::cout << "====== D" << node->getDepth() << " ======" << std::endl;
-		Leaf *leaf = node->getFirstLeaf();
-		if (leaf != NULL) {
-			std::cout << "L:";
-			do {
-					std::cout << leaf->getRenderable()->getName() << " ";
-					leaf = leaf->getNextSibling();
-			} while(leaf != NULL); 
-		}
-		
-		for(int i = 0; i < 8; ++i) {
+	std::cout << "====== D" << node->getDepth() << " ======" << std::endl;
+	Leaf *leaf = node->getFirstLeaf();
+	if (leaf != NULL) {
+		std::cout << "L:";
+		do {
+				std::cout << leaf->getRenderable()->getName() << " ";
+				leaf = leaf->getNextSibling();
+		} while(leaf != NULL); 
+	}
+
+	for(int i = 0; i < 8; ++i) {
+		if (node->getChild(i) != NULL)
+		{
 			print(node->getChild(i));
 		}
+	}
 }
 
 void Octree::addChild(Node *parent, int octant) {
