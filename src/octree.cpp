@@ -6,15 +6,19 @@ Node::Node(int nodeDepth, AABB nodeBoundingBox) {
 	_depth = nodeDepth;
 	_firstLeaf = NULL;
 	_nextSibling = NULL;
+	for(int i = 0; i < 8; ++i) {
+		_childs[i] = NULL;
+	}
 }
 
 Leaf::Leaf(Renderable *object) {
 	_renderable = object;
+	_nextSibling = NULL;
 }
 
 void Node::addLeaf(Leaf *leaf) {
-	//leaf->setNextSibling(_firstLeaf);
-	//_firstLeaf = leaf;
+	leaf->setNextSibling(NULL);
+	_firstLeaf = leaf;
 }
 
 void Node::setChild(const int octant, Node* node) {
@@ -44,17 +48,16 @@ void Octree::print() const {
 }
 
 void Octree::print(Node *node) const {
-	std::cout << "p";
 	std::cout << "====== D" << node->getDepth() << " ======\n";
 	Leaf *leaf = node->getFirstLeaf();
 	if (leaf != NULL) {
 		std::cout << "L:";
 		do {
-				std::cout << leaf->getRenderable()->asString() << " ";
+				const Renderable *r = leaf->getRenderable();
+				std::cout << r->getName() << " ";
 				leaf = leaf->getNextSibling();
 		} while(leaf != NULL); 
 	}
-	std::cout << "p2";
 	for(int i = 0; i < 8; ++i) {
 		Node *n = node->getChild(i);
 		if (n != NULL)
@@ -149,7 +152,7 @@ void Octree::addObject(Renderable *object) {
 }
 // Calculate sub bounding box in specified octant
 void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
-	std::cout << "Octree.h - Entering subdividebb\n";
+	std::cout << "Octree.h - Entering subdivide\n";
 	const AABB *parentBox = parent->getBoundingBox();
 	const AABB *objectBox = object->getBoundingBox();
 
@@ -161,23 +164,16 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
 	// FOR NOW, ADD ALL OBJECTS TO BASE OF TREE
-	std::cout << "octree.cpp - q1:" << q1 << " q2:" << q2 << std::endl;
 	if(q1 != -1 && q2 != -1 && q1 == q2) {
 		addChild(parent, q1);
 		std::cout << "octree.cpp - Added child in quadrant:"
 					<< q1 << std::endl;
-		if (parent->getChild(q1) != NULL)
-			std::cout << "octree.cpp - child not null\n";
-		else
-			std::cout << "octree.cpp - child is null\n";
 		subdivideBoundingBox(parent->getChild(q1), object);
 	}
 	else {
 		std::cout << "octree.cpp - adding leaf\n";
-		Leaf leaf = Leaf(object);
-		_leafs.push_back(leaf);
-		parent->addLeaf(&leaf);
-		if (parent->getFirstLeaf() != NULL)
-			std::cout << "octree.cpp - leaf is null\n";
+		Leaf *leaf = new Leaf(object);
+		_leafs.push_back(*leaf);
+		parent->addLeaf(leaf);
 	}
 }
