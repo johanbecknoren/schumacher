@@ -1,5 +1,5 @@
 #include "octree.h"
-
+#include "sphere.h"
 Node::Node(int nodeDepth, AABB nodeBoundingBox) {
 	_boundingBox = nodeBoundingBox;
 	_parent = NULL;
@@ -70,7 +70,14 @@ void Octree::addChild(Node *parent, int octant) {
 }
 
 void Octree::findIntersection(Ray *ray) {
-	iterateRay(ray, _root);
+	if (!_root->getBoundingBox()->isInside(ray->getOrigin())) {
+		IntersectionPoint *ip = _root->getBoundingBox()->getIntersection(ray);
+		Ray *r = new Ray(ip->getPoint(), ray->getDirection()); 
+		iterateRay(r, _root);
+	}
+	else {
+		iterateRay(ray, _root);
+	}
 }
 
 void Octree::iterateRay(Ray *ray, Node *node) {
@@ -79,7 +86,14 @@ void Octree::iterateRay(Ray *ray, Node *node) {
 		while(leaf != NULL) {
 			IntersectionPoint *i = leaf->getRenderable()->getIntersectionPoint(ray);
 			if (i != 0) {
-				std::cout << "Intersection found!";
+				std::cout << "Intersection found at: " << i->getPoint().x 
+						<< " " << i->getPoint().y << " " 
+						<< i->getPoint().z << std::endl;
+				for (int j = 0; j < _leafs.size(); ++j) {
+					const Sphere *s = (const Sphere *)(_leafs[j].getRenderable());
+					glm::vec3 pos = s->getPosition() - i->getPoint();
+					std::cout << "D: " << pos.length() << std::endl;
+				}
 			}
 			leaf = leaf->getNextSibling();
 		}

@@ -17,9 +17,9 @@ AABB::AABB(const glm::vec3& lLB, const glm::vec3& uRF,
 // Check if point is inside AABB
 bool AABB::isInside(const glm::vec3& p) const {
 	glm::vec3 diff = p - this->_origin;
-	return (diff[0] > _lowerLeftBack[0] && p[0] < _upperRightFront[0])
-			&& (diff[1] > _lowerLeftBack[1] && p[1] < _upperRightFront[1])
-			&& (diff[2] > _lowerLeftBack[2] && p[2] < _upperRightFront[2]);
+	return (diff[0] >= _lowerLeftBack[0] && p[0] < _upperRightFront[0])
+			&& (diff[1] >= _lowerLeftBack[1] && p[1] < _upperRightFront[1])
+			&& (diff[2] >= _lowerLeftBack[2] && p[2] < _upperRightFront[2]);
 }
 
 int AABB::getQuadrant(const glm::vec3& p) const {
@@ -58,7 +58,7 @@ int AABB::getQuadrant(const glm::vec3& p) const {
 }
 
 // Returnera IntersectionPoint här istället?
-IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal) {
+IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  const {
 	/* Algorithm from http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms */
 	glm::vec3 direction = glm::normalize(ray->getDirection());
 	glm::vec3 dirfrac;
