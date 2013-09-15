@@ -40,16 +40,16 @@ public:
 
     void addObject(Renderable *object);
 	void print() const;
+	void findIntersection(Ray *ray);
 
 private:
-    void findIntersection(Ray *ray) const;
-    void addChild(Node *parent, int octant);
-    void addLeaf(Renderable *renderable);
-    void iterateRay(Ray *ray, Node *node);
-    AABB *createBoundingBox(const Node *node, const int octant);
-    void subdivideBoundingBox(Node *parent, Renderable *object);
+	void addChild(Node *parent, int octant);
+	void addLeaf(Renderable *renderable);
+	void iterateRay(Ray *ray, Node *node);
+	AABB *createBoundingBox(const Node *node, const int octant);
+	void subdivideBoundingBox(Node *parent, Renderable *object);
 	void print(Node *node) const ;
-    Node *_root;
+	Node *_root;
 	std::vector<Node> _nodes;
 	std::vector<Leaf> _leafs;
 };

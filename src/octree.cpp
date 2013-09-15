@@ -36,12 +36,6 @@ Octree::~Octree() {
 
 void Octree::print() const {
 	std::cout << "Printing octree \n"; 
-	for(int i = 0; i < _nodes.size(); ++i) {
-		std::cout << _nodes[i].getDepth() << std::endl; 
-	}
-	for(int i = 0; i < _leafs.size(); ++i) {
-		std::cout << _leafs[i].getRenderable()->getName() << std::endl; 
-	}
 
 	print(_root);
 	std::cout << std::endl;
@@ -75,21 +69,29 @@ void Octree::addChild(Node *parent, int octant) {
 	}
 }
 
-void Octree::findIntersection(Ray *ray) const {
-	ray = NULL;
+void Octree::findIntersection(Ray *ray) {
+	iterateRay(ray, _root);
 }
 
 void Octree::iterateRay(Ray *ray, Node *node) {
 	if (node->getBoundingBox()->isInside(ray->getOrigin())) {
 		Leaf *leaf = node->getFirstLeaf();
 		while(leaf != NULL) {
-			leaf->getRenderable()->getIntersectionPoint(ray);
+			IntersectionPoint *i = leaf->getRenderable()->getIntersectionPoint(ray);
+			if (i != 0) {
+				std::cout << "Intersection found!";
+			}
+			leaf = leaf->getNextSibling();
 		}
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
 				iterateRay(ray, node->getChild(i));
 			}
 		}
+	}
+	else {
+		std::cout << node->getDepth() << "No collision";
+		
 	}
 }
 
@@ -145,7 +147,6 @@ AABB *Octree::createBoundingBox(const Node *node, const int octant) {
 	upperRight = lowerLeft + diff;
 	glm::vec3 origin = (lowerLeft + upperRight) / 2.0f;
 	AABB *bb = new AABB(lowerLeft, upperRight, origin);
-	bb->print();
 	return bb;
 }
 
@@ -155,27 +156,21 @@ void Octree::addObject(Renderable *object) {
 }
 // Calculate sub bounding box in specified octant
 void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
-	std::cout << "Octree.h - Entering subdivide\n";
 	const AABB *parentBox = parent->getBoundingBox();
 	const AABB *objectBox = object->getBoundingBox();
 
 	const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
 	const glm::vec3 upperRight = objectBox->getUpperRightFront();
-	objectBox->print();
 	int q1 = parentBox->getQuadrant(lowerLeft);
 	int q2 = parentBox->getQuadrant(upperRight);
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
 	// FOR NOW, ADD ALL OBJECTS TO BASE OF TREE
-	std::cout << "octree.cpp - q1:" << q1 << " q2:" << q2 << std::endl;
 	if(q1 != -1 && q2 != -1 && q1 == q2) {
 		addChild(parent, q1);
-		std::cout << "octree.cpp - Added child in quadrant:"
-					<< q1 << std::endl;
 		subdivideBoundingBox(parent->getChild(q1), object);
 	}
 	else {
-		std::cout << "octree.cpp - adding leaf\n";
 		Leaf *leaf = new Leaf(object);
 		_leafs.push_back(*leaf);
 		parent->addLeaf(leaf);

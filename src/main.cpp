@@ -16,8 +16,8 @@ int main() {
 
 	std::cout<<"main.cpp - getQuadrant, AABB: "<<bb.getQuadrant(point)<<"\n";
 	Octree tree(&bb);
-	Sphere *sphere = new Sphere(0.01f, glm::vec3(-5.35f));
-
+	Sphere *sphere = new Sphere(3.01f, glm::vec3(-5.35f));
+	std::cout << "main.cpp - " << sphere->asString() << std::endl;
 	ip = bb.getIntersection(r,true);
 	if(ip!=NULL) {
 	std::cout << "\nmain.cpp - Ray-AABB intersection. Point = "
@@ -31,5 +31,6 @@ int main() {
 	std::cout << "main.cpp -  \n";
 	tree.print();
 	std::cout << " --- \n ";
+	tree.findIntersection(r);
 	return 0;
 }
