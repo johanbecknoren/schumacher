@@ -42,20 +42,31 @@ void Octree::print() const {
 }
 
 void Octree::print(Node *node) const {
-	std::cout << "====== D" << node->getDepth() << " ======\n";
+	std::cout << "====== D" << node->getDepth() << " ";
+	std::string s;
+	for(int i = 0; i < 8; ++i) {
+		Node *n = node->getChild(i);
+		if (n != NULL) {
+			s += '-';
+		}
+		else {
+			s += '+';
+		}
+	}
+	std::cout << s;
 	Leaf *leaf = node->getFirstLeaf();
 	if (leaf != NULL) {
-		std::cout << "L:";
+		std::cout << " L:";
 		do {
 				const Renderable *r = leaf->getRenderable();
 				std::cout << r->getName() << " ";
 				leaf = leaf->getNextSibling();
 		} while(leaf != NULL); 
 	}
+	std::cout << std::endl;
 	for(int i = 0; i < 8; ++i) {
 		Node *n = node->getChild(i);
-		if (n != NULL)
-		{
+		if (n != NULL) {
 			print(n);
 		}
 	}
@@ -99,13 +110,13 @@ void Octree::iterateRay(Ray *ray, Node *node) {
 		}
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
+				std::cout << i << " ";
 				iterateRay(ray, node->getChild(i));
 			}
 		}
 	}
 	else {
-		std::cout << node->getDepth() << "No collision";
-		
+		std::cout << node->getDepth() << " No collision\n";
 	}
 }
 
@@ -179,7 +190,6 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 	int q2 = parentBox->getQuadrant(upperRight);
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
-	// FOR NOW, ADD ALL OBJECTS TO BASE OF TREE
 	if(q1 != -1 && q2 != -1 && q1 == q2) {
 		addChild(parent, q1);
 		subdivideBoundingBox(parent->getChild(q1), object);

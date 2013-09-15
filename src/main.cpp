@@ -16,7 +16,8 @@ int main() {
 
 	std::cout<<"main.cpp - getQuadrant, AABB: "<<bb.getQuadrant(point)<<"\n";
 	Octree tree(&bb);
-	Sphere *sphere = new Sphere(0.01f, glm::vec3(-0.35f));
+	Sphere *sphere = new Sphere(0.001f, glm::vec3(-0.352f));
+	Sphere *sp2 = new Sphere(0.001f, glm::vec3(1.02f, 0.13f, 4.23f));
 	std::cout << "main.cpp - " << sphere->asString() << std::endl;
 	ip = bb.getIntersection(r,true);
 	if(ip!=NULL) {
@@ -26,8 +27,8 @@ int main() {
 		<<ip->getNormal().z<<std::endl;
 	} else
 		std::cout << "main.cpp - No intersection!\n";
-
-	tree.addObject(sphere);
+	tree.addObject(sp2);
+	//tree.addObject(sphere);
 	std::cout << "main.cpp -  \n";
 	tree.print();
 	std::cout << " --- \n ";
