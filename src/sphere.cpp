@@ -15,8 +15,9 @@ void Sphere::createAABB() {
 
 std::string Sphere::asString() const {
 	std::stringstream s;
-	s << _name << " p:[" << _position.x << " " << _position.y << " " << _position.z << "] r:" << _radius;
-	return s.str(); 
+	s << _name << " p:[" << _position.x << " " << _position.y << " "
+      << _position.z << "] r:" << _radius;
+	return s.str();
 }
 
 IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
@@ -30,8 +31,9 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 	if(d != NULL) {// Intersection with AABB exists
 		A = glm::dot(dir, dir);
 		B = 2 * glm::dot((ray->getOrigin() - _position), dir);
-		C = glm::dot((ray->getOrigin() - _position), (ray->getOrigin() - _position)) - _radius*_radius;
-		
+		C = glm::dot((ray->getOrigin() - _position),
+                 (ray->getOrigin() - _position)) - _radius*_radius;
+
 		float sqrtTerm = B*B - 4*A*C;
 
 		if(sqrtTerm < 0.0f) {// Imaginary root(s)
@@ -67,7 +69,7 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 		glm::vec3 intP = ray->getOrigin() + glm::normalize(ray->getDirection())*t;
 		glm::vec3 surfNormal = glm::normalize(intP - _position);
 
-   		return new IntersectionPoint(intP, surfNormal);	
+		return new IntersectionPoint(intP, surfNormal);
   }
   else { // No intersection with sphere's AABB
     return NULL;

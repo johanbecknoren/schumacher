@@ -1,6 +1,8 @@
 #include "lightsource.h"
 
-Lightsource::Lightsource(const glm::vec3& lLB, const glm::vec3& uRF, const glm::vec3 p, const float& i, const glm::vec3 c) {
+Lightsource::Lightsource(const glm::vec3& lLB,
+                         const glm::vec3& uRF,
+                         const glm::vec3 p, const float& i, const glm::vec3 c) {
 	_lowerLeftBack = lLB;
 	_upperRightFront = uRF;
 	_position = p;

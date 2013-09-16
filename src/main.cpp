@@ -11,6 +11,7 @@ int main() {
 	Ray *r = new Ray(glm::vec3(-15.f,-15.f,-15.f), glm::vec3(1.0,0.7f,0.8f));
 	glm::vec3 point(-9.5f,9.5f,9.5f);
 	Ray *r2 = new Ray(glm::vec3(0.0f), glm::vec3(-1.0f));
+	Ray *r3 = new Ray(glm::vec3(-15.f), glm::vec3(1.0f));
 	std::cout << "Creating AABB!\n";
 	AABB bb(glm::vec3(-10.0f), glm::vec3(10.0f));
 
@@ -35,7 +36,7 @@ int main() {
 	std::cout << "main.cpp -  \n";
 	tree.print();
 	std::cout << " --- \n ";
-	r->print();
-	tree.findIntersection(r);
+
+	tree.findIntersection(r3);
 	return 0;
 }
