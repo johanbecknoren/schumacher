@@ -27,11 +27,11 @@ int main() {
 		<<ip->getNormal().z<<std::endl;
 	} else
 		std::cout << "main.cpp - No intersection!\n";
+	tree.addObject(sphere);
 	tree.addObject(sp2);
-	//tree.addObject(sphere);
 	std::cout << "main.cpp -  \n";
 	tree.print();
 	std::cout << " --- \n ";
-	tree.findIntersection(r2);
+	tree.findIntersection(r);
 	return 0;
 }

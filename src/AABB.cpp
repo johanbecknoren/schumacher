@@ -57,7 +57,6 @@ int AABB::getQuadrant(const glm::vec3& p) const {
 //	return 0;
 }
 
-// Returnera IntersectionPoint här istället?
 IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  const {
 	/* Algorithm from http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms */
 	glm::vec3 direction = glm::normalize(ray->getDirection());

@@ -91,7 +91,7 @@ void Octree::findIntersection(Ray *ray) {
 	}
 }
 
-void Octree::iterateRay(Ray *ray, Node *node) {
+bool Octree::iterateRay(Ray *ray, Node *node) {
 	if (node->getBoundingBox()->isInside(ray->getOrigin())) {
 		Leaf *leaf = node->getFirstLeaf();
 		while(leaf != NULL) {
@@ -110,14 +110,53 @@ void Octree::iterateRay(Ray *ray, Node *node) {
 		}
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
-				std::cout << i << " ";
-				iterateRay(ray, node->getChild(i));
+				std::cout << "octree.cpp - childid: " << i << " " << node->getDepth()  << " \n";
+				if(!iterateRay(ray, node->getChild(i))) {
+					// No collision found in lower depth. 
+					// Try to find other collision.
+					std::vector<IntersectionPoint *> pts;
+					for (int p = 0; p < 8; ++p) {
+						if (i != p) {
+							if (node->getChild(p) != NULL && 
+							!node->getBoundingBox()->isInside(ray->getOrigin())) {
+								IntersectionPoint *ip = 
+									node->getChild(p)->getBoundingBox()->getIntersection(ray);
+								if (ip != NULL) {
+									pts.push_back(ip);
+								}
+							}
+						}
+					}
+					for (int p = 0; p < pts.size(); ++p) {
+						std::cout << pts[p]->asString() << " | ";
+						Ray *r = new Ray(pts[p]->getPoint() + 0.0001f * ray->getDirection(),
+									ray->getDirection());
+						iterateRay(r, _root);	
+						return true;
+					}
+			//		IntersectionPoint *ip = pts[0];
+			//		Ray *r = new Ray(ip->getPoint(), 
+			//						ray->getDirection()); 
+			//		std::cout << "Spawning new ray " 
+			//				<< node->getDepth() << " " << i 
+		//	<< ip->getPoint().x << " " << ip->getPoint().y
+	//		<< ip->getPoint().z << std::endl;
+	//				iterateRay(r, _root);
+
+//					return true;
+
+				}
+				else {
+					return true;
+				}
 			}
 		}
 	}
 	else {
-		std::cout << node->getDepth() << " No collision\n";
+		std::cout << "octree.cpp - Break at depth: " << node->getDepth() << " No collision\n";
+		return false;
 	}
+	return false;
 }
 
 AABB *Octree::createBoundingBox(const Node *node, const int octant) {
