@@ -134,6 +134,7 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 						iterateRay(r, _root);	
 						return true;
 					}
+					if (pts.size() == 0) return false;
 				}
 				else {
 					return true;
