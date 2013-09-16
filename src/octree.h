@@ -24,6 +24,7 @@ public:
     const int getDepth() const { return _depth; };
     void addLeaf(Leaf *leaf);
     Leaf *getFirstLeaf() { return _firstLeaf; };
+	void setFirstLeaf(Leaf *leaf) { _firstLeaf = leaf; }
 private:
     AABB _boundingBox;
     Node *_parent;

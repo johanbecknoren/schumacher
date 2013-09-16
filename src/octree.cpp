@@ -17,8 +17,8 @@ Leaf::Leaf(Renderable *object) {
 }
 
 void Node::addLeaf(Leaf *leaf) {
-	leaf->setNextSibling(NULL);
-	_firstLeaf = leaf;
+	leaf->setNextSibling(getFirstLeaf());
+	setFirstLeaf(leaf);	
 }
 
 void Node::setChild(const int octant, Node* node) {
@@ -134,17 +134,6 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 						iterateRay(r, _root);	
 						return true;
 					}
-			//		IntersectionPoint *ip = pts[0];
-			//		Ray *r = new Ray(ip->getPoint(), 
-			//						ray->getDirection()); 
-			//		std::cout << "Spawning new ray " 
-			//				<< node->getDepth() << " " << i 
-		//	<< ip->getPoint().x << " " << ip->getPoint().y
-	//		<< ip->getPoint().z << std::endl;
-	//				iterateRay(r, _root);
-
-//					return true;
-
 				}
 				else {
 					return true;
@@ -230,7 +219,8 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
 	if(q1 != -1 && q2 != -1 && q1 == q2) {
-		addChild(parent, q1);
+		if(parent->getChild(q1) == NULL)
+			addChild(parent, q1);
 		subdivideBoundingBox(parent->getChild(q1), object);
 	}
 	else {
