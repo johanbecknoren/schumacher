@@ -114,17 +114,17 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 				if(!iterateRay(ray, node->getChild(i))) {
 					// No collision found in lower depth. 
 					// Try to find other collision.
+					std::cout << "Hej";
 					std::vector<IntersectionPoint *> pts;
 					for (int p = 0; p < 8; ++p) {
-						if (i != p) {
-							if (node->getChild(p) != NULL && 
+						
+						if (node->getChild(p) != NULL && 
 							!node->getBoundingBox()->isInside(ray->getOrigin())) {
 								IntersectionPoint *ip = 
 									node->getChild(p)->getBoundingBox()->getIntersection(ray);
 								if (ip != NULL) {
 									pts.push_back(ip);
 								}
-							}
 						}
 					}
 					for (int p = 0; p < pts.size(); ++p) {
@@ -134,7 +134,7 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 						iterateRay(r, _root);	
 						return true;
 					}
-					if (pts.size() == 0) return false;
+					return false;
 				}
 				else {
 					return true;

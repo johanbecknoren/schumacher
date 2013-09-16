@@ -31,6 +31,7 @@ int main() {
 	tree.addObject(sphere);
 	tree.addObject(sp2);
 	tree.addObject(sphere);
+	tree.addObject(sp3);
 	std::cout << "main.cpp -  \n";
 	tree.print();
 	std::cout << " --- \n ";
