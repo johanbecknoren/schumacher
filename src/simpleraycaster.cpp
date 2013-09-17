@@ -24,9 +24,9 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 			
 			if(ip != NULL )	{
 				float intensity = glm::dot(r->getDirection(), - ip->getNormal());
-				pixels[u*W*3 + v*3 + 0] = intensity*ip->getMaterial().getDiffuseColor().x;
-				pixels[u*W*3 + v*3 + 1] = intensity*ip->getMaterial().getDiffuseColor().y;
-				pixels[u*W*3 + v*3 + 2] = intensity*ip->getMaterial().getDiffuseColor().z;
+				pixels[u*3 + W*(H-v)*3 + 0] = intensity*ip->getMaterial().getDiffuseColor().x;
+				pixels[u*3 + W*(H-v)*3 + 1] = intensity*ip->getMaterial().getDiffuseColor().y;
+				pixels[u*3 + W*(H-v)*3 + 2] = intensity*ip->getMaterial().getDiffuseColor().z;
 			}
 		}
 	}
