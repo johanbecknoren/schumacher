@@ -83,7 +83,7 @@ void Octree::addChild(Node *parent, int octant) {
 	}
 }
 
-void Octree::findIntersection(Ray *ray) {
+IntersectionPoint *Octree::findIntersection(Ray *ray) {
 	std::string s;
 	ray->print();
 	std::cin >> s;
@@ -92,10 +92,10 @@ void Octree::findIntersection(Ray *ray) {
 		IntersectionPoint *ip = _root->getBoundingBox()->getIntersection(ray);
 		Ray *r = new Ray(ip->getPoint(), ray->getDirection());
 		
-		iterateRay(r, _root, b);
+		return iterateRay(r, _root, b);
 	}
 	else {
-		iterateRay(ray, _root, b);
+		return iterateRay(ray, _root, b);
 	}
 }
 

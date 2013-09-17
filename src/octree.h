@@ -44,7 +44,7 @@ public:
 
     void addObject(Renderable *object);
 	void print() const;
-	void findIntersection(Ray *ray);
+	IntersectionPoint *findIntersection(Ray *ray);
 
 private:
 	void addChild(Node *parent, int octant);
