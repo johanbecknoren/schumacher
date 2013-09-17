@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "material.h"
 #include "lightsource.h"
+#include "utils.h"
 
 int main() {
 
