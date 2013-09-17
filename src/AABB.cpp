@@ -78,13 +78,13 @@ IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  
 
 	if(tmax < 0.0f) { // Ray intersection, but whole AABB is behind us
 		t = tmax;
-		std::cout<<"AABB.cpp - Intersection, but AABB behind us\n";
+		//std::cout<<"AABB.cpp - Intersection, but AABB behind us\n";
 		return NULL;
 	}
 
 	if(tmin > tmax) { // No intersection
 		t = tmax;
-		std::cout<<"AABB.cpp - No intersection\n";
+		//std::cout<<"AABB.cpp - No intersection\n";
 		return NULL;
 	}
 

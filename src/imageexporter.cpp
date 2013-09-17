@@ -26,7 +26,7 @@ FIBITMAP* ImageExporter::convertScreenToBitmap(int width, int height)
 {
 	BYTE* pixels = new BYTE[3 * width * height];
 
-    //glReadPixels(0, 0, width, height, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels);
+    glReadPixels(0, 0, width, height, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels);
 
 	FIBITMAP * image = FreeImage_ConvertFromRawBits(pixels, width, height, 3 * width, BitsPerPixel, 0x0000FF, 0xFF0000, 0x00FF00, false);
 
@@ -64,6 +64,7 @@ void ImageExporter::saveImage(char filename[], int width, int height)
 
 void ImageExporter::saveImage(int image[], char filename[], int width, int height)
 {
+	std::cout << "Received filename: " << filename;
 	char folder[] = "export/";
 	char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);

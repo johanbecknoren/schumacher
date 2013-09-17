@@ -5,8 +5,10 @@
 #include "lightsource.h"
 #include "utils.h"
 #include "imageexporter.h"
+#include "simpleraycaster.h"
 
 int main() {
+	Camera *cam = new Camera();
 
 	IntersectionPoint *ip = new IntersectionPoint();
 	Ray *r = new Ray(glm::vec3(-15.f,-15.f,-15.f), glm::vec3(1.0,0.7f,0.8f));
@@ -17,7 +19,7 @@ int main() {
 	AABB bb(glm::vec3(-10.0f), glm::vec3(10.0f));
 
 	std::cout<<"main.cpp - getQuadrant, AABB: "<<bb.getQuadrant(point)<<"\n";
-	Octree tree(&bb);
+	Octree *tree = new Octree(&bb);
 	Sphere *sphere = new Sphere(0.001f, glm::vec3(-0.352f));
 	Sphere *sp2 = new Sphere(1.f, glm::vec3(1.02f, 0.13f, 4.23f));
 	Sphere *sp3 = new Sphere(3.f, glm::vec3(5));
@@ -30,14 +32,26 @@ int main() {
 		<<ip->getNormal().z<<std::endl;
 	} else
 	std::cout << "main.cpp - No intersection!\n";
-	tree.addObject(sphere);
-	tree.addObject(sp2);
-	tree.addObject(sphere);
-	tree.addObject(sp3);
+	tree->addObject(sphere);
+	tree->addObject(sp2);
+	tree->addObject(sphere);
+	tree->addObject(sp3);
 	std::cout << "main.cpp -  \n";
-	tree.print();
+	//tree->print();
 	std::cout << " --- \n ";
 
-	IntersectionPoint *collisionPoint = tree.findIntersection(r3);
+	SimpleRaycaster sRay;
+	float* pixels = new float[3 * WIDTH * HEIGHT];
+	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
+
+	sRay.render(pixels, tree, WIDTH, HEIGHT, cam);
+	
+	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
+		pixelsInt[i] = int(pixels[i]*255.0f);
+		//std::cout<<pixels[i]<<", ";
+
+	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
+	
+	//IntersectionPoint *collisionPoint = tree.findIntersection(r3);
 	return 0;
 }

@@ -102,16 +102,16 @@ IntersectionPoint *Octree::findIntersection(Ray *ray) {
 IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 	bool findNew = false;
 	if (node->getBoundingBox()->isInside(ray->getOrigin())) {
-		std::cout << "Inside\n";
+		//std::cout << "Inside\n";
 		Leaf *leaf = node->getFirstLeaf();
 		std::vector<IntersectionPoint> pts;
 		while(leaf != NULL) {
-			std::cout << "Testing leaf "<< leaf->getRenderable()->asString() << " \n";
+			//std::cout << "Testing leaf "<< leaf->getRenderable()->asString() << " \n";
 			IntersectionPoint *i = leaf->getRenderable()->getIntersectionPoint(ray);
 			if (i != NULL) {
-				std::cout << "Intersection found at: " << i->getPoint().x
-						<< " " << i->getPoint().y << " "
-						<< i->getPoint().z << std::endl;
+				//std::cout << "Intersection found at: " << i->getPoint().x
+						//<< " " << i->getPoint().y << " "
+					//	<< i->getPoint().z << std::endl;
 				active = true;
 				pts.push_back(*i);
 			}
@@ -129,16 +129,16 @@ IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 					id = i;
 				}
 			}
-			std::cout << "Smallest intersection at: " << pts[id].getPoint().x
-						<< " " << pts[id].getPoint().y << " "
-						<< pts[id].getPoint().z << std::endl;
+			//std::cout << "Smallest intersection at: " << pts[id].getPoint().x
+					//	<< " " << pts[id].getPoint().y << " "
+						//<< pts[id].getPoint().z << std::endl;
 
 			return &pts[id];
 
 		}
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
-				std::cout << "octree.cpp - oct: " << i << " d:" << node->getDepth()  << " \n";
+			//	std::cout << "octree.cpp - oct: " << i << " d:" << node->getDepth()  << " \n";
 				bool act;
 				IntersectionPoint *ip = iterateRay(ray, node->getChild(i), act);
 				if (ip != NULL) return ip;	
@@ -154,7 +154,7 @@ IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 		node->getBoundingBox()->print();
 	}
 	if (findNew) {
-		std::cout << "octree.cpp - Break at depth: " << node->getDepth() << " " << " No collision\n";
+		//std::cout << "octree.cpp - Break at depth: " << node->getDepth() << " " << " No collision\n";
 		node->getBoundingBox()->print();
 		std::cout << "Hej " << node->getDepth() << std::endl << std::endl;
 		std::vector<IntersectionPoint *> pts;

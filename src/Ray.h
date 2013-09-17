@@ -13,9 +13,9 @@ public:
 	glm::vec3 getOrigin() const { return _origin; } ;
 	glm::vec3 getDirection() const { return _direction; };
 	void print () {
-		std::cout << "Ray - Origin: " << _origin.x << ',' << _origin.y << ','
+		/*std::cout << "Ray - Origin: " << _origin.x << ',' << _origin.y << ','
         << _origin.z << "\nRay - Direction: " << _direction.x << ','
-        << _direction.y<<','<<_direction.z<<"\n";
+        << _direction.y<<','<<_direction.z<<"\n";*/
 	};
 private:
 	glm::vec3 _origin;
