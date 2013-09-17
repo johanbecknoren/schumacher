@@ -12,6 +12,9 @@ namespace ImageExporter
     static float timeTrack = 0;
 	void saveImage(char filename[], int width, int height);
 	void saveImage(int image[], char filename[], int width, int height);
+	bool saveSequence(int &n, float dt, int range, int width, int height);
+	void saveSequence(int &n, int width, int height);
+
 
 	char* merge(char* folder, char* filename);
 	FIBITMAP* convertScreenToBitmap(int width, int height);

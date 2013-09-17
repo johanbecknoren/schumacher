@@ -9,11 +9,11 @@
 #include <GL/glfw.h>
 #include <GL/freeglut.h>
 
-#include "imageExporter.h"
+#include "imageexporter.h"
 
 int BitsPerPixel = 24;
 
-char* merge(char* folder, char* filename)
+char* ImageExporter::merge(char* folder, char* filename)
 {
 	char *newArray = new char[std::strlen(folder)+std::strlen(filename)+1];
 	std::strcpy(newArray,folder);
@@ -22,7 +22,7 @@ char* merge(char* folder, char* filename)
 	return newArray;
 }
 
-FIBITMAP* convertScreenToBitmap(int width, int height)
+FIBITMAP* ImageExporter::convertScreenToBitmap(int width, int height)
 {
 	BYTE* pixels = new BYTE[3 * width * height];
 
@@ -33,7 +33,7 @@ FIBITMAP* convertScreenToBitmap(int width, int height)
 	return image;
 }
 
-FIBITMAP* convertArrayToBitmap(int image[], int width, int height) 
+FIBITMAP* ImageExporter::convertArrayToBitmap(int image[], int width, int height) 
 {
 	BYTE *pixels = new BYTE[3 * width * height];
 	RGBQUAD color;
@@ -55,7 +55,7 @@ void ImageExporter::saveImage(char filename[], int width, int height)
 	//På windows måste det finnas en mapp för att den ska sparas. 
 	//Borde ändras till att be användaren att välja mapp
 	char folder[] = "export/";
-    char *fend = merge(filename, ".png");
+    char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);
 	
 	FIBITMAP * bitmap = convertScreenToBitmap(width, height);
@@ -65,8 +65,8 @@ void ImageExporter::saveImage(char filename[], int width, int height)
 void ImageExporter::saveImage(int image[], char filename[], int width, int height)
 {
 	char folder[] = "export/";
-	char *fend = merge(filename, ".png");
-	char *file = merge(folder. fend);
+	char *fend = merge(filename, (char*)".png");
+	char *file = merge(folder, fend);
 
 	FIBITMAP *bitmap = convertArrayToBitmap(image, width, height);
 	FreeImage_Save(FIF_PNG, bitmap, file, BitsPerPixel);
