@@ -9,7 +9,6 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 	float fovx = float(M_PI)/4.0f; // 45 grader
 	float fovy = (float(H)/float(W)) * fovx;
 
-	int counter = 0;
 	int total = W * H;
 	int rayCounter = 0;
 
@@ -33,7 +32,7 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 				pixels[u*3 + W*(H-v)*3 + 1] = intensity*ip->getMaterial().getDiffuseColor().y;
 				pixels[u*3 + W*(H-v)*3 + 2] = intensity*ip->getMaterial().getDiffuseColor().z;
 			}
-			ProgressBar::printProgBar(int(100.0f * float(counter) / float(total)));	
+			ProgressBar::printProgBar(int(100.0f * float(rayCounter) / float(total)));	
 		}
 	}
 	std::cout << std::endl;
