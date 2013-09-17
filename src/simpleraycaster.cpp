@@ -1,4 +1,5 @@
 #include "simpleraycaster.h"
+#include "progressbar.h"
 
 void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int H, Camera *cam){
 	// Skicka en stråle per pixel, hämta normal samt material
@@ -9,6 +10,7 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 	float fovy = (float(H)/float(W)) * fovx;
 
 	int counter = 0;
+	int total = W * H;
 	for(int u=0; u<W; ++u) {
 		for(int v=0; v<H; ++v) {
 			counter++;
@@ -28,8 +30,10 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 				pixels[u*3 + W*(H-v)*3 + 1] = intensity*ip->getMaterial().getDiffuseColor().y;
 				pixels[u*3 + W*(H-v)*3 + 2] = intensity*ip->getMaterial().getDiffuseColor().z;
 			}
+			ProgressBar::printProgBar(int(100.0f * float(counter) / float(total)));	
 		}
 	}
+	std::cout << std::endl;
 	std::cout << "Num pixels: "<<W*H<<", num rays: "<<counter<<"\n";
 	
 
