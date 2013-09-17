@@ -14,7 +14,10 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 			counter++;
 			float x = ( (2.0f*float(u)-float(W))/float(W) ) * tan(fovx);
 			float y = ( (2.0f*float(v)-float(H))/float(H) ) * tan(fovy);
-
+			
+			// TODO: Lägg detta i en funktion som returnerar intensitet (floats) och som
+			// kan anropas rekursivt. Spawna nya strålar (reflekterade och brutna) till
+			// en iterations-tröskel nås
 			Ray *r = new Ray( glm::vec3(0.0f), glm::vec3(x,y,1.0f)-glm::vec3(0.0f) );
 			IntersectionPoint* ip;
 			ip = tree->findIntersection(r);

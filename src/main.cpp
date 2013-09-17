@@ -60,6 +60,6 @@ int main() {
 		//std::cout<<pixels[i]<<", ";
 
 	
-	ImageExporter::saveImage(pixelsInt, (char*)"render1.png\n", WIDTH, HEIGHT);
+	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
 	return 0;
 }

@@ -64,7 +64,7 @@ void ImageExporter::saveImage(char filename[], int width, int height)
 
 void ImageExporter::saveImage(int image[], char filename[], int width, int height)
 {
-	std::cout << "Received filename: " << filename;
+	std::cout << "Received filename: " << filename << ".png\n";
 	char folder[] = "export/";
 	char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);
