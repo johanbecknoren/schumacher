@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "lightsource.h"
 #include "utils.h"
+#include "imageexporter.h"
 
 int main() {
 
@@ -28,7 +29,7 @@ int main() {
 		<< ", normal = "<<ip->getNormal().x<<','<<ip->getNormal().y<<','
 		<<ip->getNormal().z<<std::endl;
 	} else
-		std::cout << "main.cpp - No intersection!\n";
+	std::cout << "main.cpp - No intersection!\n";
 	tree.addObject(sphere);
 	tree.addObject(sp2);
 	tree.addObject(sphere);
