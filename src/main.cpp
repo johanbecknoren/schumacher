@@ -20,20 +20,18 @@ int main() {
 
 	std::cout<<"main.cpp - getQuadrant, AABB: "<<bb.getQuadrant(point)<<"\n";
 	Octree *tree = new Octree(&bb);
+
 	Sphere *sphere = new Sphere(0.2f, glm::vec3(0.52f,-0.2f,1.5f));
 	sphere->setMaterial(STONE);
 
-
-	std::cout << "main.cpp-Diffuse: (" << sphere->getMaterial().getDiffuseColor().x<<
-					","<<sphere->getMaterial().getDiffuseColor().y<<","<<
-					sphere->getMaterial().getDiffuseColor().z<<")\n";
-
-
 	Sphere *sp2 = new Sphere(1.f, glm::vec3(1.02f, 0.13f, 4.23f));
 	sp2->setMaterial(MARBLE);
+
 	Sphere *sp3 = new Sphere(3.f, glm::vec3(5));
 	sp3->setMaterial(STONE);
+
 	std::cout << "main.cpp - " << sphere->asString() << std::endl << sp2->asString() << std::endl;
+
 	ip = bb.getIntersection(r,true);
 	if(ip!=NULL) {
 	std::cout << "\nmain.cpp - Ray-AABB intersection. Point = "
@@ -41,27 +39,27 @@ int main() {
 		<< ", normal = "<<ip->getNormal().x<<','<<ip->getNormal().y<<','
 		<<ip->getNormal().z<<std::endl;
 	} else
-	std::cout << "main.cpp - No intersection!\n";
+		std::cout << "main.cpp - No intersection!\n";
+
 	tree->addObject(sphere);
 	tree->addObject(sp2);
 	tree->addObject(sphere);
 	tree->addObject(sp3);
-	std::cout << "main.cpp -  \n";
+//	std::cout << "main.cpp -  \n";
 	//tree->print();
-	std::cout << " --- \n ";
+//	std::cout << " --- \n ";
 
-	SimpleRaycaster sRay;
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
 
+	SimpleRaycaster sRay;
 	sRay.render(pixels, tree, WIDTH, HEIGHT, cam);
 	
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
 		pixelsInt[i] = int(pixels[i]*255.0f);
 		//std::cout<<pixels[i]<<", ";
 
-	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
 	
-	//IntersectionPoint *collisionPoint = tree.findIntersection(r3);
+	ImageExporter::saveImage(pixelsInt, (char*)"render1.png\n", WIDTH, HEIGHT);
 	return 0;
 }

@@ -20,7 +20,6 @@ class Renderable {
 			_material.setOpacity(0.03);
 			_material.setSpecular(1.0f);
 		} else if (m == MARBLE) {
-			std::cout << "Setting renderable mat to MARBLE!\n";
 			_material.setDiffuseColor(glm::vec3(1.0f, 1.0f,0.0f));
 			_material.setSpecular(0.8f);
 		} else // STONE - default
