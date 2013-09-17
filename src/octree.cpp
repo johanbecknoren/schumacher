@@ -84,7 +84,6 @@ void Octree::addChild(Node *parent, int octant) {
 void Octree::findIntersection(Ray *ray) {
 	std::string s;
 	ray->print();
-	std::cin >> s;
 	if (!_root->getBoundingBox()->isInside(ray->getOrigin())) {
 		IntersectionPoint *ip = _root->getBoundingBox()->getIntersection(ray);
 		Ray *r = new Ray(ip->getPoint(), ray->getDirection());
@@ -104,11 +103,6 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 				std::cout << "Intersection found at: " << i->getPoint().x
 						<< " " << i->getPoint().y << " "
 						<< i->getPoint().z << std::endl;
-				for (int j = 0; j < _leafs.size(); ++j) {
-					const Sphere *s = (const Sphere *)(_leafs[j].getRenderable());
-					glm::vec3 pos = s->getPosition() - i->getPoint();
-					std::cout << "D: " << pos.length() << std::endl;
-				}
 			}
 			leaf = leaf->getNextSibling();
 		}
@@ -223,7 +217,8 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 	int q2 = parentBox->getQuadrant(upperRight);
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
-	if(q1 != -1 && q2 != -1 && q1 == q2) {
+	//if(q1 != -1 && q2 != -1 && q1 == q2) {
+	if (false) {
 		if(parent->getChild(q1) == NULL)
 			addChild(parent, q1);
 		subdivideBoundingBox(parent->getChild(q1), object);
