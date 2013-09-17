@@ -2,6 +2,9 @@
 #define OCTREE_H
 #include "renderable.h"
 #include <vector>
+
+//#define USE_OCTREE
+
 class Leaf {
 public:
     Leaf(Renderable *renderable);
@@ -41,12 +44,12 @@ public:
 
     void addObject(Renderable *object);
 	void print() const;
-	void findIntersection(Ray *ray);
+	IntersectionPoint *findIntersection(Ray *ray);
 
 private:
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);
-	bool iterateRay(Ray *ray, Node *node);
+	IntersectionPoint *iterateRay(Ray *ray, Node *node, bool &active);
 	AABB *createBoundingBox(const Node *node, const int octant);
 	void subdivideBoundingBox(Node *parent, Renderable *object);
 	void print(Node *node) const ;

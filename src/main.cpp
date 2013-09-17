@@ -37,7 +37,6 @@ int main() {
 	tree.print();
 	std::cout << " --- \n ";
 
-
-	tree.findIntersection(r3);
+	IntersectionPoint *collisionPoint = tree.findIntersection(r3);
 	return 0;
 }
