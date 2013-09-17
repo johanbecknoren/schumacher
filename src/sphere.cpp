@@ -69,7 +69,7 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 		glm::vec3 intP = ray->getOrigin() + glm::normalize(ray->getDirection())*t;
 		glm::vec3 surfNormal = glm::normalize(intP - _position);
 
-		return new IntersectionPoint(intP, surfNormal);
+		return new IntersectionPoint(intP, surfNormal, getMaterial());
   }
   else { // No intersection with sphere's AABB
     return NULL;

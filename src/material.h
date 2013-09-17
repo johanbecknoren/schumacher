@@ -5,7 +5,7 @@ class Material {
 public:
 	Material() {
 		//default material
-		_diffuseColor = glm::vec3(0.5f); // gray
+		_diffuseColor = glm::vec3(0.5f,0.0f,0.0f); // gray
 		_refractionIndex = 1.0f; // almost none (float precision)
 		_specular = 0.2f; // diffuse (low specularity)
 		_opacity = 1.0f; // completely solid
