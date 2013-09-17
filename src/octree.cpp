@@ -96,9 +96,12 @@ void Octree::findIntersection(Ray *ray) {
 }
 
 bool Octree::iterateRay(Ray *ray, Node *node) {
+	bool findNew = false;
 	if (node->getBoundingBox()->isInside(ray->getOrigin())) {
+		std::cout << "Inside\n";
 		Leaf *leaf = node->getFirstLeaf();
 		while(leaf != NULL) {
+			std::cout << "Testing leaf "<< leaf->getRenderable()->asString() << " \n";
 			IntersectionPoint *i = leaf->getRenderable()->getIntersectionPoint(ray);
 			if (i != NULL) {
 				std::cout << "Intersection found at: " << i->getPoint().x
@@ -110,13 +113,21 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
 				std::cout << "octree.cpp - oct: " << i << " d:" << node->getDepth()  << " \n";
-				iterateRay(ray, node->getChild(i));
+				if (!iterateRay(ray, node->getChild(i))) {
+					findNew = true;
+				}
 			}
 		}
 	}
-	else {
-		std::cout << "octree.cpp - Break at depth: " << node->getDepth() << " No collision\n";
-		std::cout << "Hej " << node->getDepth() << std::endl;
+	else { 
+		findNew = true;
+		std::cout << "Outside of ";
+		node->getBoundingBox()->print();
+	}
+	if (findNew) {
+		std::cout << "octree.cpp - Break at depth: " << node->getDepth() << " " << " No collision\n";
+		node->getBoundingBox()->print();
+		std::cout << "Hej " << node->getDepth() << std::endl << std::endl;
 		std::vector<IntersectionPoint *> pts;
 		for (int p = 0; p < 8; ++p) {
 			if (node->getChild(p) != NULL) {
@@ -131,7 +142,7 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 		}
 		for (int p = 0; p < pts.size(); ++p) {
 			std::cout << pts[p]->asString() << " | ";
-			Ray *r = new Ray(pts[p]->getPoint() + 0.000001f * ray->getDirection(),
+			Ray *r = new Ray(pts[p]->getPoint() + ray->getDirection() * 0.00001f,
 									ray->getDirection());
 			findIntersection(r);
 			
@@ -139,7 +150,7 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 
 		return false;
 	}
-	return false;
+	return true;
 }
 
 AABB *Octree::createBoundingBox(const Node *node, const int octant) {
