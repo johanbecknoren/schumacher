@@ -28,6 +28,7 @@ link_directories(
 	${CMAKE_SOURCE_DIR}/externals/libs
 	) 
 
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/export)
 
 if(CMAKE_SOURCE_DIR)
 	add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
