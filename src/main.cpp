@@ -29,9 +29,9 @@ int main() {
 		<<ip->getNormal().z<<std::endl;
 	} else
 		std::cout << "main.cpp - No intersection!\n";
-	//tree.addObject(sphere);
+	tree.addObject(sphere);
 	tree.addObject(sp2);
-	//tree.addObject(sphere);
+	tree.addObject(sphere);
 	tree.addObject(sp3);
 	std::cout << "main.cpp -  \n";
 	tree.print();
