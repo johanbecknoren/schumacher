@@ -1,5 +1,7 @@
 #include "octree.h"
 #include "sphere.h"
+#include <climits>
+
 Node::Node(int nodeDepth, AABB nodeBoundingBox) {
 	_boundingBox = nodeBoundingBox;
 	_parent = NULL;
@@ -102,6 +104,7 @@ IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 	if (node->getBoundingBox()->isInside(ray->getOrigin())) {
 		std::cout << "Inside\n";
 		Leaf *leaf = node->getFirstLeaf();
+		std::vector<IntersectionPoint> pts;
 		while(leaf != NULL) {
 			std::cout << "Testing leaf "<< leaf->getRenderable()->asString() << " \n";
 			IntersectionPoint *i = leaf->getRenderable()->getIntersectionPoint(ray);
@@ -110,9 +113,28 @@ IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 						<< " " << i->getPoint().y << " "
 						<< i->getPoint().z << std::endl;
 				active = true;
-				return i;
+				pts.push_back(*i);
 			}
+			std::cout << std::endl;
 			leaf = leaf->getNextSibling();
+		}
+		if (pts.size() > 0) {
+			float min = FLT_MAX;
+			int id;
+			for (int i = 0; i < pts.size(); ++i) {
+				float len = abs(glm::dot(pts[i].getPoint(), ray->getOrigin()));
+
+				if(len < min) {
+					min = len;
+					id = i;
+				}
+			}
+			std::cout << "Smallest intersection at: " << pts[id].getPoint().x
+						<< " " << pts[id].getPoint().y << " "
+						<< pts[id].getPoint().z << std::endl;
+
+			return &pts[id];
+
 		}
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
@@ -233,7 +255,7 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 	int q2 = parentBox->getQuadrant(upperRight);
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
-#if USE_OCTREE
+#ifdef USE_OCTREE
 	if(q1 != -1 && q2 != -1 && q1 == q2) {
 #else
 	if(false) {

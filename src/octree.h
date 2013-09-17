@@ -2,6 +2,9 @@
 #define OCTREE_H
 #include "renderable.h"
 #include <vector>
+
+//#define USE_OCTREE
+
 class Leaf {
 public:
     Leaf(Renderable *renderable);

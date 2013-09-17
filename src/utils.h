@@ -1,7 +1,5 @@
 #include "material.h"
 
-#define USE_OCTREE true
-
 // Viewport dimensions
 #define WIDTH 640
 #define HEIGHT 480

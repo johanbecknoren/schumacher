@@ -2,7 +2,6 @@
 #include "octree.h"
 #include "sphere.h"
 #include "camera.h"
-#include "material.h"
 #include "lightsource.h"
 #include "utils.h"
 
