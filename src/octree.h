@@ -46,7 +46,7 @@ public:
 private:
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);
-	bool iterateRay(Ray *ray, Node *node);
+	IntersectionPoint *iterateRay(Ray *ray, Node *node, bool &active);
 	AABB *createBoundingBox(const Node *node, const int octant);
 	void subdivideBoundingBox(Node *parent, Renderable *object);
 	void print(Node *node) const ;
