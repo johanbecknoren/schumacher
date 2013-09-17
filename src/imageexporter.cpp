@@ -87,6 +87,7 @@ bool ImageExporter::saveSequence(int &n, float dt, int range, int width, int hei
         ImageExporter::timeTrack += dt;
 	if(n == range)
 		return false;
+	return true;
 }
 
 void ImageExporter::saveSequence(int &n, int width, int height)
