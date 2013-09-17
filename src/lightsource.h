@@ -5,7 +5,10 @@
 
 class Lightsource : public Renderable {
 	Lightsource();
-	Lightsource(const glm::vec3& lLB, const glm::vec3& uRF, const glm::vec3 p, const float& i, const glm::vec3 c);
+	Lightsource(const glm::vec3& lLB,
+              const glm::vec3& uRF,
+              const glm::vec3 p,
+              const float& i, const glm::vec3 c);
 	~Lightsource() {};
 	virtual void createAABB();
 	IntersectionPoint* getIntersection(Ray*, bool = false);

@@ -42,7 +42,7 @@ if(WIN32)
 endif(WIN32)
 
 if(UNIX)
-	target_link_libraries(schumacher assimp freeimage GL glfw glut GLEW GLU)
+	target_link_libraries(schumacher freeimage)
 endif(UNIX)
 
 

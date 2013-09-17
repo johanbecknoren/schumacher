@@ -1,11 +1,11 @@
 #ifndef OCTREE_H
 #define OCTREE_H
 #include "renderable.h"
-
+#include <vector>
 class Leaf {
 public:
     Leaf(Renderable *renderable);
-    ~Leaf();
+    ~Leaf(){};
     void setNextSibling(Leaf *sibling) { _nextSibling = sibling; };
 	Leaf *getNextSibling() { return _nextSibling; };
     const Renderable *getRenderable() const { return _renderable; };
@@ -16,15 +16,17 @@ private:
 
 class Node {
 public:
-    Node(int nodeDepth, AABB *boundingBox);
-    ~Node();
-    const AABB *getBoundingBox() const { return _boundingBox; };
+    Node(int nodeDepth, AABB boundingBox);
+    ~Node(){};
+    const AABB *getBoundingBox() const { return &_boundingBox; };
     Node *getChild(const int octant) { return _childs[octant]; };
+	void setChild(const int octant, Node *node);
     const int getDepth() const { return _depth; };
-    void addLeaf(Node *parent, Renderable *renderable);
+    void addLeaf(Leaf *leaf);
     Leaf *getFirstLeaf() { return _firstLeaf; };
+	void setFirstLeaf(Leaf *leaf) { _firstLeaf = leaf; }
 private:
-    AABB *_boundingBox;
+    AABB _boundingBox;
     Node *_parent;
     Node *_childs[8];
     Node *_nextSibling;
@@ -39,16 +41,18 @@ public:
 
     void addObject(Renderable *object);
 	void print() const;
+	void findIntersection(Ray *ray);
 
 private:
-    void findIntersection(Ray *ray) const;
-    void addChild(Node *parent, int octant);
-    void addLeaf(Renderable *renderable);
-    void iterateRay(Ray *ray, Node *node);
-    AABB *createBoundingBox(const Node *node, const int octant);
-    void subdivideBoundingBox(Node *parent, Renderable *object);
+	void addChild(Node *parent, int octant);
+	void addLeaf(Renderable *renderable);
+	bool iterateRay(Ray *ray, Node *node);
+	AABB *createBoundingBox(const Node *node, const int octant);
+	void subdivideBoundingBox(Node *parent, Renderable *object);
 	void print(Node *node) const ;
-    Node *_root;
+	Node *_root;
+	std::vector<Node> _nodes;
+	std::vector<Leaf> _leafs;
 };
 
 #endif

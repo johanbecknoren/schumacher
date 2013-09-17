@@ -1,6 +1,6 @@
 #ifndef INTERSECTIONPOINT_H
 #define INTERSECTIONPOINT_H
-
+#include <sstream>
 class IntersectionPoint {
 public:
 	IntersectionPoint() {};
@@ -10,7 +10,11 @@ public:
 	};
 
 	~IntersectionPoint() {};
-
+	std::string asString() const { 
+		std::stringstream s;
+		s << _point.x << " " << _point.y << " " << _point.z; 
+		return s.str();
+	}
 	glm::vec3 getPoint() const { return _point; }
 	glm::vec3 getNormal() const { return _surfaceNormal; }
 private:
