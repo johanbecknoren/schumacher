@@ -107,6 +107,7 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 				std::cout << "Intersection found at: " << i->getPoint().x
 						<< " " << i->getPoint().y << " "
 						<< i->getPoint().z << std::endl;
+				return true;
 			}
 			leaf = leaf->getNextSibling();
 		}
