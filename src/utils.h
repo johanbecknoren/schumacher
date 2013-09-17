@@ -1,24 +1,17 @@
+#ifndef UTILS_H
+#define UTILS_H
+
 #include "material.h"
 
 // Viewport dimensions
 #define WIDTH 640
 #define HEIGHT 480
 
-// Refractive indices
-#define AIR 1.0f
-#define GLASS 1.62f
+// Refractive indices (en.wikipedia.org/wiki/Refractive_index)
+#define REFRACTION_AIR 1.000293f
+#define REFRACTION_GLASS 1.52f
 
-// Materials
-Material* stone = new Material(
-	glm::vec3(0.7f,0.7f,0.7f),
-	0.0f,
-	0.7f,
-	0.0f,
-	1.0f);
+// Materials enums
+enum material_t { STONE, GLASS, MARBLE };
 
-Material* glass = new Material(
-	glm::vec3(1.0f),
-	GLASS,
-	0.5f,
-	0.9f,
-	0.0f);
+#endif
