@@ -115,7 +115,7 @@ IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 				active = true;
 				pts.push_back(*i);
 			}
-			std::cout << std::endl;
+			
 			leaf = leaf->getNextSibling();
 		}
 		if (pts.size() > 0) {
@@ -156,7 +156,7 @@ IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 	if (findNew) {
 		//std::cout << "octree.cpp - Break at depth: " << node->getDepth() << " " << " No collision\n";
 		node->getBoundingBox()->print();
-		std::cout << "Hej " << node->getDepth() << std::endl << std::endl;
+		//std::cout << "Hej " << node->getDepth() << std::endl << std::endl;
 		std::vector<IntersectionPoint *> pts;
 		for (int p = 0; p < 8; ++p) {
 			if (node->getChild(p) != NULL) {
