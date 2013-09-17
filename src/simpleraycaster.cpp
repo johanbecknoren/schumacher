@@ -5,13 +5,15 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 	// (främst diffuse color) från IntersectionPoint.
 	
 	// Godtycklig FOV (http://www.unknownroad.com/rtfm/graphics/rt_eyerays.html)
-	float fovx = 3.14159f/4.0f; // 45 grader
+	float fovx = float(M_PI)/4.0f; // 45 grader
 	float fovy = (float(H)/float(W)) * fovx;
 
-	int counter = 0;
+	int rayCounter = 0;
+
+	// (u,v) are pixel coords for output image
 	for(int u=0; u<W; ++u) {
 		for(int v=0; v<H; ++v) {
-			counter++;
+			rayCounter++;
 			float x = ( (2.0f*float(u)-float(W))/float(W) ) * tan(fovx);
 			float y = ( (2.0f*float(v)-float(H))/float(H) ) * tan(fovy);
 			
@@ -30,7 +32,7 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 			}
 		}
 	}
-	std::cout << "Num pixels: "<<W*H<<", num rays: "<<counter<<"\n";
+	std::cout << "Num pixels: "<<W*H<<", num rays: "<<rayCounter<<"\n";
 	
 
 }
