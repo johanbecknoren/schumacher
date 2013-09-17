@@ -84,6 +84,7 @@ void Octree::addChild(Node *parent, int octant) {
 void Octree::findIntersection(Ray *ray) {
 	std::string s;
 	ray->print();
+	std::cin >> s;
 	if (!_root->getBoundingBox()->isInside(ray->getOrigin())) {
 		IntersectionPoint *ip = _root->getBoundingBox()->getIntersection(ray);
 		Ray *r = new Ray(ip->getPoint(), ray->getDirection());
@@ -109,39 +110,33 @@ bool Octree::iterateRay(Ray *ray, Node *node) {
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
 				std::cout << "octree.cpp - oct: " << i << " d:" << node->getDepth()  << " \n";
-				if(!iterateRay(ray, node->getChild(i))) {
-					// No collision found in lower depth.
-					// Try to find other collision.
-					std::cout << "Hej " << node->getDepth() << std::endl;
-					std::vector<IntersectionPoint *> pts;
-					for (int p = 0; p < 8; ++p) {
-						if (node->getChild(p) != NULL && p != i) {
-							if (!node->getChild(p)->getBoundingBox()->isInside(ray->getOrigin())) {
-								IntersectionPoint *ip =
-											node->getChild(p)->getBoundingBox()->getIntersection(ray);
-								if (ip != NULL) {
-									pts.push_back(ip);
-								}
-							}
-						}
-					}
-					for (int p = 0; p < pts.size(); ++p) {
-						std::cout << pts[p]->asString() << " | ";
-						Ray *r = new Ray(pts[p]->getPoint(),
-									ray->getDirection());
-						findIntersection(r);
-						return true;
-					}
-					return false;
-				}
-				else {
-					return true;
-				}
+				iterateRay(ray, node->getChild(i));
 			}
 		}
 	}
 	else {
 		std::cout << "octree.cpp - Break at depth: " << node->getDepth() << " No collision\n";
+		std::cout << "Hej " << node->getDepth() << std::endl;
+		std::vector<IntersectionPoint *> pts;
+		for (int p = 0; p < 8; ++p) {
+			if (node->getChild(p) != NULL) {
+				if (!node->getChild(p)->getBoundingBox()->isInside(ray->getOrigin())) {
+					IntersectionPoint *ip =
+						node->getChild(p)->getBoundingBox()->getIntersection(ray);
+					if (ip != NULL) {
+						pts.push_back(ip);
+					}
+				}
+			}				
+		}
+		for (int p = 0; p < pts.size(); ++p) {
+			std::cout << pts[p]->asString() << " | ";
+			Ray *r = new Ray(pts[p]->getPoint() + 0.000001f * ray->getDirection(),
+									ray->getDirection());
+			findIntersection(r);
+			
+		}
+
 		return false;
 	}
 	return false;
@@ -217,8 +212,7 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 	int q2 = parentBox->getQuadrant(upperRight);
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
-	//if(q1 != -1 && q2 != -1 && q1 == q2) {
-	if (false) {
+	if(q1 != -1 && q2 != -1 && q1 == q2) {
 		if(parent->getChild(q1) == NULL)
 			addChild(parent, q1);
 		subdivideBoundingBox(parent->getChild(q1), object);
