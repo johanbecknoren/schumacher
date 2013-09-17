@@ -2,10 +2,9 @@
 #include "octree.h"
 #include "sphere.h"
 #include "camera.h"
-#include "material.h"
 #include "lightsource.h"
+//#include "material.h"
 #include "utils.h"
-
 int main() {
 
 	IntersectionPoint *ip = new IntersectionPoint();
@@ -37,6 +36,7 @@ int main() {
 	std::cout << "main.cpp -  \n";
 	tree.print();
 	std::cout << " --- \n ";
+
 
 	tree.findIntersection(r3);
 	return 0;
