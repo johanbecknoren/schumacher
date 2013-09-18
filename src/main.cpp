@@ -28,7 +28,7 @@ int main() {
 	Sphere *sp2 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 4.23f));
 	sp2->setMaterial(GLASS);
 
-	Sphere *sp3 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 6.f));
+	Sphere *sp3 = new Sphere(1.f, glm::vec3(-2.02f, 0.13f, 4.23f));
 	sp3->setMaterial(MARBLE);
 
 
