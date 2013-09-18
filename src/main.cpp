@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "imageexporter.h"
 #include "simpleraycaster.h"
+#include "raytracer.h"
 
 int main() {
 	Camera *cam = new Camera();
@@ -56,7 +57,11 @@ int main() {
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
 
 	SimpleRaycaster sRay;
-	sRay.render(pixels, tree, WIDTH, HEIGHT, cam);
+//	sRay.render(pixels, tree, WIDTH, HEIGHT, cam);
+
+	Raytracer rayTracer;
+	int iters = 20;
+	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
 	
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
 		pixelsInt[i] = int(pixels[i]*255.0f);
