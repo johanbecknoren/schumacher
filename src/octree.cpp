@@ -85,7 +85,7 @@ void Octree::addChild(Node *parent, int octant) {
 
 IntersectionPoint *Octree::findIntersection(Ray *ray) {
 	std::string s;
-	ray->print();
+	//ray->print();
 	//std::cin >> s;
 	bool b;
 	if (!_root->getBoundingBox()->isInside(ray->getOrigin())) {

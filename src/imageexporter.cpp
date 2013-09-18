@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cstring>
 #include <string>
+#include <ctime>
 
 #include <GL/glfw.h>
 #include <GL/freeglut.h>
@@ -64,9 +65,20 @@ void ImageExporter::saveImage(char filename[], int width, int height)
 
 void ImageExporter::saveImage(int image[], char filename[], int width, int height)
 {
-	std::cout << "Received filename: " << filename;
+	std::time_t rawtime;
+    std::tm* timeinfo;
+    char buffer [80];
+
+    std::time(&rawtime);
+    timeinfo = std::localtime(&rawtime);
+
+    std::strftime(buffer,80,"%Y-%m-%d-%H-%M-%S",timeinfo);
+	
+	std::cout << "Received filename: " << filename << ".png\n";
 	char folder[] = "export/";
-	char *fend = merge(filename, (char*)".png");
+	char *fend = merge(buffer, (char*)".png");
+
+	//char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);
 
 	FIBITMAP *bitmap = convertArrayToBitmap(image, width, height);

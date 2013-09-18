@@ -21,15 +21,18 @@ int main() {
 	std::cout<<"main.cpp - getQuadrant, AABB: "<<bb.getQuadrant(point)<<"\n";
 	Octree *tree = new Octree(&bb);
 
-	Sphere *sphere = new Sphere(0.2f, glm::vec3(0.52f,-0.2f,1.5f));
+	
+	Sphere *sphere = new Sphere(0.2f, glm::vec3(-0.05f,-0.2f,1.5f));
 	sphere->setMaterial(STONE);
 
-	Sphere *sp2 = new Sphere(1.f, glm::vec3(1.02f, 0.13f, 4.23f));
-	sp2->setMaterial(MARBLE);
+	Sphere *sp2 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 4.23f));
+	sp2->setMaterial(GLASS);
 
-	Sphere *sp3 = new Sphere(3.f, glm::vec3(5));
-	sp3->setMaterial(STONE);
+	Sphere *sp3 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 6.f));
+	sp3->setMaterial(MARBLE);
 
+
+	
 	std::cout << "main.cpp - " << sphere->asString() << std::endl << sp2->asString() << std::endl;
 
 	ip = bb.getIntersection(r,true);
@@ -60,6 +63,6 @@ int main() {
 		//std::cout<<pixels[i]<<", ";
 
 	
-	ImageExporter::saveImage(pixelsInt, (char*)"render1.png\n", WIDTH, HEIGHT);
+	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
 	return 0;
 }

@@ -4,8 +4,8 @@
 #include "material.h"
 
 // Viewport dimensions
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 1280
+#define HEIGHT 720
 
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)
 #define REFRACTION_AIR 1.000293f
