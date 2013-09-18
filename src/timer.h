@@ -8,21 +8,9 @@ typedef std::map<std::string, std::vector<Times>> TimerList;
 
 class Times {
 	public:
-		Times(double start, int id) {
-			_start = start;
-			_elapsed = 0;
-			_id = id;
-			_active = true;
-		}
-		void start(double current) {
-			stop(current);
-			_active = true;
-			_start = current;
-		}
-		void stop(double current) {
-			_elapsed += _start - current;
-			_active = false;
-		}
+		Times(double start, int id);
+		void start(double current);		
+		void stop(double current);
 		bool isActive() { return _active; };
 		int getId() const { return _id; };
 	private:
@@ -42,7 +30,8 @@ class Timer {
 		void startTimer(std::string name, int threadId = 0) {
 			double v = getCurrentTime();
 			std::vector<Times> vec = timers[name];
-			if (vec != timers.end()) { 
+			TimerList::iterator it = timers.find(name);
+			if (it != timers.end()) { 
 				for (int i = 0; i < vec.size(); ++i) {
 					if (threadId == vec[i].getId()) {
 						if (vec[i].isActive())
@@ -58,11 +47,13 @@ class Timer {
 		}
 		void stopTimer(std::string name, int threadId = 0) {
 			double v = getCurrentTime();
+			TimerList::iterator it = timers.find(name);
 			std::vector<Times> vec = timers[name];
-			if (vec != timers.end()) {
+			if (it != timers.end()) {
 				for (int i = 0; i < vec.size(); ++i) {
 					if (threadId == vec[i].getId()) {
 						vec[i].stop(v);
+						return;
 					}
 				}
 			}
@@ -72,11 +63,13 @@ class Timer {
 				timers.erase(name);
 				return;
 			}
+			TimerList::iterator it = timers.find(name);
 			std::vector<Times> vec = timers[name];
-			if (vec != timers.end()) {
+			if (it != timers.end()) {
 				for (int i = 0; i < vec.size(); ++i) {
 					if (threadId == vec[i].getId()) {
-						vec[i].stop(v);
+						vec.erase(vec.begin() + i);
+						return;
 					}
 				}
 			}
@@ -98,7 +91,10 @@ class Timer {
 		};
 		Timer(Timer const&);
 		void operator=(Timer const&);
-		double getCurrentTime() { return 0; };
+		double getCurrentTime() { 
+			std::chrono::time_point time = std::chrono::high_resolution_clock.now();
+			return 0; 
+		};
 };
 
 #endif
