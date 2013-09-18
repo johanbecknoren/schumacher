@@ -122,7 +122,7 @@ IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 			float min = FLT_MAX;
 			int id;
 			for (int i = 0; i < pts.size(); ++i) {
-				float len = -glm::dot(pts[i].getPoint(), ray->getOrigin());
+				float len = glm::length((pts[i].getPoint() - ray->getOrigin()));
 
 				if(len < min) {
 					min = len;
