@@ -22,6 +22,9 @@ class Renderable {
 		} else if (m == MARBLE) {
 			_material.setDiffuseColor(glm::vec3(1.0f, 1.0f,0.0f));
 			_material.setSpecular(0.8f);
+		} else if(m == LIGHT) {
+			_material.setDiffuseColor(glm::vec3(0.9f));
+			_material.setEmission(glm::vec3(1.0f));
 		} else // STONE - default
 			return;				
 	}

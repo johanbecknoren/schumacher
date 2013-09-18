@@ -32,6 +32,9 @@ int main() {
 	Sphere *sp3 = new Sphere(1.f, glm::vec3(-2.02f, 0.13f, 4.23f));
 	sp3->setMaterial(MARBLE);
 
+	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
+	spLight->setMaterial(LIGHT);
+
 
 	
 	std::cout << "main.cpp - " << sphere->asString() << std::endl << sp2->asString() << std::endl;
@@ -47,8 +50,9 @@ int main() {
 
 	tree->addObject(sphere);
 	tree->addObject(sp2);
-	tree->addObject(sphere);
+//	tree->addObject(sphere);
 	tree->addObject(sp3);
+	tree->addObject(spLight);
 //	std::cout << "main.cpp -  \n";
 	//tree->print();
 //	std::cout << " --- \n ";
@@ -57,10 +61,10 @@ int main() {
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
 
 	SimpleRaycaster sRay;
-//	sRay.render(pixels, tree, WIDTH, HEIGHT, cam);
+	//sRay.render(pixels, tree, WIDTH, HEIGHT, cam);
 
 	Raytracer rayTracer;
-	int iters = 20;
+	int iters = 15;
 	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
 	
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
