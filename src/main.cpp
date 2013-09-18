@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "imageexporter.h"
 #include "simpleraycaster.h"
+#include "timer.h"
 
 int main() {
 	Camera *cam = new Camera();

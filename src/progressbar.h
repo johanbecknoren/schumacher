@@ -3,6 +3,7 @@
 
 namespace ProgressBar {
 	static int currProc = -1;
+
 	void printProgBar(int percent) {
 		if (currProc == percent) return;
 		else currProc = percent;
