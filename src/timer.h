@@ -3,98 +3,74 @@
 
 #include <chrono>
 #include <map>
-class Times;
-typedef std::map<std::string, std::vector<Times>> TimerList;
+#include <string>
+#include <vector>
+namespace TimeTypes {
+typedef std::chrono::steady_clock::time_point TimePoint;
+typedef std::chrono::duration<int, std::milli> Millisecs;
 
-class Times {
+class Times {	
 	public:
-		Times(double start, int id);
-		void start(double current);		
-		void stop(double current);
+		Times();
+		Times(TimePoint start, int id);
+		void start(TimeTypes::TimePoint current);		
+		void stop(TimePoint current);
 		bool isActive() { return _active; };
 		int getId() const { return _id; };
+		Millisecs timeElapsed(TimePoint current) const;
 	private:
-		double _start;
-		double _elapsed;
+		TimePoint _start;
+		Millisecs _elapsed;
 		int _id;
 		bool _active;
 };
 
+class TimeTracker {
+	public:
+		TimeTracker();
+		int size() const { return _threadTimes.size(); };
+		Times& operator [](int i) { return _threadTimes[i]; }
+		void push_back(Times t); 
+		void erase(std::vector<Times>::iterator it) { _threadTimes.erase(it); }
+		std::vector<Times>::iterator begin() { return _threadTimes.begin(); }
+		double getRealtime(TimePoint current) const;
+	private:
+		Times _realTime;
+		std::vector<Times> _threadTimes;
+};
+
+typedef std::map<std::string, TimeTracker> TimerList;
+}// namespace TimeTypes
+
+
+
+
+
 class Timer {
+	enum TIME_FORMAT { MILLISEC, SEC };
 	public:
 		static Timer& getInstance() {
 			static Timer instance;
 			return instance;
 		}
-		
-		void startTimer(std::string name, int threadId = 0) {
-			double v = getCurrentTime();
-			std::vector<Times> vec = timers[name];
-			TimerList::iterator it = timers.find(name);
-			if (it != timers.end()) { 
-				for (int i = 0; i < vec.size(); ++i) {
-					if (threadId == vec[i].getId()) {
-						if (vec[i].isActive())
-							std::cout << "timer.h l40 - ERROR: Id already added for this name. Stop it or add with other ID.";
-						else
-							vec[i].start(v);
-						return;
-					}
-				}
-			}
-			Times t = Times(v, threadId);
-			vec.push_back(t);
-		}
-		void stopTimer(std::string name, int threadId = 0) {
-			double v = getCurrentTime();
-			TimerList::iterator it = timers.find(name);
-			std::vector<Times> vec = timers[name];
-			if (it != timers.end()) {
-				for (int i = 0; i < vec.size(); ++i) {
-					if (threadId == vec[i].getId()) {
-						vec[i].stop(v);
-						return;
-					}
-				}
-			}
-		}
-		void resetTimer(std::string name, int threadId = -1) {
-			if (threadId == -1) { 
-				timers.erase(name);
-				return;
-			}
-			TimerList::iterator it = timers.find(name);
-			std::vector<Times> vec = timers[name];
-			if (it != timers.end()) {
-				for (int i = 0; i < vec.size(); ++i) {
-					if (threadId == vec[i].getId()) {
-						vec.erase(vec.begin() + i);
-						return;
-					}
-				}
-			}
+		void start(std::string name, int threadId = 0);
+		void stop(std::string name, int threadId = 0);		
+		void reset(std::string name, int threadId = -1);
+		double getElapsedTime(std::string name) const;
+		double getElapsedTime(std::string name, int threadId) const;
+		void printAllTimers(TIME_FORMAT format = TIME_FORMAT::SEC) const;	
+		void printRealTime(std::string name, TIME_FORMAT format = TIME_FORMAT::SEC) const;
+		void printThreadTime(std::string name, TIME_FORMAT format = TIME_FORMAT::SEC) const;
 
-		}
-		double getElapsedTime(std::string name) const {
-			return 0;
-		}
-		double getElapsedTime(std::string name, int threadId) const {
-			
-		}
-		void printAllTimers() const {
-
-		}
+		static TimeTypes::TimePoint getCurrentTime();
 	private:
-		TimerList timers;
+		TimeTypes::TimerList timers;
 		Timer() {
 
 		};
 		Timer(Timer const&);
 		void operator=(Timer const&);
-		double getCurrentTime() { 
-			std::chrono::time_point time = std::chrono::high_resolution_clock.now();
-			return 0; 
-		};
+		
 };
 
 #endif

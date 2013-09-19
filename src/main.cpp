@@ -32,8 +32,9 @@ int main() {
 	Sphere *sp3 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 6.f));
 	sp3->setMaterial(MARBLE);
 
-
-	
+	Timer::getInstance().start("test");
+	Timer::getInstance().stop("test");
+	Timer::getInstance().printRealTime("test");
 	std::cout << "main.cpp - " << sphere->asString() << std::endl << sp2->asString() << std::endl;
 
 	ip = bb.getIntersection(r,true);
