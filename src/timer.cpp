@@ -1,5 +1,5 @@
 #include "timer.h"
-#include <iostream>
+
 namespace TimeTypes {
 Times::Times() {
 	_active = false;
@@ -37,7 +37,14 @@ double TimeTracker::getRealtime(TimePoint current) const {
 }
 
 void TimeTracker::push_back(Times t) {
-	
+	if (t.getId() != -1) {
+		std::cout << "Adding thread value\n";
+		_threadTimes.push_back(t);
+	}
+	else {
+		std::cout << "Adding realtime value\n";
+		_realTime = t;	
+	}
 }
 
 } // namespace TimeTypes
@@ -50,7 +57,7 @@ void Timer::start(std::string name, int threadId) {
 			if (threadId == it->second[i].getId()) {
 				if (it->second[i].isActive()) {
 					std::cout << "timer.h l40 - ERROR: Id already added "
-					  << "for this name. Stop it or add with other ID.";
+					  << "for this name. Stop it or add with other ID.\n";
 				}
 				else {
 					it->second[i].start(v);
@@ -107,6 +114,10 @@ double Timer::getElapsedTime(std::string name, int threadId) const {
 }	
 
 void Timer::printRealTime(std::string name, TIME_FORMAT format) const {
+	std::cout << timers.size() << std::endl;
+	for(int i = 0; i < timers.size(); ++i) {
+		std::cout << "a";
+	}
 	TimeTypes::TimerList::const_iterator it = timers.find(name);
 	std::cout << "Printing realtime value: ";
 	if (it != timers.end()) {
@@ -124,6 +135,17 @@ void Timer::printThreadTime(std::string name, TIME_FORMAT format) const {
 				return;
 		}
 	}
+}
+
+Timer *Timer::getInstance() {
+	if (_instance == 0) {
+		// Lock here
+		if (_instance == 0) {
+			std::cout << "Constructed instance" << std::endl;
+			_instance = new Timer();	
+		}
+	}
+	return _instance; 
 }
 
 TimeTypes::TimePoint Timer::getCurrentTime() { 

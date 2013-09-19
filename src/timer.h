@@ -1,6 +1,6 @@
 #ifndef TIMER_H
 #define TIMER_H
-
+#include <iostream>
 #include <chrono>
 #include <map>
 #include <string>
@@ -40,20 +40,13 @@ class TimeTracker {
 };
 
 typedef std::map<std::string, TimeTracker> TimerList;
-}// namespace TimeTypes
-
-
-
-
+};// namespace TimeTypes
 
 class Timer {
-	enum TIME_FORMAT { MILLISEC, SEC };
 	public:
-		static Timer& getInstance() {
-			static Timer instance;
-			return instance;
-		}
-		void start(std::string name, int threadId = 0);
+		enum TIME_FORMAT { MILLISEC, SEC };	
+		static Timer *getInstance(); 		
+		void start(std::string name, int threadId = -1);
 		void stop(std::string name, int threadId = 0);		
 		void reset(std::string name, int threadId = -1);
 		double getElapsedTime(std::string name) const;
@@ -72,5 +65,7 @@ class Timer {
 		void operator=(Timer const&);
 		
 };
-
+namespace {
+	static Timer *_instance;
+}
 #endif
