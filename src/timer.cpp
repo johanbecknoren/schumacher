@@ -69,8 +69,9 @@ void Timer::start(std::string name, int threadId) {
 	else {
 		TimeTypes::Times t = TimeTypes::Times(v, threadId);
 		std::cout << "Adding new timer!";
-		it->second.push_back(t);
+		it->second.push_back(t); // FEEEL
 	}
+	std::cout << timers.size() << std::endl;
 }
 
 void Timer::stop(std::string name, int threadId) {

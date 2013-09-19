@@ -33,6 +33,7 @@ int main() {
 	sp3->setMaterial(MARBLE);
 
 	Timer::getInstance()->start("test");
+	Timer::getInstance()->printRealTime("test");
 	Timer::getInstance()->stop("test");
 	Timer::getInstance()->printRealTime("test");
 	std::cout << "main.cpp - " << sphere->asString() << std::endl << sp2->asString() << std::endl;

@@ -47,7 +47,7 @@ class Timer {
 		enum TIME_FORMAT { MILLISEC, SEC };	
 		static Timer *getInstance(); 		
 		void start(std::string name, int threadId = -1);
-		void stop(std::string name, int threadId = 0);		
+		void stop(std::string name, int threadId = -1);		
 		void reset(std::string name, int threadId = -1);
 		double getElapsedTime(std::string name) const;
 		double getElapsedTime(std::string name, int threadId) const;
@@ -67,5 +67,5 @@ class Timer {
 };
 namespace {
 	static Timer *_instance;
-}
+};
 #endif
