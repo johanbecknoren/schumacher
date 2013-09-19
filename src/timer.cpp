@@ -69,7 +69,9 @@ void Timer::start(std::string name, int threadId) {
 	else {
 		TimeTypes::Times t = TimeTypes::Times(v, threadId);
 		std::cout << "Adding new timer!";
-		it->second.push_back(t); // FEEEL
+		TimeTypes::TimeTracker tr = TimeTypes::TimeTracker();
+		tr.push_back(t);
+		timers.insert(std::pair<std::string, TimeTypes::TimeTracker>(name, tr));
 	}
 	std::cout << timers.size() << std::endl;
 }
