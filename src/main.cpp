@@ -30,6 +30,9 @@ int main() {
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
+	Lightsource *light = new Lightsource(glm::vec3(0.0f, -4.0f, 5.0f), 1.0f, glm::vec3(1.0, 1.0, 1.0));
+	tree->addObject(light);
+
 	tree->addObject(sphere);
 	tree->addObject(sp2);
 //	tree->addObject(sphere);

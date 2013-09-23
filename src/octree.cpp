@@ -19,8 +19,9 @@ Leaf::Leaf(Renderable *object) {
 }
 
 void Node::addLeaf(Leaf *leaf) {
-	leaf->setNextSibling(getFirstLeaf());
-	setFirstLeaf(leaf);
+	/*leaf->setNextSibling(getFirstLeaf());
+	setFirstLeaf(leaf);*/
+	
 }
 
 void Node::setChild(const int octant, Node* node) {
@@ -109,7 +110,77 @@ std::vector<const Renderable*> Octree::getLightList() const {
 	}
 	return lightList;
 }
+bool Octree::intersect(Ray &ray, IntersectionPoint *isect) {
+	float tmin = FLT_MIN, tmax = FLT_MAX;
+	if (!_root->getBoundingBox()->IntersectT(&ray, &tmin, &tmax))
+		return false;
+	// Prepare for traversal
+	glm::vec3 invDir = 1.0f / ray.getDirection();
+#define MAX_TODO 64
+	ToDo todo[MAX_TODO];
+	int todoPos = 0;
+	bool hit = false;
+	const Node *node = _root;
+	while (node != NULL) {
+		// Exit if we found hit closer
+		if (ray.getTMax() < tmin) break;
 
+		// Check intersections inside leaf node
+		Leaf *leaf = node->getFirstLeaf();
+		std::vector<IntersectionPoint> pts;
+
+		while(leaf != NULL) {
+			IntersectionPoint *i = leaf->getRenderable()->getIntersectionPoint(&ray);
+			if (i != NULL) {
+				pts.push_back(*i);
+			}
+			
+			leaf = leaf->getNextSibling();
+		}
+		if (pts.size() > 0) {
+			float min = FLT_MAX;
+			int id;
+			for (int i = 0; i < pts.size(); ++i) {
+				float len = glm::length((pts[i].getPoint() - ray.getOrigin()));
+
+				if(len < min) {
+					min = len;
+					id = i;
+				}
+			}
+			return &pts[id];
+		}
+
+						
+		for (int i = 0; i < _nodes.size(); ++i) {
+			if (node->getChild(i) != NULL) {
+				// Compute distance along ray from p to bbox
+				float max, tplane;
+				//node->getBoundingBox()->IntersectT(&ray, &min, &tplane);
+				
+				// Get node children ptrs
+				if (node->getChild(i)->getBoundingBox()->IntersectT(&ray, &tplane, &max)) {
+					todo[todoPos].node = node->getChild(i);
+					todo[todoPos].tmin = tplane;
+					todo[todoPos].tmax = tmax;
+					++todoPos;
+				}
+
+			}
+			
+		}
+		// Grab next node to process
+		
+
+		// Get node children pointer for ray
+
+
+		// Advance to next node or enqueue other child
+
+
+	}
+	return hit;	
+}
 IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 	bool findNew = false;
 	if (node->getBoundingBox()->isInside(ray->getOrigin())) {
@@ -140,12 +211,7 @@ IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 					id = i;
 				}
 			}
-			//std::cout << "Smallest intersection at: " << pts[id].getPoint().x
-					//	<< " " << pts[id].getPoint().y << " "
-						//<< pts[id].getPoint().z << std::endl;
-
 			return &pts[id];
-
 		}
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {

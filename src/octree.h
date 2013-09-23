@@ -21,11 +21,11 @@ public:
     Node(int nodeDepth, AABB boundingBox);
     ~Node(){};
     const AABB *getBoundingBox() const { return &_boundingBox; };
-    Node *getChild(const int octant) { return _childs[octant]; };
+    Node *getChild(const int octant) const { return _childs[octant]; };
 	void setChild(const int octant, Node *node);
     const int getDepth() const { return _depth; };
     void addLeaf(Leaf *leaf);
-    Leaf *getFirstLeaf() { return _firstLeaf; };
+    Leaf *getFirstLeaf() const { return _firstLeaf; };
 	void setFirstLeaf(Leaf *leaf) { _firstLeaf = leaf; }
 private:
     AABB _boundingBox;
@@ -45,6 +45,7 @@ public:
 	void print() const;
 	IntersectionPoint *findIntersection(Ray *ray);
 	std::vector<const Renderable*> getLightList() const;
+	bool intersect(Ray &ray, IntersectionPoint *isect);
 private:
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);
@@ -56,5 +57,8 @@ private:
 	std::vector<Node> _nodes;
 	std::vector<Leaf> _leafs;
 };
-
+struct ToDo {
+	const Node *node;
+	float tmin, tmax;
+};
 #endif

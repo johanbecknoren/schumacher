@@ -9,3 +9,8 @@ Ray::Ray(const glm::vec3& o, const glm::vec3 &dir) {
 	this->_origin = o;
 	this->_direction = glm::normalize(dir);
 }
+
+void Ray::updateT(const float tmin, const float tmax) { 
+	_tmin = tmin; 
+	_tmax = tmax; 
+}
