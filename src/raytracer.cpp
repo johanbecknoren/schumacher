@@ -1,5 +1,6 @@
 #include "raytracer.h"
-//#include "progressbar.h"
+#include "progressbar.h"
+
 // Returnera intensitet
 float traverseRay(Ray* rayIncoming, IntersectionPoint *ip, Octree* tree, int iterations) {
 //	std::cout<<"Calc reflected ray\n";
@@ -59,7 +60,7 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 			}
 			++pixCounter;
 			
-			//ProgressBar::printProgBar(int(100.0f * float(pixCounter) / float(total)));	
+			ProgressBar::printProgBar(int(100.0f * float(pixCounter) / float(total)));	
 			
 		}
 	}

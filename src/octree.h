@@ -1,8 +1,7 @@
 #ifndef OCTREE_H
 #define OCTREE_H
-#include "renderable.h"
 #include <vector>
-
+#include "renderable.h"
 //#define USE_OCTREE
 
 class Leaf {

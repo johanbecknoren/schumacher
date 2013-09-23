@@ -1,11 +1,18 @@
 #ifndef PROGRESSBAR_H
 #define PROGRESSBAR_H
 
-namespace ProgressBar {
-	static int currProc = -1;
-	void printProgBar(int percent) {
-		if (currProc == percent) return;
-		else currProc = percent;
+class ProgressBar;
+
+namespace {
+	static ProgressBar *_instance;
+}
+
+class ProgressBar {
+	int currProc = -1;
+	public:
+	static void printProgBar(int percent) {
+		if (getInstance()->currProc == percent) return;
+		else getInstance()->currProc = percent;
 		std::string bar;
 
 		for (int i = 0; i < 50; ++i) {
@@ -22,8 +29,16 @@ namespace ProgressBar {
 		std::cout << "\r" "[" << bar << "] ";
 		std::cout.width(3);
 		std::cout << percent << "%    " << std::flush;
-	}
-
-}
+	};
+	private:
+		ProgressBar(){};
+		
+		static ProgressBar *getInstance() {
+			if (_instance == 0) {
+				_instance = new ProgressBar();
+			}
+			return _instance;
+		}
+};
 
 #endif

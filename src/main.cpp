@@ -1,12 +1,10 @@
 #include <iostream>
-#include "octree.h"
 #include "sphere.h"
-#include "camera.h"
 #include "lightsource.h"
 #include "utils.h"
 #include "imageexporter.h"
-#include "simpleraycaster.h"
 #include "raytracer.h"
+#include "timer.h"
 
 int main() {
 	Camera *cam = new Camera();
@@ -22,7 +20,7 @@ int main() {
 	std::cout<<"main.cpp - getQuadrant, AABB: "<<bb.getQuadrant(point)<<"\n";
 	Octree *tree = new Octree(&bb);
 
-	
+	Timer::getInstance()->printRealTime("test", TIME_FORMAT::SEC);
 	Sphere *sphere = new Sphere(0.2f, glm::vec3(-0.05f,-0.2f,1.5f));
 	sphere->setMaterial(STONE);
 
@@ -35,8 +33,6 @@ int main() {
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
-
-	
 	std::cout << "main.cpp - " << sphere->asString() << std::endl << sp2->asString() << std::endl;
 
 	ip = bb.getIntersection(r,true);
@@ -53,25 +49,21 @@ int main() {
 //	tree->addObject(sphere);
 	tree->addObject(sp3);
 	tree->addObject(spLight);
-//	std::cout << "main.cpp -  \n";
-	//tree->print();
-//	std::cout << " --- \n ";
 
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
-
-	SimpleRaycaster sRay;
-	//sRay.render(pixels, tree, WIDTH, HEIGHT, cam);
+	Timer::getInstance()->start("tracing");	
 
 	Raytracer rayTracer;
 	int iters = 15;
 	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
-	
+
+	Timer::getInstance()->stop("tracing");
+
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
 		pixelsInt[i] = int(pixels[i]*255.0f);
-		//std::cout<<pixels[i]<<", ";
+	Timer::getInstance()->printRealTime("tracing");
 
-	
 	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
 	return 0;
 }
