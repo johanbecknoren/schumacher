@@ -1,6 +1,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include "utils.h"
+
 class Material {
 public:
 	Material() {
@@ -24,14 +26,17 @@ public:
 	float getSpecular() const { return _specular; }
 	float getOpacity() const { return _opacity; }
 	glm::vec3 getEmission() const { return _emission; }
+	material_t getMaterialType() const { return _materialType; }
 
 	void setDiffuseColor(const glm::vec3& c) { _diffuseColor = c; }
 	void setRefractionIndex(const float& rI) { _refractionIndex = rI; }
 	void setSpecular(const float& s) { _specular = s; }
 	void setOpacity(const float& o) { _opacity = o; }
 	void setEmission(const glm::vec3 e) { _emission = e; }
+	void setMaterialType(material_t type) { _materialType = type; }
 
 private:
+	material_t _materialType;
 	glm::vec3 _diffuseColor;
 	float _refractionIndex;
 	float _specular;

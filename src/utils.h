@@ -1,8 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "material.h"
-
 // Viewport dimensions
 #define WIDTH 512
 #define HEIGHT 512

@@ -14,6 +14,7 @@ class Renderable {
 	virtual std::string asString() const { return "asString() not implemented for " + getName(); };
 	void setMaterial(const material_t& m) {
 		_material = Material();
+		_material.setMaterialType(m);
 		if (m == GLASS) {
 			_material.setDiffuseColor(glm::vec3(1.0f));
 			_material.setRefractionIndex(REFRACTION_GLASS);

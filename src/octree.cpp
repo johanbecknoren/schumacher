@@ -99,6 +99,17 @@ IntersectionPoint *Octree::findIntersection(Ray *ray) {
 	}
 }
 
+std::vector<const Renderable*> Octree::getLightList() const {
+	std::vector<const Renderable*> lightList;
+	for (int i = 0; i < _leafs.size(); ++i) {
+		const Renderable *r = _leafs[i].getRenderable();
+		if (r->getMaterial().getMaterialType() == LIGHT) {
+			lightList.push_back(r);
+		}
+	}
+	return lightList;
+}
+
 IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
 	bool findNew = false;
 	if (node->getBoundingBox()->isInside(ray->getOrigin())) {

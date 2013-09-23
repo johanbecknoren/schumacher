@@ -44,7 +44,7 @@ public:
     void addObject(Renderable *object);
 	void print() const;
 	IntersectionPoint *findIntersection(Ray *ray);
-
+	std::vector<const Renderable*> getLightList() const;
 private:
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);
