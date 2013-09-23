@@ -16,6 +16,7 @@ class Times {
 		Times(TimePoint start, int id);
 		void start(TimeTypes::TimePoint current);		
 		void stop(TimePoint current);
+		void reset();
 		bool isActive() { return _active; };
 		int getId() const { return _id; };
 		Millisecs timeElapsed(TimePoint current) const;
@@ -35,6 +36,9 @@ class TimeTracker {
 		void erase(std::vector<Times>::iterator it) { _threadTimes.erase(it); }
 		std::vector<Times>::iterator begin() { return _threadTimes.begin(); }
 		double getRealtime(TimePoint current) const;
+		void start(TimePoint v, int threadId);
+		void stop(TimePoint v, int threadId);
+		void reset(int threadId);
 	private:
 		Times _realTime;
 		std::vector<Times> _threadTimes;

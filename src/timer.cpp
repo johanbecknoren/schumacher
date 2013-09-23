@@ -23,10 +23,14 @@ void Times::stop(TimePoint current) {
 	_active = false;
 }
 
+void Times::reset() {
+	_elapsed = std::chrono::seconds(0);
+	_active = false;
+}
+
 Millisecs Times::timeElapsed(TimePoint current) const {
 	Millisecs totalElapsed = _elapsed;
-	if (_active)
-	{
+	if (_active) {
 		totalElapsed += std::chrono::duration_cast<Millisecs>(current - _start );
 	}
 	return totalElapsed;
@@ -47,6 +51,33 @@ void TimeTracker::push_back(Times t) {
 	else {
 		std::cout << "Adding realtime value\n";
 		_realTime = t;	
+	}
+}
+
+void TimeTracker::stop(TimePoint v, int threadId) {
+	if (threadId == -1) {
+		_realTime.stop(v);
+		return;
+	}
+	for (int i = 0; i < _threadTimes.size(); ++i) {
+		if (threadId == _threadTimes[i].getId()) {
+			_threadTimes[i].stop(v);
+			return;
+		}
+	}
+
+}
+
+void TimeTracker::reset(int threadId) {
+	if (threadId == -1) {
+		_realTime.reset();
+		return;
+	}
+	for (int i = 0; i < _threadTimes.size(); ++i) {
+		if (threadId == _threadTimes[i].getId()) {
+			_threadTimes[i].reset();
+			return;
+		}
 	}
 }
 
@@ -71,7 +102,6 @@ void Timer::start(std::string name, int threadId) {
 	}
 	else {
 		TimeTypes::Times t = TimeTypes::Times(v, threadId);
-		std::cout << "Adding new timer!";
 		TimeTypes::TimeTracker tr = TimeTypes::TimeTracker();
 		tr.push_back(t);
 		timers.insert(std::pair<std::string, TimeTypes::TimeTracker>(name, tr));
@@ -83,12 +113,7 @@ void Timer::stop(std::string name, int threadId) {
 	TimeTypes::TimerList::iterator it = timers.find(name);
 
 	if (it != timers.end()) {
-		for (int i = 0; i < it->second.size(); ++i) {
-			if (threadId == it->second[i].getId()) {
-				it->second[i].stop(v);
-				return;
-			}
-		}
+		it->second.stop(v, threadId);
 	}
 }
 

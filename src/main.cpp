@@ -22,7 +22,7 @@ int main() {
 	std::cout<<"main.cpp - getQuadrant, AABB: "<<bb.getQuadrant(point)<<"\n";
 	Octree *tree = new Octree(&bb);
 
-	
+	Timer::getInstance()->printRealTime("test", TIME_FORMAT::SEC);
 	Sphere *sphere = new Sphere(0.2f, glm::vec3(-0.05f,-0.2f,1.5f));
 	sphere->setMaterial(STONE);
 
@@ -37,7 +37,7 @@ int main() {
 	Timer::getInstance()->stop("test");
 	
 	std::cout << "main.cpp - " << sphere->asString() << std::endl << sp2->asString() << std::endl;
-
+Timer::getInstance()->printRealTime("test", TIME_FORMAT::SEC);
 	ip = bb.getIntersection(r,true);
 	if(ip!=NULL) {
 	std::cout << "\nmain.cpp - Ray-AABB intersection. Point = "
@@ -51,21 +51,17 @@ int main() {
 	tree->addObject(sp2);
 	tree->addObject(sphere);
 	tree->addObject(sp3);
-//	std::cout << "main.cpp -  \n";
-	//tree->print();
-//	std::cout << " --- \n ";
 
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
-
+	Timer::getInstance()->start("tracing");	
 	SimpleRaycaster sRay;
 	sRay.render(pixels, tree, WIDTH, HEIGHT, cam);
-	
+	Timer::getInstance()->stop("tracing");
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
 		pixelsInt[i] = int(pixels[i]*255.0f);
-		//std::cout<<pixels[i]<<", ";
-
-	Timer::getInstance()->printRealTime("test", TIME_FORMAT::SEC);
+	Timer::getInstance()->printRealTime("tracing");
+	Timer::getInstance()->printRealTime("test", TIME_FORMAT::MILLISEC);
 
 	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
 	return 0;
