@@ -34,7 +34,7 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 				pixels[u*3 + W*(H-v)*3 + 1] = intensity*ip->getMaterial().getDiffuseColor().y;
 				pixels[u*3 + W*(H-v)*3 + 2] = intensity*ip->getMaterial().getDiffuseColor().z;
 			}
-			ProgressBar::printProgBar(int(100.0f * float(rayCounter) / float(total)));	
+			ProgressBar::printProgBar(rayCounter, total);	
 		}
 	}
 	std::cout << std::endl;

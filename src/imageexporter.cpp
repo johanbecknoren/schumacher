@@ -67,20 +67,20 @@ void ImageExporter::saveImage(int image[], char filename[], int width, int heigh
 {
 	std::time_t rawtime;
     std::tm* timeinfo;
-    char buffer [80];
+    char buffer [120];
 
     std::time(&rawtime);
     timeinfo = std::localtime(&rawtime);
 
-    std::strftime(buffer,80,"%Y-%m-%d-%H-%M-%S",timeinfo);
+    std::strftime(buffer, 120, "%Y-%m-%d-%H-%M-%S", timeinfo);
 	
-	std::cout << "Received filename: " << filename << ".png\n";
+	
 	char folder[] = "export/";
 	char *fend = merge(buffer, (char*)".png");
-
+// 	fend = merge(filename, fend);
 	//char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);
-
+std::cout << "Received filename: " << file << "\n";
 	FIBITMAP *bitmap = convertArrayToBitmap(image, width, height);
 	FreeImage_Save(FIF_PNG, bitmap, file, BitsPerPixel);
 }

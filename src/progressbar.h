@@ -10,7 +10,8 @@ namespace {
 class ProgressBar {
 	int currProc = -1;
 	public:
-	static void printProgBar(int percent) {
+	static void printProgBar(int count, int total) {
+		int percent = int(100.0f * float(count) / float(total)); 
 		if (getInstance()->currProc == percent) return;
 		else getInstance()->currProc = percent;
 		std::string bar;
@@ -28,7 +29,10 @@ class ProgressBar {
 		}
 		std::cout << "\r" "[" << bar << "] ";
 		std::cout.width(3);
-		std::cout << percent << "%    " << std::flush;
+		std::cout << percent;
+		if (total > 0)
+			std::cout << "% (" << count << "/" << total << ")";
+		std::cout << std::flush;
 	};
 	private:
 		ProgressBar(){};
