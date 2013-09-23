@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+enum TIME_FORMAT { MILLISEC, SEC };
 namespace TimeTypes {
 typedef std::chrono::steady_clock::time_point TimePoint;
 typedef std::chrono::duration<int, std::milli> Millisecs;
@@ -44,7 +45,7 @@ typedef std::map<std::string, TimeTracker> TimerList;
 
 class Timer {
 	public:
-		enum TIME_FORMAT { MILLISEC, SEC };	
+			
 		static Timer *getInstance(); 		
 		void start(std::string name, int threadId = -1);
 		void stop(std::string name, int threadId = -1);		
@@ -61,6 +62,7 @@ class Timer {
 		Timer() {
 
 		};
+		double msToS(double d) const;
 		Timer(Timer const&);
 		void operator=(Timer const&);
 		

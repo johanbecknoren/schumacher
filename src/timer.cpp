@@ -18,14 +18,17 @@ void Times::start(TimePoint current) {
 }
 
 void Times::stop(TimePoint current) {
-	_elapsed += std::chrono::duration_cast<Millisecs>(_start - current);		
+	if(!_active) return;
+	_elapsed += std::chrono::duration_cast<Millisecs>(current - _start );		
 	_active = false;
 }
 
 Millisecs Times::timeElapsed(TimePoint current) const {
 	Millisecs totalElapsed = _elapsed;
 	if (_active)
-		totalElapsed += std::chrono::duration_cast<Millisecs>(_start - current);
+	{
+		totalElapsed += std::chrono::duration_cast<Millisecs>(current - _start );
+	}
 	return totalElapsed;
 }
 
@@ -73,7 +76,6 @@ void Timer::start(std::string name, int threadId) {
 		tr.push_back(t);
 		timers.insert(std::pair<std::string, TimeTypes::TimeTracker>(name, tr));
 	}
-	std::cout << timers.size() << std::endl;
 }
 
 void Timer::stop(std::string name, int threadId) {
@@ -117,15 +119,21 @@ double Timer::getElapsedTime(std::string name, int threadId) const {
 }	
 
 void Timer::printRealTime(std::string name, TIME_FORMAT format) const {
-	std::cout << timers.size() << std::endl;
-	for(int i = 0; i < timers.size(); ++i) {
-		std::cout << "a";
-	}
 	TimeTypes::TimerList::const_iterator it = timers.find(name);
-	std::cout << "Printing realtime value: ";
+
 	if (it != timers.end()) {
-		std::cout << "Hej!";	
-		std::cout << name << " " << it->second.getRealtime(getCurrentTime());	
+		std::cout << "Timer: ";	
+		std::string v = "ms";
+		double time = it->second.getRealtime(getCurrentTime());
+		if (format == SEC) {
+			time = msToS(time);
+			v = "s";
+		}
+		std::cout.precision(2);
+		std::cout << name << " " << time << v;	
+	}
+	else {
+		std::cout << "No timer called " << name << " found.";
 	}
 	std::cout << std::endl;
 }
@@ -134,17 +142,17 @@ void Timer::printThreadTime(std::string name, TIME_FORMAT format) const {
 
 	if (it != timers.end()) {
 		for (int i = 0; i < it->second.size(); ++i) {
-				
 				return;
 		}
 	}
 }
-
+double Timer::msToS(double d) const {
+	return d * 0.001;
+}
 Timer *Timer::getInstance() {
 	if (_instance == 0) {
 		// Lock here
 		if (_instance == 0) {
-			std::cout << "Constructed instance" << std::endl;
 			_instance = new Timer();	
 		}
 	}

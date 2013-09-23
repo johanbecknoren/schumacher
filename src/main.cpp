@@ -35,7 +35,7 @@ int main() {
 	Timer::getInstance()->start("test");
 	Timer::getInstance()->printRealTime("test");
 	Timer::getInstance()->stop("test");
-	Timer::getInstance()->printRealTime("test");
+	
 	std::cout << "main.cpp - " << sphere->asString() << std::endl << sp2->asString() << std::endl;
 
 	ip = bb.getIntersection(r,true);
@@ -65,7 +65,8 @@ int main() {
 		pixelsInt[i] = int(pixels[i]*255.0f);
 		//std::cout<<pixels[i]<<", ";
 
-	
+	Timer::getInstance()->printRealTime("test", TIME_FORMAT::SEC);
+
 	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
 	return 0;
 }
