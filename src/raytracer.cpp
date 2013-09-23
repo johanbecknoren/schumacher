@@ -15,7 +15,7 @@ float traverseRay(Ray* rayIncoming, IntersectionPoint *ip, Octree* tree, int ite
 
 //	std::cout<<"Sending ray into octree\n";
 	ip = tree->findIntersection(reflected);
-	float intensity;
+	float intensity = 0;
 	if(ip != NULL && iterations > 0) {
 		intensity = glm::dot(reflected->getDirection(), - ip->getNormal());
 //		std::cout << "Recursive call...\n";

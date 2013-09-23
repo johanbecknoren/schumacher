@@ -55,7 +55,7 @@ int main() {
 	Timer::getInstance()->start("tracing");	
 
 	Raytracer rayTracer;
-	int iters = 15;
+	int iters = 0;
 	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
 
 	Timer::getInstance()->stop("tracing");

@@ -85,33 +85,3 @@ void ImageExporter::saveImage(int image[], char filename[], int width, int heigh
 	FreeImage_Save(FIF_PNG, bitmap, file, BitsPerPixel);
 }
 
-bool ImageExporter::saveSequence(int &n, float dt, int range, int width, int height)
-{
-    if(ImageExporter::timeTrack > 1.0 / ImageExporter::fps) {
-		std::stringstream strs;
-		strs << n;
-		std::string temp_str = strs.str();
-		saveImage((char*) temp_str.c_str(),
-				  width, height);
-        n++;
-        ImageExporter::timeTrack = 0.0f;
-    }
-    else
-        ImageExporter::timeTrack += dt;
-	if(n == range)
-		return false;
-	return true;
-}
-
-void ImageExporter::saveSequence(int &n, int width, int height)
-{
-	std::stringstream strs;
-	strs << n;
-	std::string temp_str = strs.str();
-
-	saveImage((char*) temp_str.c_str(),
-			  width, height);
-	std::cout << "saved "  << temp_str << std::endl;
-    n++;
-}
-
