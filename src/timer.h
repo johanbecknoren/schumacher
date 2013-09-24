@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-enum TIME_FORMAT { MILLISEC, SEC };
+enum TIME_FORMAT { MILLISEC, SEC, MIN, HRS, HIGHEST };
 namespace TimeTypes {
 typedef std::chrono::steady_clock::time_point TimePoint;
 typedef std::chrono::duration<int, std::milli> Millisecs;
@@ -57,9 +57,9 @@ class Timer {
 		void reset(std::string name, int threadId = -1);
 		double getElapsedTime(std::string name) const;
 		double getElapsedTime(std::string name, int threadId) const;
-		void printAllTimers(TIME_FORMAT format = TIME_FORMAT::SEC) const;	
-		void printRealTime(std::string name, TIME_FORMAT format = TIME_FORMAT::SEC) const;
-		void printThreadTime(std::string name, TIME_FORMAT format = TIME_FORMAT::SEC) const;
+		void printAllTimers(TIME_FORMAT format = TIME_FORMAT::HIGHEST) const;	
+		void printRealTime(std::string name, TIME_FORMAT format = TIME_FORMAT::HIGHEST) const;
+		void printThreadTime(std::string name, TIME_FORMAT format = TIME_FORMAT::HIGHEST) const;
 
 		static TimeTypes::TimePoint getCurrentTime();
 	private:
@@ -67,6 +67,7 @@ class Timer {
 		Timer() {
 
 		};
+		double convertToHighest(TIME_FORMAT &format, double t) const;
 		double msToS(double d) const;
 		Timer(Timer const&);
 		void operator=(Timer const&);

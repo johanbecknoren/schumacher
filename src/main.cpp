@@ -45,11 +45,15 @@ int main() {
 	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
 
 	Timer::getInstance()->stop("tracing");
-
-	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
-		pixelsInt[i] = int(pixels[i]*255.0f);
 	Timer::getInstance()->printRealTime("tracing");
 
+	Timer::getInstance()->start("tracing");
+	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
+		pixelsInt[i] = int(pixels[i]*255.0f);
+	
+
 	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
+	Timer::getInstance()->stop("tracing");
+	Timer::getInstance()->printRealTime("tracing");
 	return 0;
 }
