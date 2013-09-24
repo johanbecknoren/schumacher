@@ -1,5 +1,6 @@
 #include "raytracer.h"
 #include "progressbar.h"
+#include "timer.h"
 
 // Returnera intensitet
 float traverseRay(Ray* rayIncoming, IntersectionPoint *ip, Octree* tree, int iterations) {
@@ -37,8 +38,9 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 	int total = W*H;
 
 	for(int u=0; u<W; ++u) {
+		Timer::getInstance()->start("Thread", u);
 		for(int v=0; v<H; ++v) {
-
+			
 			float x = ( (2.0f*float(u)-float(W))/float(W) ) * tan(fovx);
 			float y = ( (2.0f*float(v)-float(H))/float(H) ) * tan(fovy);
 
@@ -59,9 +61,10 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 			++pixCounter;
 			
 			ProgressBar::printProgBar(pixCounter, total);	
-			
+		
 		}
+		Timer::getInstance()->stop("Thread", u);
 	}
-
+	Timer::getInstance()->printThreadTime("Thread");	
 	std::cout << "Done!\n";
 }

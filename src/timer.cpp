@@ -36,6 +36,11 @@ Millisecs Times::timeElapsed(TimePoint current) const {
 	return totalElapsed;
 }
 
+double Times::millisecsElapsed(TimePoint current) const {
+	Millisecs elapsed = timeElapsed(current);
+	return elapsed.count();
+}
+
 TimeTracker::TimeTracker() {
 }
 
@@ -96,7 +101,8 @@ void TimeTracker::start(TimePoint v, int threadId) {
 			return;
 		}
 	}
-
+	TimeTypes::Times t = TimeTypes::Times(v, threadId);
+	_threadTimes.push_back(t);
 }
 
 } // namespace TimeTypes
@@ -141,12 +147,21 @@ void Timer::reset(std::string name, int threadId) {
 	}
 }
 
-double Timer::getElapsedTime(std::string name) const {
-	return 0;
-}
-
-
-double Timer::getElapsedTime(std::string name, int threadId) const {
+double Timer::getThreadTime(std::string name, int threadId) const {
+	TimeTypes::TimerList::const_iterator it = timers.find(name);
+	double time = 0;
+	if (it != timers.end()) {
+		for (int i = 0; i < it->second.size(); ++i) {
+			if (threadId == it->second.cget(i).getId()) {
+					return it->second.cget(i).millisecsElapsed(getCurrentTime());
+			}
+			time += it->second.cget(i).millisecsElapsed(getCurrentTime());
+		}
+		std::cout << "n threads" << it->second.size() << std::endl;	
+		if (threadId == -1) {
+			return time;
+		}
+	}
 	return 0;
 }	
 
@@ -155,30 +170,41 @@ void Timer::printRealTime(std::string name, TIME_FORMAT format) const {
 
 	if (it != timers.end()) {
 		std::cout << "Timer: ";	
-		std::string v = "ms";
 		double time = it->second.getRealtime(getCurrentTime());
-		if (format == HIGHEST) {
-			time = convertToHighest(format, time);
-		}
-		if (format == SEC) {
-// 			time = msToS(time);
-			v = "s";
-		}
-		std::cout << name << " " << time << v;	
+		
+		std::cout << name << " ";	
+		printLine(time, format);
 	}
 	else {
 		std::cout << "No timer called " << name << " found.";
 	}
 	std::cout << std::endl;
 }
-void Timer::printThreadTime(std::string name, TIME_FORMAT format) const {
-	TimeTypes::TimerList::const_iterator it = timers.find(name);
 
-	if (it != timers.end()) {
-		for (int i = 0; i < it->second.size(); ++i) {
-				return;
-		}
+void Timer::printLine(double time, TIME_FORMAT format) const {
+	std::string v = "ms";
+
+	if (format == HIGHEST) {
+		time = convertToHighest(format, time);
 	}
+	if (format == SEC) {
+		v = "s";
+	}
+	else if (format == MIN) {
+		v = "m";
+	}
+	else if (format == HRS) {
+		v = "h";
+	}
+	std::cout << time << v;
+
+}
+void Timer::printThreadTime(std::string name, TIME_FORMAT format) const {
+	double time = getThreadTime(name);
+	std::cout << "Timer:";
+	std::cout << name << " ";
+	printLine(time,format);
+	std::cout << std::endl;
 }
 double Timer::msToS(double d) const {
 	return d * 0.001;
@@ -218,3 +244,4 @@ double Timer::convertToHighest(TIME_FORMAT &format, double t) const {
 	return t;
 	
 }
+Timer *Timer::_instance;
