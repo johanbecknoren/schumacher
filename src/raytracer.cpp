@@ -49,11 +49,11 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 			if(ip!=NULL) {
 				Material firstMat = ip->getMaterial();
 //				std::cout<<"Found intersection\n";
-// 				float intensity = traverseRay(r, ip, tree, iterations);
+				float intensity = traverseRay(r, ip, tree, iterations);
 // 				std::cout << "intensity = " << intensity<<std::endl;
-				pixels[u*3 + W*(H-v)*3 + 0] = firstMat.getDiffuseColor().x;
-				pixels[u*3 + W*(H-v)*3 + 1] = firstMat.getDiffuseColor().y;
-				pixels[u*3 + W*(H-v)*3 + 2] = firstMat.getDiffuseColor().z;
+				pixels[u*3 + W*(H-v)*3 + 0] = intensity * firstMat.getDiffuseColor().x;
+				pixels[u*3 + W*(H-v)*3 + 1] = intensity * firstMat.getDiffuseColor().y;
+				pixels[u*3 + W*(H-v)*3 + 2] = intensity * firstMat.getDiffuseColor().z;
 
 			}
 			++pixCounter;

@@ -81,7 +81,7 @@ void ImageExporter::saveImage(int image[], char filename[], int width, int heigh
 	
 #ifdef CMAKE_SOURCE_DIR
 	char ef[] = "/export/";
-	char dir[] = CMAKE_SOURCE_DIR;
+	char dir[] = CMAKE_BINARY_DIR;
 	char *folder = merge(dir, ef);
 #else
 	char folder[] = "export/";
