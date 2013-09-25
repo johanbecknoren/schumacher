@@ -1,5 +1,5 @@
 #include "raytracer.h"
-#include "progressbar.h"
+// #include "progressbar.h"
 #include "timer.h"
 
 // Returnera intensitet
@@ -60,7 +60,7 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 			}
 			++pixCounter;
 			
-			ProgressBar::printProgBar(pixCounter, total);	
+// 			ProgressBar::printProgBar(pixCounter, total);	
 		
 		}
 		Timer::getInstance()->stop("Thread", u);

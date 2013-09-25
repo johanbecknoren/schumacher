@@ -2,7 +2,7 @@
 #define OCTREE_H
 #include <vector>
 #include "renderable.h"
-//#define USE_OCTREE
+
 
 class Leaf {
 public:
@@ -45,7 +45,7 @@ public:
 	void print() const;
 	IntersectionPoint *findIntersection(Ray *ray);
 	std::vector<const Renderable*> getLightList() const;
-	bool intersect(Ray &ray, IntersectionPoint *isect);
+	bool intersect(Ray &ray, IntersectionPoint &isect);
 private:
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);
