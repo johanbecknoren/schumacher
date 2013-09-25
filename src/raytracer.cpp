@@ -15,7 +15,7 @@ float traverseRay(Ray* rayIncoming, IntersectionPoint *ip, Octree* tree, int ite
 	Ray* reflected = new Ray(ip->getPoint(), reflDir);
 
 //	std::cout<<"Sending ray into octree\n";
-	ip = tree->findIntersection(reflected);
+	tree->intersect(&reflected, &ip);
 	float intensity = 0;
 	if(ip != NULL && iterations > 0) {
 		intensity = glm::dot(reflected->getDirection(), - ip->getNormal());
@@ -46,12 +46,11 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 
 			Ray *r = new Ray( cam->getPosition(), glm::vec3(x,y,-cam->getDirection().z)-glm::vec3(0.0f));
 			IntersectionPoint* ip;
-			ip = tree->findIntersection(r);
 			
-			if(ip!=NULL) {
+			if(tree->intersect(r, ip)) {
 				Material firstMat = ip->getMaterial();
 //				std::cout<<"Found intersection\n";
-				float intensity = traverseRay(r, ip, tree, iterations);
+				float intensity = traverseRay(r, &ip, tree, iterations);
 // 				std::cout << "intensity = " << intensity<<std::endl;
 				pixels[u*3 + W*(H-v)*3 + 0] = intensity * firstMat.getDiffuseColor().x;
 				pixels[u*3 + W*(H-v)*3 + 1] = intensity * firstMat.getDiffuseColor().y;

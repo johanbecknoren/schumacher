@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "imageexporter.h"
 #include "simpleraycaster.h"
+#include "raytracer.h"
 #include "timer.h"
 
 int main(int argc, char **argv) {
@@ -24,7 +25,7 @@ int main(int argc, char **argv) {
 
 	Octree *tree = new Octree(&bb);
 
-	Sphere *sphere = new Sphere(2.0f, glm::vec3(3.0f,3.f,3.f));
+	Sphere *sphere = new Sphere(0.2f, glm::vec3(-0.05f,-0.2f,1.5f));
 	sphere->setMaterial(STONE);
 
 	Sphere *sp2 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 4.23f));
@@ -33,7 +34,7 @@ int main(int argc, char **argv) {
 	Sphere *sp3 = new Sphere(1.f, glm::vec3(-2.02f, 3.13f, 4.23f));
 	sp3->setMaterial(MARBLE);
 
-	Sphere *spLight = new Sphere(0.01f, glm::vec3(0.0f,-4.0f, 5.0f));
+	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
 	Lightsource *light = new Lightsource(glm::vec3(0.0f, -4.0f, 5.0f), 1.0f, glm::vec3(1.0, 1.0, 1.0));
@@ -52,11 +53,11 @@ int main(int argc, char **argv) {
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
 
-// 	Raytracer rayTracer;
+	Raytracer rayTracer;
 	SimpleRaycaster caster;
 	caster.render(pixels, tree, WIDTH, HEIGHT, cam);
 	int iters = 1;
-//	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
+	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
 
 
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)

@@ -43,13 +43,11 @@ public:
 
     void addObject(Renderable *object);
 	void print() const;
-	IntersectionPoint *findIntersection(Ray *ray);
 	std::vector<const Renderable*> getLightList() const;
 	bool intersect(Ray &ray, IntersectionPoint &isect);
 private:
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);
-	IntersectionPoint *iterateRay(Ray *ray, Node *node, bool &active);
 	AABB *createBoundingBox(const Node *node, const int octant);
 	void subdivideBoundingBox(Node *parent, Renderable *object);
 	void print(Node *node) const ;
