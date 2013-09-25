@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-enum TIME_FORMAT { MILLISEC, SEC };
+enum TIME_FORMAT { MILLISEC, SEC, MIN, HRS, HIGHEST };
 namespace TimeTypes {
 typedef std::chrono::steady_clock::time_point TimePoint;
 typedef std::chrono::duration<int, std::milli> Millisecs;
@@ -21,6 +21,7 @@ class Times {
 		bool isActive() { return _active; };
 		int getId() const { return _id; };
 		Millisecs timeElapsed(TimePoint current) const;
+		double millisecsElapsed(TimePoint current) const;
 	private:
 		TimePoint _start;
 		Millisecs _elapsed;
@@ -33,6 +34,7 @@ class TimeTracker {
 		TimeTracker();
 		int size() const { return _threadTimes.size(); };
 		Times& operator [](int i) { return _threadTimes[i]; }
+		const Times& cget(int i) const { return _threadTimes[i]; }
 		void push_back(Times t); 
 		void erase(std::vector<Times>::iterator it) { _threadTimes.erase(it); }
 		std::vector<Times>::iterator begin() { return _threadTimes.begin(); }
@@ -55,11 +57,13 @@ class Timer {
 		void start(std::string name, int threadId = -1);
 		void stop(std::string name, int threadId = -1);		
 		void reset(std::string name, int threadId = -1);
-		double getElapsedTime(std::string name) const;
-		double getElapsedTime(std::string name, int threadId) const;
-		void printAllTimers(TIME_FORMAT format = TIME_FORMAT::SEC) const;	
-		void printRealTime(std::string name, TIME_FORMAT format = TIME_FORMAT::SEC) const;
-		void printThreadTime(std::string name, TIME_FORMAT format = TIME_FORMAT::SEC) const;
+		double getRealTime(std::string name) const;
+		double getThreadTime(std::string name, int threadId = -1) const;
+		void printAllTimers(TIME_FORMAT format = TIME_FORMAT::HIGHEST) const;	
+		void printRealTime(std::string name, 
+						TIME_FORMAT format = TIME_FORMAT::HIGHEST) const;
+		void printThreadTime(std::string name, 
+						TIME_FORMAT format = TIME_FORMAT::HIGHEST) const;
 
 		static TimeTypes::TimePoint getCurrentTime();
 	private:
@@ -67,12 +71,12 @@ class Timer {
 		Timer() {
 
 		};
+		void printLine(double time, TIME_FORMAT format) const;
+		double convertToHighest(TIME_FORMAT &format, double t) const;
 		double msToS(double d) const;
 		Timer(Timer const&);
 		void operator=(Timer const&);
-		
+		static Timer *_instance;
 };
-namespace {
-	static Timer *_instance;
-};
+
 #endif

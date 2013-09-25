@@ -55,7 +55,12 @@ void ImageExporter::saveImage(char filename[], int width, int height)
 {
 	//På windows måste det finnas en mapp för att den ska sparas. 
 	//Borde ändras till att be användaren att välja mapp
+#ifdef CMAKE_SOURCE_DIR
+	char folder[] = CMAKE_SOURCE_DIR;
+#else
 	char folder[] = "export/";
+#endif
+
     char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);
 	
@@ -74,8 +79,14 @@ void ImageExporter::saveImage(int image[], char filename[], int width, int heigh
 
     std::strftime(buffer, 120, "%Y-%m-%d-%H-%M-%S", timeinfo);
 	
-	
+#ifdef CMAKE_SOURCE_DIR
+	char ef[] = "/export/";
+	char dir[] = CMAKE_BINARY_DIR;
+	char *folder = merge(dir, ef);
+#else
 	char folder[] = "export/";
+#endif
+
 	char *fend = merge(buffer, (char*)".png");
 // 	fend = merge(filename, fend);
 	//char *fend = merge(filename, (char*)".png");

@@ -30,10 +30,10 @@ link_directories(
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/export)
 
-if(CMAKE_SOURCE_DIR)
-	add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
+if(CMAKE_CURRENT_BINARY_DIR)
+	add_definitions(-DCMAKE_BINARY_DIR=\"${CMAKE_CURRENT_BINARY_DIR}\")
 else()
-	add_definitions(-DCMAKE_SOURCE_DIR=\"\")
+	add_definitions(-DCMAKE_BINARY_DIR=\"\")
 endif()
 
 add_executable(schumacher ${HEADERS} ${SRCS} )

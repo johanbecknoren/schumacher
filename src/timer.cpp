@@ -36,6 +36,11 @@ Millisecs Times::timeElapsed(TimePoint current) const {
 	return totalElapsed;
 }
 
+double Times::millisecsElapsed(TimePoint current) const {
+	Millisecs elapsed = timeElapsed(current);
+	return elapsed.count();
+}
+
 TimeTracker::TimeTracker() {
 }
 
@@ -59,12 +64,16 @@ void TimeTracker::stop(TimePoint v, int threadId) {
 		_realTime.stop(v);
 		return;
 	}
+	bool allOff = true;
 	for (int i = 0; i < _threadTimes.size(); ++i) {
 		if (threadId == _threadTimes[i].getId()) {
 			_threadTimes[i].stop(v);
-			return;
+			if (!allOff) return;
 		}
+		if (_threadTimes[i].isActive()) allOff = false;
 	}
+	if (allOff)
+		_realTime.stop(v);
 
 }
 
@@ -81,24 +90,28 @@ void TimeTracker::reset(int threadId) {
 	}
 }
 
+void TimeTracker::start(TimePoint v, int threadId) {
+	_realTime.start(v);
+	if (threadId == -1) {	
+		return;
+	}
+	for (int i = 0; i < _threadTimes.size(); ++i) {
+		if (threadId == _threadTimes[i].getId()) {
+			_threadTimes[i].start(v);
+			return;
+		}
+	}
+	TimeTypes::Times t = TimeTypes::Times(v, threadId);
+	_threadTimes.push_back(t);
+}
+
 } // namespace TimeTypes
 
 void Timer::start(std::string name, int threadId) {
 	TimeTypes::TimePoint v = getCurrentTime();
 	TimeTypes::TimerList::iterator it = timers.find(name);
 	if (it != timers.end()) { 
-		for (int i = 0; i < it->second.size(); ++i) {
-			if (threadId == it->second[i].getId()) {
-				if (it->second[i].isActive()) {
-					std::cout << "timer.h l40 - ERROR: Id already added "
-					  << "for this name. Stop it or add with other ID.\n";
-				}
-				else {
-					it->second[i].start(v);
-					return;
-				}
-			}
-		}
+		it->second.start(v, threadId);		
 	}
 	else {
 		TimeTypes::Times t = TimeTypes::Times(v, threadId);
@@ -134,12 +147,21 @@ void Timer::reset(std::string name, int threadId) {
 	}
 }
 
-double Timer::getElapsedTime(std::string name) const {
-	return 0;
-}
-
-
-double Timer::getElapsedTime(std::string name, int threadId) const {
+double Timer::getThreadTime(std::string name, int threadId) const {
+	TimeTypes::TimerList::const_iterator it = timers.find(name);
+	double time = 0;
+	if (it != timers.end()) {
+		for (int i = 0; i < it->second.size(); ++i) {
+			if (threadId == it->second.cget(i).getId()) {
+					return it->second.cget(i).millisecsElapsed(getCurrentTime());
+			}
+			time += it->second.cget(i).millisecsElapsed(getCurrentTime());
+		}
+		std::cout << "n threads" << it->second.size() << std::endl;	
+		if (threadId == -1) {
+			return time;
+		}
+	}
 	return 0;
 }	
 
@@ -148,28 +170,41 @@ void Timer::printRealTime(std::string name, TIME_FORMAT format) const {
 
 	if (it != timers.end()) {
 		std::cout << "Timer: ";	
-		std::string v = "ms";
 		double time = it->second.getRealtime(getCurrentTime());
-		if (format == SEC) {
-			time = msToS(time);
-			v = "s";
-		}
-		std::cout.precision(2);
-		std::cout << name << " " << time << v;	
+		
+		std::cout << name << " ";	
+		printLine(time, format);
 	}
 	else {
 		std::cout << "No timer called " << name << " found.";
 	}
 	std::cout << std::endl;
 }
-void Timer::printThreadTime(std::string name, TIME_FORMAT format) const {
-	TimeTypes::TimerList::const_iterator it = timers.find(name);
 
-	if (it != timers.end()) {
-		for (int i = 0; i < it->second.size(); ++i) {
-				return;
-		}
+void Timer::printLine(double time, TIME_FORMAT format) const {
+	std::string v = "ms";
+
+	if (format == HIGHEST) {
+		time = convertToHighest(format, time);
 	}
+	if (format == SEC) {
+		v = "s";
+	}
+	else if (format == MIN) {
+		v = "m";
+	}
+	else if (format == HRS) {
+		v = "h";
+	}
+	std::cout << time << v;
+
+}
+void Timer::printThreadTime(std::string name, TIME_FORMAT format) const {
+	double time = getThreadTime(name);
+	std::cout << "Timer:";
+	std::cout << name << " ";
+	printLine(time,format);
+	std::cout << std::endl;
 }
 double Timer::msToS(double d) const {
 	return d * 0.001;
@@ -189,3 +224,24 @@ TimeTypes::TimePoint Timer::getCurrentTime() {
 	return p; 
 }
 
+double Timer::convertToHighest(TIME_FORMAT &format, double t) const {
+	if (t < 1000.0) {
+		format = TIME_FORMAT::MILLISEC;
+		return t;
+	}
+	else t = msToS(t);
+	if (t < 60.0) {
+		format = TIME_FORMAT::SEC;
+		return t;
+	}
+	else t /= 60.0; // Convert to minutes
+	if (t < 60) {
+		format = TIME_FORMAT::MIN;
+		return t;
+	}
+	else t /= 60.0;
+	format = TIME_FORMAT::HRS;
+	return t;
+	
+}
+Timer *Timer::_instance;

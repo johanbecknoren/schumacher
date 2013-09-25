@@ -6,7 +6,13 @@
 #include "raytracer.h"
 #include "timer.h"
 
-int main() {
+int main(int argc, char **argv) {
+	bool exportImage = true;
+	for (int i = 0; i < argc; ++i) {
+		if (std::string(argv[i]) == "-e") {
+			exportImage = false;
+		}
+	}
 	Camera *cam = new Camera();
 
 	Ray *r = new Ray(glm::vec3(-15.f,-15.f,-15.f), glm::vec3(1.0,0.7f,0.8f));
@@ -48,11 +54,15 @@ int main() {
 	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
 
 	Timer::getInstance()->stop("tracing");
-
-	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
-		pixelsInt[i] = int(pixels[i]*255.0f);
 	Timer::getInstance()->printRealTime("tracing");
 
-	ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
+	Timer::getInstance()->start("tracing");
+	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
+		pixelsInt[i] = int(pixels[i]*255.0f);
+	
+	if (exportImage)
+		ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
+	Timer::getInstance()->stop("tracing");
+	Timer::getInstance()->printRealTime("tracing");
 	return 0;
 }
