@@ -4,14 +4,19 @@
 #include "renderable.h"
 
 class Lightsource : public Renderable {
-	Lightsource();
+public:
+	Lightsource(const glm::vec3 pos, 
+					const float& intensity, 
+					const glm::vec3 color);
+
 	Lightsource(const glm::vec3& lLB,
               const glm::vec3& uRF,
               const glm::vec3 p,
               const float& i, const glm::vec3 c);
 	~Lightsource() {};
 	virtual void createAABB();
-	IntersectionPoint* getIntersection(Ray*, bool = false);
+	virtual IntersectionPoint *getIntersectionPoint(Ray *ray) const;
+	IntersectionPoint *getIntersection(Ray*, bool);
 private:
 	glm::vec3 _lowerLeftBack;
 	glm::vec3 _upperRightFront;

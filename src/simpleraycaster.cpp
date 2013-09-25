@@ -1,5 +1,5 @@
 #include "simpleraycaster.h"
-#include "progressbar.h"
+// #include "progressbar.h"
 
 void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int H, Camera *cam){
 	// Skicka en stråle per pixel, hämta normal samt material
@@ -24,17 +24,15 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, const int W, const int
 			// en iterations-tröskel nås
 			//Ray *r = new Ray( glm::vec3(0.0f), glm::vec3(x,y,1.0f)-glm::vec3(0.0f) );
 			Ray *r = new Ray( cam->getPosition(), glm::vec3(x,y,-cam->getDirection().z)-glm::vec3(0.0f) );
+			IntersectionPoint ip;
 
-			IntersectionPoint* ip;
-			ip = tree->findIntersection(r);
-			
-			if(ip != NULL )	{
-				float intensity = glm::dot(r->getDirection(), - ip->getNormal());
-				pixels[u*3 + W*(H-v)*3 + 0] = intensity*ip->getMaterial().getDiffuseColor().x;
-				pixels[u*3 + W*(H-v)*3 + 1] = intensity*ip->getMaterial().getDiffuseColor().y;
-				pixels[u*3 + W*(H-v)*3 + 2] = intensity*ip->getMaterial().getDiffuseColor().z;
+			if (tree->intersect(*r, ip)) {
+				float intensity = glm::dot(r->getDirection(), - ip.getNormal());
+				pixels[u*3 + W*(H-v)*3 + 0] = intensity*ip.getMaterial().getDiffuseColor().x;
+				pixels[u*3 + W*(H-v)*3 + 1] = intensity*ip.getMaterial().getDiffuseColor().y;
+				pixels[u*3 + W*(H-v)*3 + 2] = intensity*ip.getMaterial().getDiffuseColor().z;
 			}
-			ProgressBar::printProgBar(rayCounter, total);	
+// 			ProgressBar::printProgBar(rayCounter, total);	
 		}
 	}
 	std::cout << std::endl;
