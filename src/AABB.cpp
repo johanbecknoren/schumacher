@@ -56,6 +56,24 @@ int AABB::getQuadrant(const glm::vec3& p) const {
 //	return 0;
 }
 
+bool AABB::IntersectT(Ray *ray, float *tmin, float *tmax) const {
+	float t0 = ray->getTMin();
+	float t1 = ray->getTMax();
+	for(int i = 0; i < 3; ++i) {
+		float invRayDir = 1.0f / ray->getDirection()[i];
+		float tNear = (_lowerLeftBack[i] - ray->getOrigin()[i]) * invRayDir;
+		float tFar = (_upperRightFront[i] - ray->getOrigin()[i]) * invRayDir;
+		if (tNear > tFar) std::swap(tNear, tFar);
+		
+		t0 = tNear > t0 ? tNear : t0;
+		t1 = tFar < t1 ? tFar : t1;
+		if (t0 > t1) return false;
+	}
+	if (tmin) *tmin = t0;
+	if (tmax) *tmax = t1;
+	return true;
+}
+
 IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  const {
 	/* Algorithm from http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms */
 	glm::vec3 direction = glm::normalize(ray->getDirection());

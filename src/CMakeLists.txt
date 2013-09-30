@@ -3,7 +3,7 @@ project(schumacher)
 
 IF(UNIX)
 	MESSAGE(STATUS "La till c++11!")
-	SET(CMAKE_CXX_FLAGS "-std=c++11 -Werror")
+	SET(CMAKE_CXX_FLAGS "-std=c++11 -Werror -Wall -Wno-unused-variable")
 ENDIF(UNIX)
 
 FILE(GLOB HEADERS  ./*.h*)
