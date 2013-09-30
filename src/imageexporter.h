@@ -7,9 +7,6 @@
 
 namespace ImageExporter
 {
-
-    static float fps = 30;
-    static float timeTrack = 0;
 	void saveImage(char filename[], int width, int height);
 	void saveImage(int image[], char filename[], int width, int height);
 

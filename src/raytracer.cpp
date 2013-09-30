@@ -1,5 +1,5 @@
 #include "raytracer.h"
-// #include "progressbar.h"
+#include "progressbar.h"
 #include "timer.h"
 
 // Returnera intensitet
@@ -15,7 +15,7 @@ float traverseRay(Ray* rayIncoming, IntersectionPoint *ip, Octree* tree, int ite
 	Ray* reflected = new Ray(ip->getPoint(), reflDir);
 
 //	std::cout<<"Sending ray into octree\n";
-	tree->intersect(&reflected, &ip);
+	tree->intersect(*reflected, *ip);
 	float intensity = 0;
 	if(ip != NULL && iterations > 0) {
 		intensity = glm::dot(reflected->getDirection(), - ip->getNormal());
@@ -45,12 +45,12 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 			float y = ( (2.0f*float(v)-float(H))/float(H) ) * tan(fovy);
 
 			Ray *r = new Ray( cam->getPosition(), glm::vec3(x,y,-cam->getDirection().z)-glm::vec3(0.0f));
-			IntersectionPoint* ip;
+			IntersectionPoint* ip = nullptr;
 			
-			if(tree->intersect(r, ip)) {
+			if(tree->intersect(*r, *ip)) {
 				Material firstMat = ip->getMaterial();
 //				std::cout<<"Found intersection\n";
-				float intensity = traverseRay(r, &ip, tree, iterations);
+				float intensity = traverseRay(r, ip, tree, iterations);
 // 				std::cout << "intensity = " << intensity<<std::endl;
 				pixels[u*3 + W*(H-v)*3 + 0] = intensity * firstMat.getDiffuseColor().x;
 				pixels[u*3 + W*(H-v)*3 + 1] = intensity * firstMat.getDiffuseColor().y;
@@ -59,7 +59,7 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 			}
 			++pixCounter;
 			
-// 			ProgressBar::printProgBar(pixCounter, total);	
+			ProgressBar::printProgBar(pixCounter, total);	
 		
 		}
 		Timer::getInstance()->stop("Thread", u);

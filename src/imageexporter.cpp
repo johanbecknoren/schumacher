@@ -36,7 +36,6 @@ FIBITMAP* ImageExporter::convertScreenToBitmap(int width, int height)
 
 FIBITMAP* ImageExporter::convertArrayToBitmap(int image[], int width, int height) 
 {
-	BYTE *pixels = new BYTE[3 * width * height];
 	RGBQUAD color;
 	FIBITMAP *bitmap = FreeImage_Allocate(width, height, BitsPerPixel);
 	for (int w = 0; w < width; ++w) {

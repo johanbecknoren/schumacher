@@ -102,7 +102,6 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) {
 		return false;
 	
 	// Prepare for traversal
-	glm::vec3 invDir = 1.0f / ray.getDirection();
 #define MAX_TODO 64
 	ToDo todo[MAX_TODO];
 	int todoPos = 0;
@@ -236,25 +235,30 @@ void Octree::addObject(Renderable *object) {
 }
 // Calculate sub bounding box in specified octant
 void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
-	const AABB *parentBox = parent->getBoundingBox();
-	const AABB *objectBox = object->getBoundingBox();
 
-	const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
-	const glm::vec3 upperRight = objectBox->getUpperRightFront();
-	int q1 = parentBox->getQuadrant(lowerLeft);
-	int q2 = parentBox->getQuadrant(upperRight);
+#ifdef USE_OCTREE	
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
-#ifdef USE_OCTREE
-	if(q1 != -1 && q2 != -1 && q1 == q2) {
-#else
-	if(false) {
-#endif
-		if(parent->getChild(q1) == NULL)
+	const AABB *parentBox = parent->getBoundingBox();
+	const AABB *objectBox = object->getBoundingBox();	
+	const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
+
+	int q1 = parentBox->getQuadrant(lowerLeft);
+
+	const glm::vec3 upperRight = objectBox->getUpperRightFront();
+	int q2 = parentBox->getQuadrant(upperRight);
+	if(q1 != -1 && q2 != -1 && q1 == q2) {		
+		if(parent->getChild(q1) == NULL) {
 			addChild(parent, q1);
+		}
 		subdivideBoundingBox(parent->getChild(q1), object);
 	}
 	else {
+#else
+	// We are not using octree, so we dont need to do anything 
+	// with the bounding boxes when adding objects.
+	{
+#endif
 		Leaf *leaf = new Leaf(object);
 		_leafs.push_back(*leaf);
 		parent->addLeaf(leaf);
