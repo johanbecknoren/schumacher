@@ -16,7 +16,7 @@ class Renderable {
 		_material = Material();
 		_material.setMaterialType(m);
 		if (m == GLASS) {
-			_material.setDiffuseColor(glm::vec3(1.0f));
+			_material.setDiffuseColor(glm::vec3(0.0f, 0.0f, 1.0f));
 			_material.setRefractionIndex(REFRACTION_GLASS);
 			_material.setOpacity(0.03);
 			_material.setSpecular(1.0f);

@@ -1,7 +1,7 @@
 #ifndef OCTREE_H
 #define OCTREE_H
 #include <vector>
-#include "renderable.h"
+#include "pointlight.h"
 
 
 class Leaf {
@@ -42,6 +42,8 @@ public:
     ~Octree();
 
     void addObject(Renderable *object);
+	void addPointLight(PointLight *pointLight) { _pointLights.push_back(pointLight); }
+	const std::vector<PointLight *> &getPointLights() { return _pointLights; }
 	void print() const;
 	std::vector<const Renderable*> getLightList() const;
 	bool intersect(Ray &ray, IntersectionPoint &isect);
@@ -54,6 +56,7 @@ private:
 	Node *_root;
 	std::vector<Node> _nodes;
 	std::vector<Leaf> _leafs;
+	std::vector<PointLight *> _pointLights;
 };
 struct ToDo {
 	const Node *node;

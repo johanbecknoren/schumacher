@@ -2,7 +2,7 @@
 #include "sphere.h"
 #include <climits>
 
-// #define USE_OCTREE
+#define USE_OCTREE
 
 Node::Node(int nodeDepth, AABB nodeBoundingBox) {
 	_boundingBox = nodeBoundingBox;

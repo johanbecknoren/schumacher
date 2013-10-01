@@ -5,6 +5,7 @@
 #include "imageexporter.h"
 #include "simpleraycaster.h"
 #include "raytracer.h"
+#include "whittedtracer.h"
 #include "timer.h"
 #include "plane.h"
 int main(int argc, char **argv) {
@@ -29,25 +30,31 @@ int main(int argc, char **argv) {
 	Sphere *sp2 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 4.23f));
 	sp2->setMaterial(GLASS);
 
-	Sphere *sp3 = new Sphere(1.f, glm::vec3(-2.02f, 3.13f, 4.23f));
+	Sphere *sp3 = new Sphere(1.f, glm::vec3(-2.02f, 0.13f, 4.23f));
 	sp3->setMaterial(MARBLE);
 
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
+	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, -15.f, 1.0f), 1, glm::vec3(255.f, 255.f, 255.f));
+
 	tree->addObject(sphere);
 	tree->addObject(sp2);
 	tree->addObject(sp3);
 	tree->addObject(spLight);
+	tree->addPointLight(ptLgt);
 
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
 
-	Raytracer rayTracer;
-	SimpleRaycaster caster;
-	caster.render(pixels, tree, WIDTH, HEIGHT, cam);
+	Raytracer rayTracer(WIDTH, HEIGHT);
+	SimpleRaycaster caster(WIDTH, HEIGHT);
+	WhittedTracer wTracer(WIDTH, HEIGHT);
+
+	wTracer.render(pixels, tree, cam);
+// 	caster.render(pixels, tree, cam);
 // 	int iters = 1;
-// 	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
+// 	rayTracer.render(pixels, tree, cam, iters);
 
 
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)

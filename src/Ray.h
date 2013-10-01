@@ -3,14 +3,15 @@
 
 #include <iostream>
 #include <glm/glm.hpp>
-
+#include <glm/gtx/string_cast.hpp> 
 class Ray {
 public:
 	Ray();
-	Ray(const glm::vec3&, const glm::vec3&);
+	Ray(const glm::vec3& origin, const glm::vec3& dir);
 	~Ray(){};
 	float getTMin() const { return _tmin; }
 	float getTMax() const { return _tmax; }
+	void setTMax(float tmax) { _tmax = tmax; }
 	glm::vec3 getOrigin() const { return _origin; } ;
 	glm::vec3 getPosition() const { return _origin * _tmin; };
 	glm::vec3 getDirection() const { return _direction; };
@@ -18,9 +19,8 @@ public:
 	void setDirection(const glm::vec3 d) { _direction = glm::normalize(d); };
 	void updateT(const float tmin, const float tmax);	
 	void print () {
-		std::cout << "Ray - Origin: " << _origin.x << ',' << _origin.y << ','
-        << _origin.z << "\nRay - Direction: " << _direction.x << ','
-        << _direction.y<<','<<_direction.z<<"\n";
+		std::cout << "Ray - Origin: " << glm::to_string(_origin) << 
+			"\nRay - Direction: " << glm::to_string(_direction) <<"\n";
 	};
 private:
 	glm::vec3 _origin;

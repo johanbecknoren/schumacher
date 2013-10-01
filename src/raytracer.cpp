@@ -26,23 +26,20 @@ float traverseRay(Ray* rayIncoming, IntersectionPoint *ip, Octree* tree, int ite
 	return intensity;
 }
 
-void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Camera *cam, int &iterations) {
+void Raytracer::render(float* pixels, Octree *tree, Camera *cam, int &iterations) {
 
-	// Godtycklig FOV (http://www.unknownroad.com/rtfm/graphics/rt_eyerays.html)
-	float fovx = float(M_PI)/4.0f; // 45 grader
-	float fovy = (float(H)/float(W)) * fovx;
 	std::cout << "Populating *pixels...\n";
 	// (u,v) are pixel coords for output image
 
 	int pixCounter = 0;
-	int total = W*H;
+	int total = _W * _H;
 
-	for(int u=0; u<W; ++u) {
+	for(int u = 0; u < _W; ++u) {
 		Timer::getInstance()->start("Thread", u);
-		for(int v=0; v<H; ++v) {
+		for(int v = 0; v < _H; ++v) {
 			
-			float x = ( (2.0f*float(u)-float(W))/float(W) ) * tan(fovx);
-			float y = ( (2.0f*float(v)-float(H))/float(H) ) * tan(fovy);
+			float x = ( (2.0f*float(u)-float(_W))/float(_W) ) * _tanfovx;
+			float y = ( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
 
 			Ray *r = new Ray( cam->getPosition(), glm::vec3(x,y,-cam->getDirection().z)-glm::vec3(0.0f));
 			IntersectionPoint* ip = nullptr;
@@ -52,9 +49,10 @@ void Raytracer::render(float* pixels, Octree *tree, const int W, const int H, Ca
 //				std::cout<<"Found intersection\n";
 				float intensity = traverseRay(r, ip, tree, iterations);
 // 				std::cout << "intensity = " << intensity<<std::endl;
-				pixels[u*3 + W*(H-v)*3 + 0] = intensity * firstMat.getDiffuseColor().x;
-				pixels[u*3 + W*(H-v)*3 + 1] = intensity * firstMat.getDiffuseColor().y;
-				pixels[u*3 + W*(H-v)*3 + 2] = intensity * firstMat.getDiffuseColor().z;
+				int id = calculateId(u, v);
+				pixels[id + 0] = intensity * firstMat.getDiffuseColor().x;
+				pixels[id + 1] = intensity * firstMat.getDiffuseColor().y;
+				pixels[id + 2] = intensity * firstMat.getDiffuseColor().z;
 
 			}
 			++pixCounter;
