@@ -1,19 +1,19 @@
-#ifndef LIGHTSOURCE_H
-#define LIGHTSOURCE_H
+#ifndef POINTLIGHT_H
+#define POINTLIGHT_H
 
 #include "renderable.h"
 
-class Lightsource : public Renderable {
+class PointLight : public Renderable {
 public:
-	Lightsource(const glm::vec3 pos, 
+	PointLight(const glm::vec3 pos, 
 					const float& intensity, 
 					const glm::vec3 color);
 
-	Lightsource(const glm::vec3& lLB,
+	PointLight(const glm::vec3& lLB,
               const glm::vec3& uRF,
               const glm::vec3 p,
               const float& i, const glm::vec3 c);
-	~Lightsource() {};
+	~PointLight() {};
 	virtual void createAABB();
 	virtual IntersectionPoint *getIntersectionPoint(Ray *ray) const;
 	IntersectionPoint *getIntersection(Ray*, bool);

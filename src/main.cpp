@@ -1,6 +1,6 @@
 #include <iostream>
 #include "sphere.h"
-#include "lightsource.h"
+#include "pointlight.h"
 #include "utils.h"
 #include "imageexporter.h"
 #include "simpleraycaster.h"
@@ -16,10 +16,6 @@ int main(int argc, char **argv) {
 	}
 	Camera *cam = new Camera();
 
-	Ray *r = new Ray(glm::vec3(-15.f,-15.f,-15.f), glm::vec3(1.0,1.0f,1.0f));
-	glm::vec3 point(-9.5f,9.5f,9.5f);
-	Ray *r2 = new Ray(glm::vec3(0.0f), glm::vec3(-1.0f));
-	Ray *r3 = new Ray(glm::vec3(-15.f), glm::vec3(1.0f));
 	std::cout << "Creating AABB!\n";
 	AABB bb(glm::vec3(-10.0f), glm::vec3(10.0f));
 
@@ -37,18 +33,10 @@ int main(int argc, char **argv) {
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
-	Lightsource *light = new Lightsource(glm::vec3(0.0f, -4.0f, 5.0f), 1.0f, glm::vec3(1.0, 1.0, 1.0));
-	spLight->setMaterial(LIGHT);
-//	tree->addObject(light);
-
 	tree->addObject(sphere);
 	tree->addObject(sp2);
 	tree->addObject(sp3);
 	tree->addObject(spLight);
-	IntersectionPoint pt;
-	bool t = tree->intersect(*r, pt);
-	if (t) std::cout << "Found intersection!" << std::endl;
-	else std::cout << "No intersection!" << std::endl;
 
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
@@ -56,8 +44,8 @@ int main(int argc, char **argv) {
 	Raytracer rayTracer;
 	SimpleRaycaster caster;
 	caster.render(pixels, tree, WIDTH, HEIGHT, cam);
-	int iters = 1;
-	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
+// 	int iters = 1;
+// 	rayTracer.render(pixels, tree, WIDTH, HEIGHT, cam, iters);
 
 
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)

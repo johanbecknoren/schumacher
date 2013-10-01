@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.6.0)
 project(schumacher)
 
 IF(UNIX)
-	MESSAGE(STATUS "La till c++11!")
 	SET(CMAKE_CXX_FLAGS "-std=c++11 -Werror -Wall -Wno-error=unused-variable")
 ENDIF(UNIX)
 
@@ -39,7 +38,7 @@ endif()
 add_executable(schumacher ${HEADERS} ${SRCS} )
 
 if(WIN32)
-	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib assimp.lib glew32.lib )
+	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib)
 endif(WIN32)
 
 if(UNIX)
