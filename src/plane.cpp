@@ -27,5 +27,5 @@ IntersectionPoint *Plane::getIntersectionPoint(Ray *ray) const {
 	float d = nom/denom;
 	intVec = ray->getOrigin() + d * ray->getDirection();
 
-//	return NULL;
+	return NULL;
 }

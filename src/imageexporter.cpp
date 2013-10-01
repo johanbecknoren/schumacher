@@ -36,7 +36,6 @@ FIBITMAP* ImageExporter::convertScreenToBitmap(int width, int height)
 
 FIBITMAP* ImageExporter::convertArrayToBitmap(int image[], int width, int height) 
 {
-	BYTE *pixels = new BYTE[3 * width * height];
 	RGBQUAD color;
 	FIBITMAP *bitmap = FreeImage_Allocate(width, height, BitsPerPixel);
 	for (int w = 0; w < width; ++w) {
@@ -55,7 +54,12 @@ void ImageExporter::saveImage(char filename[], int width, int height)
 {
 	//På windows måste det finnas en mapp för att den ska sparas. 
 	//Borde ändras till att be användaren att välja mapp
+#ifdef CMAKE_SOURCE_DIR
+	char folder[] = CMAKE_SOURCE_DIR;
+#else
 	char folder[] = "export/";
+#endif
+
     char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);
 	
@@ -67,51 +71,27 @@ void ImageExporter::saveImage(int image[], char filename[], int width, int heigh
 {
 	std::time_t rawtime;
     std::tm* timeinfo;
-    char buffer [80];
+    char buffer [120];
 
     std::time(&rawtime);
     timeinfo = std::localtime(&rawtime);
 
-    std::strftime(buffer,80,"%Y-%m-%d-%H-%M-%S",timeinfo);
+    std::strftime(buffer, 120, "%Y-%m-%d-%H-%M-%S", timeinfo);
 	
-	std::cout << "Received filename: " << filename << ".png\n";
+#ifdef CMAKE_SOURCE_DIR
+	char ef[] = "/export/";
+	char dir[] = CMAKE_BINARY_DIR;
+	char *folder = merge(dir, ef);
+#else
 	char folder[] = "export/";
-	char *fend = merge(buffer, (char*)".png");
+#endif
 
+	char *fend = merge(buffer, (char*)".png");
+// 	fend = merge(filename, fend);
 	//char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);
-
+std::cout << "Received filename: " << file << "\n";
 	FIBITMAP *bitmap = convertArrayToBitmap(image, width, height);
 	FreeImage_Save(FIF_PNG, bitmap, file, BitsPerPixel);
-}
-
-bool ImageExporter::saveSequence(int &n, float dt, int range, int width, int height)
-{
-    if(ImageExporter::timeTrack > 1.0 / ImageExporter::fps) {
-		std::stringstream strs;
-		strs << n;
-		std::string temp_str = strs.str();
-		saveImage((char*) temp_str.c_str(),
-				  width, height);
-        n++;
-        ImageExporter::timeTrack = 0.0f;
-    }
-    else
-        ImageExporter::timeTrack += dt;
-	if(n == range)
-		return false;
-	return true;
-}
-
-void ImageExporter::saveSequence(int &n, int width, int height)
-{
-	std::stringstream strs;
-	strs << n;
-	std::string temp_str = strs.str();
-
-	saveImage((char*) temp_str.c_str(),
-			  width, height);
-	std::cout << "saved "  << temp_str << std::endl;
-    n++;
 }
 

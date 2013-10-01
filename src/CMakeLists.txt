@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 2.6.0)
 project(schumacher)
 
 IF(UNIX)
-	MESSAGE(STATUS "La till c++11!")
-	SET(CMAKE_CXX_FLAGS "-std=c++11 -Werror")
+	SET(CMAKE_CXX_FLAGS "-std=c++11 -Werror -Wall -Wno-error=unused-variable")
 ENDIF(UNIX)
 
 FILE(GLOB HEADERS  ./*.h*)
@@ -30,16 +29,16 @@ link_directories(
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/export)
 
-if(CMAKE_SOURCE_DIR)
-	add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
+if(CMAKE_CURRENT_BINARY_DIR)
+	add_definitions(-DCMAKE_BINARY_DIR=\"${CMAKE_CURRENT_BINARY_DIR}\")
 else()
-	add_definitions(-DCMAKE_SOURCE_DIR=\"\")
+	add_definitions(-DCMAKE_BINARY_DIR=\"\")
 endif()
 
 add_executable(schumacher ${HEADERS} ${SRCS} )
 
 if(WIN32)
-	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib assimp.lib glew32.lib )
+	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib)
 endif(WIN32)
 
 if(UNIX)
