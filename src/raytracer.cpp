@@ -20,7 +20,7 @@ float traverseRay(Ray* rayIncoming, IntersectionPoint *ip, Octree* tree, int ite
 //		std::cout << "Recursive call...\n";
 		intensity += traverseRay(reflected, ip, tree, --iterations);
 	}
-	
+
 	return intensity;
 }
 

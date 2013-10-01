@@ -7,9 +7,11 @@
 #include "imageexporter.h"
 #include "simpleraycaster.h"
 #include "raytracer.h"
+#include "plane.h"
 
 int main() {
 	Camera *cam = new Camera();
+	Plane *plane = new Plane(glm::vec3(0.f), glm::vec3(1.0f),5.f,5.f);
 
 	IntersectionPoint *ip = new IntersectionPoint();
 	Ray *r = new Ray(glm::vec3(-15.f,-15.f,-15.f), glm::vec3(1.0,0.7f,0.8f));
