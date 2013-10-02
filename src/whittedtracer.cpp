@@ -25,9 +25,10 @@ void WhittedTracer::render(float *pixels, Octree *tree, Camera *cam) {
 		}
 	}
 	Timer::getInstance()->stop("whitted");
-	Timer::getInstance()->printRealTime("whitted");
+	
 	std::cout << std::endl;
 	std::cout << "Num pixels: "<<_W*_H<<", num rays: "<<rayCounter<<"\n";
+	Timer::getInstance()->printRealTime("whitted");
 }
 
 glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
@@ -57,9 +58,9 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 	glm::vec3 surfacePosition = ip.getPoint();
 
 	glm::vec3 color = glm::vec3(0.0f);
-	for (int i = 0; i < lights.size(); ++i) {
+	for (size_t i = 0; i < lights.size(); ++i) {
 		glm::vec3 L = (lights[i]->getPosition() - surfacePosition);
-		float length = glm::length(L);	
+// 		float length = glm::length(L);	
 		L = glm::normalize(L);
 		// Shadow ray test
 		Ray shadowRay = Ray(surfacePosition + L * 0.0001f, L);
