@@ -68,7 +68,7 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 		IntersectionPoint ip;
 		if (tree->intersect(shadowRay, ip)) {
 			// Add ambient color here
-			color += glm::vec3(0.01f);
+			color += glm::vec3(0.1f);
 		}
 		else 
 		{
@@ -79,7 +79,7 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 			glm::vec3 R = 2 * a * surfaceNormal - L;
 			float vDotR = pow(glm::max(glm::dot(R, V), 0.0f), 10);
 			
-			color += ip.getMaterial().getDiffuseColor() * nDotL; // Diffuse component
+			color += ip.getMaterial().getDiffuseColor(); //* nDotL; // Diffuse component
 			color += vDotR * ip.getMaterial().getDiffuseColor(); // Specular component
 			
 		}
