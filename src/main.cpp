@@ -28,19 +28,23 @@ int main(int argc, char **argv) {
 	sphere->setMaterial(STONE);
 
 	Sphere *sp2 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 4.23f));
-	sp2->setMaterial(GLASS);
+	sp2->setMaterial(MIRROR);
 
 	Sphere *sp3 = new Sphere(1.f, glm::vec3(-2.02f, 0.13f, 4.23f));
-	sp3->setMaterial(MARBLE);
+	sp3->setMaterial(STONE);
 
+	Sphere *sp4 = new Sphere(1.f, glm::vec3(-2.32f, -2.f, 4.23f));
+	sp4->setMaterial(STONE);
+	
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
-	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, -15.f, 1.0f), 1, glm::vec3(255.f, 255.f, 255.f));
+	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 25.f, 1.0f), 1, glm::vec3(1.f));
 
 	tree->addObject(sphere);
 	tree->addObject(sp2);
 	tree->addObject(sp3);
+	tree->addObject(sp4);
 	tree->addObject(spLight);
 	tree->addPointLight(ptLgt);
 

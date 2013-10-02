@@ -12,7 +12,7 @@ public:
 		_specular = 0.2f; // diffuse (low specularity)
 		_opacity = 1.0f; // completely solid
 		_emission = glm::vec3(0.0f);
-		_absorbtion = 0.5f;
+		_absorbtion = 1.0f;
 	}
 	Material(const glm::vec3 &c, const float &rI, const float &s, const float &o) {
 		_diffuseColor = c;

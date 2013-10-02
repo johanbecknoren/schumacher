@@ -1,7 +1,7 @@
 #ifndef SIMPLERAYCAST_H
 #define SIMPLERAYCAST_H
-#include "octree.h"
 
+#include "octree.h"
 #include "tracer.h"
 
 class SimpleRaycaster : Tracer {
