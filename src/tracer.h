@@ -20,7 +20,7 @@ class Tracer {
 			return r;
 		}
 		int calculateId(const int u, const int v) const {
-			return u * 3 + _W * (_H - 1 - v) * 3;
+			return u * 3 + _W * v * 3;
 		}
 
 // 		Ray calculateRefraction() {

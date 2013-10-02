@@ -9,6 +9,8 @@
 #include "timer.h"
 #include "glrenderer.h"
 #include "quadrilateral.h"
+#include "cornellboxfactory.h"
+
 int main(int argc, char **argv) {
 	bool exportImage = true;
 	for (int i = 0; i < argc; ++i) {
@@ -40,16 +42,24 @@ int main(int argc, char **argv) {
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
-	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, -25.f, 1.0f), 1, glm::vec3(1.f));
-
+	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 25.f, 1.0f), 1, glm::vec3(1.f));
+	
 	Quadrilateral *quad = new Quadrilateral(
-		glm::vec3(-0.5f, 3.f, -1.f),
-		glm::vec3( 0.5f, 3.f, -1.f),
-		glm::vec3(-0.5f, 3.f, -0.f),
-		glm::vec3( 0.5f, 3.f, -0.f));
+		glm::vec3(-0.5f, -1.f, -1.f),
+		glm::vec3( 0.5f, -1.f, -1.f),
+		glm::vec3(-0.5f, -1.f, -0.f),
+		glm::vec3( 0.5f, -1.f, -0.f));
 
 	quad->setMaterial(MARBLE);
 
+	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
+	tree->addObject(&boxCeiling);
+
+	Quadrilateral boxBack = CornellBoxFactory::createBack();
+	tree->addObject(&boxBack);
+
+	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
+	tree->addObject(&boxFloor);
 
 	tree->addObject(sphere);
 	tree->addObject(sp2);

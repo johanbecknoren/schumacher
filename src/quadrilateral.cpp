@@ -18,6 +18,13 @@ std::string Quadrilateral::asString() const {
 	return ss.str();
 }
 
+void Quadrilateral::scale(float v) {
+	_v00 *= v;
+	_v01 *= v;
+	_v10 *= v;
+	_v11 *= v;
+}
+
 IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
 	//std::cout << "Quad: intersection\n";
 	// Intersection algorithm from http://graphics.cs.kuleuven.be/publications/LD05ERQIT/LD05ERQIT_code.cpp

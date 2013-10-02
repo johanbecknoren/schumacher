@@ -28,7 +28,7 @@ class Renderable {
 			_material.setEmission(glm::vec3(1.0f));
 		} else if (m == MIRROR) {
 			_material.setDiffuseColor(glm::vec3(0.0f, 1.0f, 0.0f));
-			_material.setAbsorbtion(0.0f);
+			_material.setAbsorbtion(0.1f);
 			_material.setSpecular(0.8f);
 		} else // STONE - default
 			return;				
