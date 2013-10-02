@@ -7,7 +7,7 @@
 #include "raytracer.h"
 #include "whittedtracer.h"
 #include "timer.h"
-//#include "plane.h"
+#include "glrenderer.h"
 #include "quadrilateral.h"
 int main(int argc, char **argv) {
 	bool exportImage = true;
@@ -43,10 +43,10 @@ int main(int argc, char **argv) {
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, -25.f, 1.0f), 1, glm::vec3(1.f));
 
 	Quadrilateral *quad = new Quadrilateral(
-		glm::vec3(-0.5f,1.f,-3.f),
-		glm::vec3(0.5f,1.f,-3.f),
-		glm::vec3(-0.5f,0.f,-3.f),
-		glm::vec3(0.5f,0.f,-3.f));
+		glm::vec3(-0.5f, 3.f, -1.f),
+		glm::vec3( 0.5f, 3.f, -1.f),
+		glm::vec3(-0.5f, 3.f, -0.f),
+		glm::vec3( 0.5f, 3.f, -0.f));
 
 	quad->setMaterial(MARBLE);
 
@@ -70,11 +70,14 @@ int main(int argc, char **argv) {
 // 	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);
-
+	GlRenderer renderer(WIDTH, HEIGHT);
+	
 
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
 		pixelsInt[i] = int(pixels[i]*255.0f);
 	
+//renderer.render(pixelsInt);
+
  	if (exportImage)
 		ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
 	return 0;

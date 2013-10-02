@@ -19,13 +19,12 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, Camera *cam){
 			// kan anropas rekursivt. Spawna nya strålar (reflekterade och brutna) till
 			// en iterations-tröskel nås
 			//Ray *r = new Ray( glm::vec3(0.0f), glm::vec3(x,y,1.0f)-glm::vec3(0.0f) );
-			Ray *r = nullptr;
-			*r = cam->createRay(x, y);
+			Ray r = cam->createRay(x, y);
 // 			Ray *r = new Ray( cam->getPosition(), glm::vec3(x,y,-cam->getDirection().z)-glm::vec3(0.0f) );
 			IntersectionPoint ip;
 
-			if (tree->intersect(*r, ip)) {
-				float intensity = glm::dot(r->getDirection(), - ip.getNormal());
+			if (tree->intersect(r, ip)) {
+				float intensity = glm::dot(r.getDirection(), - ip.getNormal());
 				int id = calculateId(u, v);
 				pixels[id + 0] = intensity*ip.getMaterial().getDiffuseColor().x;
 				pixels[id + 1] = intensity*ip.getMaterial().getDiffuseColor().y;

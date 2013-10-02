@@ -15,9 +15,8 @@ class Tracer {
 		}
 
 		Ray calculateReflection(const Ray &inRay, const IntersectionPoint &ip) {
-			glm::vec3 reflection = -(glm::dot(inRay.getDirection(), ip.getPoint()) * ip.getNormal()) + inRay.getDirection();
-			Ray r = Ray(ip.getPoint(), reflection);
-			r.setOrigin(ip.getPoint() + 0.001f * reflection);
+			glm::vec3 reflection = inRay.getDirection() - 2 * glm::dot(inRay.getDirection(), ip.getNormal()) * ip.getNormal();			
+			Ray r = Ray(ip.getPoint() + 0.001f * reflection, reflection);
 			return r;
 		}
 		int calculateId(const int u, const int v) const {

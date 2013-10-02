@@ -35,14 +35,15 @@ glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
  	const int maxDepth = 2;
-	
 	if (tree->intersect(ray, ip)) {
 		if (depth < maxDepth) {
 			color = phongShader(ray, ip, tree);
 			color *= ip.getMaterial().getAbsorbtion();
 
 			Ray reflection = calculateReflection(ray, ip);
-			color += (1 - ip.getMaterial().getAbsorbtion()) * iterateRay(reflection, tree, depth + 1);
+			float absor = 1.0f - ip.getMaterial().getAbsorbtion();
+			glm::vec3 rayColor = iterateRay(reflection, tree, depth + 1);
+			color += absor * rayColor;
 			
 		}
 		else {
