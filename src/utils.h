@@ -10,6 +10,6 @@
 #define REFRACTION_GLASS 1.52f
 
 // Materials enums
-enum material_t { STONE, GLASS, MARBLE, LIGHT };
+enum material_t { STONE, GLASS, MARBLE, LIGHT, MIRROR };
 
 #endif

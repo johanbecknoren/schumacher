@@ -1,11 +1,13 @@
 #include "whittedtracer.h"
 #include "progressbar.h"
+#include "timer.h"
 
 void WhittedTracer::render(float *pixels, Octree *tree, Camera *cam) {
 	int total = _W * _H;
 	int rayCounter = 0;
 
 	// (u,v) are pixel coords for output image
+	Timer::getInstance()->start("whitted");
 	for(int u=0; u<_W; ++u) {
 		for(int v=0; v<_H; ++v) {
 			rayCounter++;
@@ -22,26 +24,31 @@ void WhittedTracer::render(float *pixels, Octree *tree, Camera *cam) {
 			ProgressBar::printProgBar(rayCounter, total);	
 		}
 	}
+	Timer::getInstance()->stop("whitted");
+	
 	std::cout << std::endl;
 	std::cout << "Num pixels: "<<_W*_H<<", num rays: "<<rayCounter<<"\n";
+	Timer::getInstance()->printRealTime("whitted");
 }
 
 glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
  	const int maxDepth = 2;
+	
 	if (tree->intersect(ray, ip)) {
-		
-		
 		if (depth < maxDepth) {
 			color = phongShader(ray, ip, tree);
 			color *= ip.getMaterial().getAbsorbtion();
 
 			Ray reflection = calculateReflection(ray, ip);
 			color += (1 - ip.getMaterial().getAbsorbtion()) * iterateRay(reflection, tree, depth + 1);
+			
+		}
+		else {
+			color = phongShader(ray, ip, tree);
 		}
 	}
-
 	return color;
 }
 
@@ -53,28 +60,28 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 	glm::vec3 color = glm::vec3(0.0f);
 	for (size_t i = 0; i < lights.size(); ++i) {
 		glm::vec3 L = (lights[i]->getPosition() - surfacePosition);
-		float length = glm::length(L);	
+// 		float length = glm::length(L);	
 		L = glm::normalize(L);
 		// Shadow ray test
 		Ray shadowRay = Ray(surfacePosition + L * 0.0001f, L);
-		shadowRay.setTMax(length);
+
 		IntersectionPoint ip;
 		if (tree->intersect(shadowRay, ip)) {
 			// Add ambient color here
-// 			color += glm::vec3(1.0f);
+			color += glm::vec3(0.01f);
 		}
 		else 
 		{
 			glm::vec3 V = glm::normalize(incoming.getPosition() - surfacePosition);
 			float nDotL = glm::max(glm::dot(surfaceNormal, L), 0.0f);
-			if (nDotL == 0.0f) continue;
+
 			float a = glm::dot(L, surfaceNormal);
 			glm::vec3 R = 2 * a * surfaceNormal - L;
 			float vDotR = pow(glm::max(glm::dot(R, V), 0.0f), 10);
-
+			
 			color += ip.getMaterial().getDiffuseColor() * nDotL; // Diffuse component
 			color += vDotR * ip.getMaterial().getDiffuseColor(); // Specular component
-
+			
 		}
 
 	}
