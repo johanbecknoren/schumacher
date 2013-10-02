@@ -7,7 +7,8 @@
 #include "raytracer.h"
 #include "whittedtracer.h"
 #include "timer.h"
-#include "plane.h"
+//#include "plane.h"
+#include "quadrilateral.h"
 int main(int argc, char **argv) {
 	bool exportImage = true;
 	for (int i = 0; i < argc; ++i) {
@@ -17,7 +18,7 @@ int main(int argc, char **argv) {
 	}
 
 	Camera *cam = new Camera();
-	Plane *plane = new Plane(glm::vec3(0.f), glm::vec3(1.0f),5.f,5.f);
+	//Plane *plane = new Plane(glm::vec3(0.f), glm::vec3(1.0f),5.f,5.f);
 
 	std::cout << "Creating AABB!\n";
 	AABB bb(glm::vec3(-10.0f), glm::vec3(10.0f));
@@ -38,11 +39,21 @@ int main(int argc, char **argv) {
 
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, -15.f, 1.0f), 1, glm::vec3(255.f, 255.f, 255.f));
 
+	Quadrilateral *quad = new Quadrilateral(
+		glm::vec3(-2.f,2.f,3.f),
+		glm::vec3(2.f,2.f,3.f),
+		glm::vec3(-2.f,-2.f,3.f),
+		glm::vec3(2.f,-2.f,3.f));
+
+	quad->setMaterial(MARBLE);
+
+
 	tree->addObject(sphere);
 	tree->addObject(sp2);
 	tree->addObject(sp3);
 	tree->addObject(spLight);
 	tree->addPointLight(ptLgt);
+	tree->addObject(quad);
 
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];

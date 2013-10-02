@@ -51,7 +51,7 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 	glm::vec3 surfacePosition = ip.getPoint();
 
 	glm::vec3 color = glm::vec3(0.0f);
-	for (int i = 0; i < lights.size(); ++i) {
+	for (size_t i = 0; i < lights.size(); ++i) {
 		glm::vec3 L = (lights[i]->getPosition() - surfacePosition);
 		float length = glm::length(L);	
 		L = glm::normalize(L);

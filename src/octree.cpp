@@ -241,12 +241,13 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 	// add node and continue subdividing.
 	const AABB *parentBox = parent->getBoundingBox();
 	const AABB *objectBox = object->getBoundingBox();	
+	
 	const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
-
 	int q1 = parentBox->getQuadrant(lowerLeft);
 
 	const glm::vec3 upperRight = objectBox->getUpperRightFront();
 	int q2 = parentBox->getQuadrant(upperRight);
+
 	if(q1 != -1 && q2 != -1 && q1 == q2) {		
 		if(parent->getChild(q1) == NULL) {
 			addChild(parent, q1);
