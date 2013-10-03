@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 		glm::vec3(-0.5f, -1.f, -0.f),
 		glm::vec3( 0.5f, -1.f, -0.f));
 
-	quad->setMaterial(MARBLE);
+	quad->setMaterial(STONE	);
 
 	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
 	tree->addObject(&boxCeiling);
@@ -60,6 +60,13 @@ int main(int argc, char **argv) {
 
 	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
 	tree->addObject(&boxFloor);
+	
+	Quadrilateral boxRight = CornellBoxFactory::createRight();
+	tree->addObject(&boxRight);
+	
+	Quadrilateral boxLeft = CornellBoxFactory::createLeft();
+	tree->addObject(&boxLeft);
+
 
 	tree->addObject(sphere);
 	tree->addObject(sp2);
