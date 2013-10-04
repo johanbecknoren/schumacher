@@ -2,14 +2,12 @@
 #include <sstream>
 
 Quadrilateral::Quadrilateral( const glm::vec3& v00, const glm::vec3& v01, const glm::vec3& v10, const glm::vec3& v11) {
-	std::cout << "Quad: constructor\n";
 	_v00 = v00;
 	_v01 = v01;
 	_v10 = v10;
 	_v11 = v11;
 	createAABB();
 	_name = "Quadrilateral";
-	std::cout << "Done\n";
 }
 
 std::string Quadrilateral::asString() const {
@@ -23,6 +21,13 @@ void Quadrilateral::scale(float v) {
 	_v01 *= v;
 	_v10 *= v;
 	_v11 *= v;
+}
+
+void Quadrilateral::translate(const glm::vec3& t){
+	_v00 += t;
+	_v01 += t;
+	_v10 += t;
+	_v11 += t;
 }
 
 IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
@@ -133,7 +138,7 @@ IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
 
 	//std::cout << "Done\n";
 	glm::vec3 intP = ray->getOrigin() + glm::normalize(ray->getDirection())*t;
-	glm::vec3 surfNormal = glm::normalize( glm::cross(_v00-_v01, _v00-_v10) );
+	glm::vec3 surfNormal = -glm::normalize( glm::cross(_v00-_v01, _v00-_v10) );
 
 	//std::cout<<"surfNormal = "<<glm::to_string(surfNormal)<<std::endl;
 
@@ -150,8 +155,6 @@ void Quadrilateral::createAABB(){
 		glm::max( glm::max(_v00.x,_v01.x), glm::max(_v10.x,_v11.x) ),
 		glm::max( glm::max(_v00.y,_v01.y), glm::max(_v10.y,_v11.y) ),
 		glm::max( glm::max(_v00.z,_v01.z), glm::max(_v10.z,_v11.z) ));
-
-	std::cout<<"Quad: lLB:"<<glm::to_string(lLB)<<std::endl;
 
 	this->_boundingBox = new AABB(lLB, uRF);
 }
