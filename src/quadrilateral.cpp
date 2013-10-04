@@ -138,7 +138,7 @@ IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
 
 	//std::cout << "Done\n";
 	glm::vec3 intP = ray->getOrigin() + glm::normalize(ray->getDirection())*t;
-	glm::vec3 surfNormal = glm::normalize( glm::cross(_v00-_v01, _v00-_v10) );
+	glm::vec3 surfNormal = -glm::normalize( glm::cross(_v00-_v01, _v00-_v10) );
 
 	//std::cout<<"surfNormal = "<<glm::to_string(surfNormal)<<std::endl;
 
