@@ -48,7 +48,9 @@ int main(int argc, char **argv) {
 	Triangle *tri = new Triangle(glm::vec3( 1.f, -1.f, 10.f),
 								 glm::vec3( 1.f,  1.f, 10.f),
 								 glm::vec3(-1.f, -1.f, 10.f));
+	tri->setMaterial(MARBLE);
 	tree->addObject(tri);
+	
 	tri->getBoundingBox()->print();
 // 	Quadrilateral *quad = new Quadrilateral(
 // 				  glm::vec3( 1., 1., 5.),
