@@ -18,6 +18,9 @@ public:
 	void setOrigin(const glm::vec3 o) { _origin = o; };
 	void setDirection(const glm::vec3 d) { _direction = glm::normalize(d); };
 	void updateT(const float tmin, const float tmax);	
+	glm::vec3 getPosition(const float t) const {
+		return glm::vec3(_origin.x + t, _origin.y + t, _origin.z + t);
+	}
 	void print () {
 		std::cout << "Ray - Origin: " << glm::to_string(_origin) << 
 			"\nRay - Direction: " << glm::to_string(_direction) <<"\n";

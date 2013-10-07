@@ -10,6 +10,7 @@
 #include "glrenderer.h"
 #include "quadrilateral.h"
 #include "cornellboxfactory.h"
+#include "triangle.h"
 
 int main(int argc, char **argv) {
 	bool exportImage = true;
@@ -43,37 +44,42 @@ int main(int argc, char **argv) {
 	spLight->setMaterial(LIGHT);
 
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 5.f, 1.0f), 1, glm::vec3(1.f));
-	
-	Quadrilateral *quad = new Quadrilateral(
-				  glm::vec3( 1., 1., 5.),
-                  glm::vec3( 1., -1., 5.),
-                  glm::vec3(-1., -1., 5.),
-				  glm::vec3( -1., 1., 5.));
-	quad->setMaterial(CORNELL_LEFT);
 
-	/*Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
-	tree->addObject(&boxCeiling);
+	Triangle *tri = new Triangle(glm::vec3( 1.f, -1.f, 10.f),
+								 glm::vec3( 1.f,  1.f, 10.f),
+								 glm::vec3(-1.f, -1.f, 10.f));
+	tree->addObject(tri);
+	tri->getBoundingBox()->print();
+// 	Quadrilateral *quad = new Quadrilateral(
+// 				  glm::vec3( 1., 1., 5.),
+//                   glm::vec3( 1., -1., 5.),
+//                   glm::vec3(-1., -1., 5.),
+// 				  glm::vec3( -1., 1., 5.));
+// 	quad->setMaterial(CORNELL_LEFT);
+//      quad->getBoundingBox()->print();
+// 	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
+// 	tree->addObject(&boxCeiling);
+// // 
+// 	Quadrilateral boxBack = CornellBoxFactory::createBack();
+// 	tree->addObject(&boxBack);
+// // 
+// 	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
+// 	tree->addObject(&boxFloor);
+// // 	
+// 	Quadrilateral boxRight = CornellBoxFactory::createRight();
+// 	tree->addObject(&boxRight);
+// 
+// 	Quadrilateral boxLeft = CornellBoxFactory::createLeft();
+// 	tree->addObject(&boxLeft);
 
-	Quadrilateral boxBack = CornellBoxFactory::createBack();
-	tree->addObject(&boxBack);
 
-	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
-	tree->addObject(&boxFloor);
-	
-	Quadrilateral boxRight = CornellBoxFactory::createRight();
-	tree->addObject(&boxRight);
-	
-	Quadrilateral boxLeft = CornellBoxFactory::createLeft();
-	tree->addObject(&boxLeft);*/
-
-
-	tree->addObject(sphere);
-	tree->addObject(sp2);
-	tree->addObject(sp3);
-	tree->addObject(sp4);
-	tree->addObject(spLight);
-	tree->addPointLight(ptLgt);
-	tree->addObject(quad);
+// 	tree->addObject(sphere);
+// 	tree->addObject(sp2);
+// 	tree->addObject(sp3);
+// 	tree->addObject(sp4);
+// 	tree->addObject(spLight);
+// 	tree->addPointLight(ptLgt);
+// 	tree->addObject(quad);
 	tree->print();
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
@@ -86,7 +92,7 @@ int main(int argc, char **argv) {
  	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);
-	GlRenderer renderer(WIDTH, HEIGHT);
+// 	GlRenderer renderer(WIDTH, HEIGHT);
 	
 
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)

@@ -154,8 +154,7 @@ IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
 
 	return new IntersectionPoint(iPoint, sN, this->getMaterial());
 
-
-	/*//std::cout << "Quad: intersection\n";
+/*	//std::cout << "Quad: intersection\n";
 	// Intersection algorithm from http://graphics.cs.kuleuven.be/publications/LD05ERQIT/LD05ERQIT_code.cpp
 	float epsilon = float(10e-6),u,v,t;
 	glm::vec3 E_01 = _v10 - _v00;

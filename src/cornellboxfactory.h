@@ -7,14 +7,17 @@
 
 class CornellBoxFactory {
 
-	public: 
+	public:
 		static Quadrilateral createFloor() {
 		Quadrilateral f = Quadrilateral(
-			glm::vec3(552.8f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 0.0f, 0.0f), 			
-			glm::vec3(0.0f, 0.0f, 559.2f), 		
-			glm::vec3(549.6f, 0.0f, 559.2f));
-		
+				glm::vec3(552.8f, 0.0f, 0.0f),
+            glm::vec3(549.6f, 0.0f, 559.2f),
+			glm::vec3(0.0f, 0.0f, 559.2f),
+            glm::vec3(0.0f, 0.0f, 0.0f));
+//         glm::vec3(552.8f, 0.0f, 0.0f),
+//             glm::vec3(549.6f, 0.0f, 559.2f),
+// 			glm::vec3(0.0f, 0.0f, 559.2f),
+//             glm::vec3(0.0f, 0.0f, 0.0f));
 		f.translate(_t);
 		f.scale(_scaleFactor);
 		return f;
@@ -22,10 +25,14 @@ class CornellBoxFactory {
 
 	static Quadrilateral createCeil() {
 		Quadrilateral c = Quadrilateral(
-			glm::vec3(556.0f,   548.8f, 0.0f),
-			glm::vec3(556.0f,   548.8f, 559.2f), 			
-			glm::vec3(0.0f,     548.8f, 559.2f), 		
-			glm::vec3(0.0f,     548.8f, 0.0f));
+// 			glm::vec3(556.0f,   548.8f, 0.0f),
+// 			glm::vec3(556.0f,   548.8f, 559.2f),
+// 			glm::vec3(0.0f,     548.8f, 559.2f),
+// 			glm::vec3(0.0f,     548.8f, 0.0f));			
+            glm::vec3(10.0f, 10.f, 0.0f),
+			glm::vec3(10.0f, 10.f, 10.f),
+			glm::vec3(0.0f,  10.f, 10.f),
+			glm::vec3(0.0f,  10.f, 0.0f));
 		c.translate(_t);
 		c.scale(_scaleFactor);
 		return c;
@@ -33,31 +40,44 @@ class CornellBoxFactory {
 
 	static Quadrilateral createBack() {
 		Quadrilateral b = Quadrilateral(
-			glm::vec3(549.6, 0.0, 559.2),
-			glm::vec3(0.0,   0.0, 559.2), 			
-			glm::vec3(0.0, 548.8, 559.2), 		
-			glm::vec3(556.0, 548.8, 559.2));
-		b.translate(_t);
-		b.scale(_scaleFactor);
+// 			glm::vec3(549.6, 0.0, 559.2),
+// 			glm::vec3(0.0, 548.8, 559.2),
+// 			glm::vec3(556.0, 548.8, 559.2),
+//             glm::vec3(0.0,   0.0, 559.2));
+			glm::vec3(10.0,  0.0, 10.0),
+			glm::vec3(0.0,   0.0, 10.0),
+			glm::vec3(10.0, 10.0, 10.0),
+            glm::vec3(0.0,  10.0, 10.0));
+// 		b.translate(_t);
+// 		b.scale(_scaleFactor);
 		return b;
 	}
 
 	static Quadrilateral createRight() {
 		Quadrilateral r = Quadrilateral(
-			glm::vec3(0.0, 0.0, 559.2),
-			glm::vec3(0.0, 0.0, 0.0), 			
-			glm::vec3(0.0, 548.8, 0.0), 		
-			glm::vec3(0.0, 548.8, 559.2));
+// 			glm::vec3(0.0, 0.0, 559.2),
+// 			glm::vec3(0.0, 0.0, 0.0),
+// 			glm::vec3(0.0, 548.8, 0.0),
+// 			glm::vec3(0.0, 548.8, 559.2));
+            glm::vec3(0.0, 0.0, 10.0),
+			glm::vec3(0.0, 10.0, 10.0),
+			glm::vec3(0.0, 10.0, 0.0),
+			glm::vec3(0.0, 0.0, 0.0));
+
 		r.translate(_t);
 		r.scale(_scaleFactor);
 		return r;
 	}
 	static Quadrilateral createLeft() {
 		Quadrilateral l = Quadrilateral(
-			glm::vec3(552.8, 0.0, 0.0),
-			glm::vec3(549.6, 0.0, 559.2), 			
-			glm::vec3(556.0, 548.8, 559.2), 		
-			glm::vec3(556.0, 548.8, 0.0));
+// 			glm::vec3(552.8, 0.0, 0.0),
+// 			glm::vec3(549.6, 0.0, 559.2),
+// 			glm::vec3(556.0, 548.8, 559.2),
+// 			glm::vec3(556.0, 548.8, 0.0));			
+            glm::vec3(10.0, 0.0, 0.0),
+			glm::vec3(10.0, 0.0, 10.0),
+			glm::vec3(10.0, 10.0, 10.0),
+			glm::vec3(10.0, 10.0, 0.0));
 		l.translate(_t);
 		l.scale(_scaleFactor);
 		return l;
