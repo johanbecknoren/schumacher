@@ -67,7 +67,6 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 		Ray shadowRay = Ray(surfacePosition + L * 0.0001f, L);
 
 //		IntersectionPoint ip;
-		color += glm::vec3(0.03f);
 		if (tree->intersect(shadowRay, ip)) {
 			
 		}
