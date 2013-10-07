@@ -30,7 +30,14 @@ class Renderable {
 			_material.setDiffuseColor(glm::vec3(0.0f, 1.0f, 0.0f));
 			_material.setAbsorbtion(0.1f);
 			_material.setSpecular(0.8f);
-		} else // STONE - default
+		} else if (m == STONE) {	
+			_material.setDiffuseColor(glm::vec3(0.5f,0.5f,0.5f)); // gray
+			_material.setRefractionIndex(1.0f); // almost none (float precision)
+			_material.setSpecular(0.01f); // diffuse (low specularity)
+			_material.setOpacity(1.0f); // completely solid
+			_material.setEmission(glm::vec3(0.0f));
+			_material.setAbsorbtion(0.8f);
+		}
 			return;				
 	}
 	Material getMaterial() const { return _material; }

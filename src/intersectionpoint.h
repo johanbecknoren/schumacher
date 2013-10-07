@@ -11,6 +11,16 @@ public:
 		_surfaceNormal = n;
 		_material = m;
 	};
+	IntersectionPoint(const IntersectionPoint* ip) {
+		_point = glm::vec3(ip->getPoint());
+		_surfaceNormal = glm::vec3(ip->getNormal());
+		_material = Material(ip->getMaterial());
+	}
+	IntersectionPoint(const IntersectionPoint& ip) {
+		_point = ip.getPoint();
+		_surfaceNormal = ip.getNormal();
+		_material = ip.getMaterial();
+	}
 
 	~IntersectionPoint() {};
 	std::string asString() const { 

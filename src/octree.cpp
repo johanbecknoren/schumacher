@@ -183,7 +183,7 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) {
 				id = i;
 			}
 		}
-		isect = pts[id];
+		isect = IntersectionPoint(pts[id]);
 	}
 
 	return hit;	

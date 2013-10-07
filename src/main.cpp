@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	Octree *tree = new Octree(&bb);
 
 	Sphere *sphere = new Sphere(0.2f, glm::vec3(-0.05f,-0.2f,1.5f));
-	sphere->setMaterial(STONE);
+	sphere->setMaterial(MARBLE);
 
 	Sphere *sp2 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 4.23f));
 	sp2->setMaterial(MIRROR);
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 	sp3->setMaterial(STONE);
 
 	Sphere *sp4 = new Sphere(1.f, glm::vec3(-2.32f, -2.f, 4.23f));
-	sp4->setMaterial(STONE);
+	sp4->setMaterial(MARBLE);
 	
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 
 	quad->setMaterial(STONE	);
 
-	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
+	/*Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
 	tree->addObject(&boxCeiling);
 
 	Quadrilateral boxBack = CornellBoxFactory::createBack();
@@ -62,10 +62,10 @@ int main(int argc, char **argv) {
 	tree->addObject(&boxFloor);
 	
 	Quadrilateral boxRight = CornellBoxFactory::createRight();
-//	tree->addObject(&boxRight);
+	tree->addObject(&boxRight);
 	
 	Quadrilateral boxLeft = CornellBoxFactory::createLeft();
-	tree->addObject(&boxLeft);
+	tree->addObject(&boxLeft);*/
 
 
 	tree->addObject(sphere);
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
 	tree->addObject(sp4);
 	tree->addObject(spLight);
 	tree->addPointLight(ptLgt);
-	tree->addObject(quad);
+//	tree->addObject(quad);
 	tree->print();
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];

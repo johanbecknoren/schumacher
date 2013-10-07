@@ -7,15 +7,15 @@ class Material {
 public:
 	Material() {
 		//default material
-		_diffuseColor = glm::vec3(0.5f,0.5f,0.5f); // gray
+		_diffuseColor = glm::vec3(0.f,0.f,0.f); // black
 		_refractionIndex = 1.0f; // almost none (float precision)
 		_specular = 0.02f; // diffuse (low specularity)
 		_opacity = 1.0f; // completely solid
 		_emission = glm::vec3(0.0f);
 		_absorbtion = 0.5f;
 	}
-	Material(const glm::vec3 &c, const float &rI, const float &s, const float &o) {
-		_diffuseColor = c;
+	Material(const glm::vec3 &d, const float &rI, const float &s, const float &o) {
+		_diffuseColor = d;
 		_refractionIndex = rI;
 		_specular = s;
 		_opacity = o;
@@ -30,7 +30,7 @@ public:
 	material_t getMaterialType() const { return _materialType; }
 	float getAbsorbtion() const { return _absorbtion; }
 
-	void setDiffuseColor(const glm::vec3& c) { _diffuseColor = c; }
+	void setDiffuseColor(const glm::vec3& d) { _diffuseColor = d; }
 	void setRefractionIndex(const float& rI) { _refractionIndex = rI; }
 	void setSpecular(const float& s) { _specular = s; }
 	void setOpacity(const float& o) { _opacity = o; }
