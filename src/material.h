@@ -6,13 +6,13 @@
 class Material {
 public:
 	Material() {
-		//default material
+		//default material (stone-isch)
 		_diffuseColor = glm::vec3(0.f,0.f,0.f); // black
 		_refractionIndex = 1.0f; // almost none (float precision)
-		_specular = 0.02f; // diffuse (low specularity)
+		_specular = 0.01f; // diffuse (low specularity)
 		_opacity = 1.0f; // completely solid
 		_emission = glm::vec3(0.0f);
-		_absorbtion = 0.5f;
+		_absorbtion = 0.75f;
 	}
 	Material(const glm::vec3 &d, const float &rI, const float &s, const float &o) {
 		_diffuseColor = d;

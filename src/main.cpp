@@ -45,12 +45,11 @@ int main(int argc, char **argv) {
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 5.f, 1.0f), 1, glm::vec3(1.f));
 	
 	Quadrilateral *quad = new Quadrilateral(
-		glm::vec3(-0.5f, -1.f, -1.f),
-		glm::vec3( 0.5f, -1.f, -1.f),
-		glm::vec3(-0.5f, -1.f, -0.f),
-		glm::vec3( 0.5f, -1.f, -0.f));
-
-	quad->setMaterial(STONE	);
+				  glm::vec3( 1., 1., 5.),
+                  glm::vec3( 1., -1., 5.),
+                  glm::vec3(-1., -1., 5.),
+				  glm::vec3( -1., 1., 5.));
+	quad->setMaterial(CORNELL_LEFT);
 
 	/*Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
 	tree->addObject(&boxCeiling);
@@ -74,7 +73,7 @@ int main(int argc, char **argv) {
 	tree->addObject(sp4);
 	tree->addObject(spLight);
 	tree->addPointLight(ptLgt);
-//	tree->addObject(quad);
+	tree->addObject(quad);
 	tree->print();
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
@@ -83,8 +82,8 @@ int main(int argc, char **argv) {
 	SimpleRaycaster caster(WIDTH, HEIGHT);
 	WhittedTracer wTracer(WIDTH, HEIGHT);
 
-	wTracer.render(pixels, tree, cam);
-// 	caster.render(pixels, tree, cam);
+//	wTracer.render(pixels, tree, cam);
+ 	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);
 	GlRenderer renderer(WIDTH, HEIGHT);
