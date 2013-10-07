@@ -1,7 +1,7 @@
 #include "quadrilateral.h"
 #include <sstream>
 
-Quadrilateral::Quadrilateral( const glm::vec3& v00, const glm::vec3& v01, const glm::vec3& v10, const glm::vec3& v11) {
+Quadrilateral::Quadrilateral( const glm::vec3& v00, const glm::vec3& v10, const glm::vec3& v11, const glm::vec3& v01) {
 	_v00 = v00;
 	_v01 = v01;
 	_v10 = v10;

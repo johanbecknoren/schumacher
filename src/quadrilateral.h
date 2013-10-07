@@ -5,7 +5,7 @@
 
 class Quadrilateral : public Renderable {
 public:
-	Quadrilateral( const glm::vec3& v00, const glm::vec3& v01, const glm::vec3& v10, const glm::vec3& v11);
+	Quadrilateral( const glm::vec3& v00, const glm::vec3& v10, const glm::vec3& v11, const glm::vec3& v01);
 	Quadrilateral() {};
 	~Quadrilateral() {};
 

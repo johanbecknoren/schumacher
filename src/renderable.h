@@ -33,7 +33,11 @@ class Renderable {
 			_material.setSpecular(0.8f);
 		} else if (m == STONE) {	
 			_material.setDiffuseColor(glm::vec3(0.8f,0.8f,0.8f)); // gray
-		} else if (m == CORNELL_CEIL || m == CORNELL_FLOOR || m == CORNELL_BACK) {
+		} else if (m == CORNELL_CEIL) {
+			_material.setDiffuseColor(glm::vec3(1.0f));
+		} else if (m == CORNELL_FLOOR) {
+			_material.setDiffuseColor(glm::vec3(1.0f));
+		} else if (m == CORNELL_BACK) {
 			_material.setDiffuseColor(glm::vec3(1.0f));
 		} else if (m == CORNELL_RIGHT) {
 			_material.setDiffuseColor(glm::vec3(0.0f, 1.0f, 0.0f));

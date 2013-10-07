@@ -51,20 +51,25 @@ int main(int argc, char **argv) {
 				  glm::vec3( -1., 1., 5.));
 	quad->setMaterial(CORNELL_LEFT);
 
-	/*Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
+	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
+	boxCeiling.setMaterial(CORNELL_CEIL);
 	tree->addObject(&boxCeiling);
 
 	Quadrilateral boxBack = CornellBoxFactory::createBack();
+	boxBack.setMaterial(CORNELL_BACK);
 	tree->addObject(&boxBack);
 
 	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
+	boxFloor.setMaterial(CORNELL_FLOOR);
 	tree->addObject(&boxFloor);
 	
 	Quadrilateral boxRight = CornellBoxFactory::createRight();
+	boxRight.setMaterial(CORNELL_RIGHT);
 	tree->addObject(&boxRight);
 	
 	Quadrilateral boxLeft = CornellBoxFactory::createLeft();
-	tree->addObject(&boxLeft);*/
+	boxLeft.setMaterial(CORNELL_LEFT);
+	tree->addObject(&boxLeft);
 
 
 	tree->addObject(sphere);
@@ -73,7 +78,7 @@ int main(int argc, char **argv) {
 	tree->addObject(sp4);
 	tree->addObject(spLight);
 	tree->addPointLight(ptLgt);
-	tree->addObject(quad);
+//	tree->addObject(quad);
 	tree->print();
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
