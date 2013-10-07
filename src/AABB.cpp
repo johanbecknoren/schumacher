@@ -146,7 +146,6 @@ IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  
 		}
 	}
 	//return t;
-	std::cout << "HEHE";	
 	return new IntersectionPoint(intP, surfNormal);
 }
 void AABB::print() const {

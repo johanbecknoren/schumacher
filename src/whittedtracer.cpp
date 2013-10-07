@@ -34,7 +34,7 @@ void WhittedTracer::render(float *pixels, Octree *tree, Camera *cam) {
 glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
- 	const int maxDepth = 10;
+ 	const int maxDepth = 2;
 	if (tree->intersect(ray, ip)) {
 		if (depth < maxDepth) {
 			color = phongShader(ray, ip, tree);
@@ -75,7 +75,7 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 		{
 			glm::vec3 V = glm::normalize(incoming.getPosition() - surfacePosition);
 			float nDotL = glm::max(glm::dot(surfaceNormal, L), 0.0f);
-
+			if (nDotL == 0) continue;
 			float a = glm::dot(L, surfaceNormal);
 			glm::vec3 R = 2 * a * surfaceNormal - L;
 			float vDotR = pow(glm::max(glm::dot(R, V), 0.0f), 10);

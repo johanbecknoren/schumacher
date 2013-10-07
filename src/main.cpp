@@ -45,43 +45,42 @@ int main(int argc, char **argv) {
 
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 5.f, 1.0f), 1, glm::vec3(1.f));
 
-	Triangle *tri = new Triangle(glm::vec3( 1.f, -1.f, 10.f),
-								 glm::vec3( 1.f,  1.f, 10.f),
-								 glm::vec3(-1.f, -1.f, 10.f));
-	tri->setMaterial(MARBLE);
-	tree->addObject(tri);
 	
-	tri->getBoundingBox()->print();
-// 	Quadrilateral *quad = new Quadrilateral(
-// 				  glm::vec3( 1., 1., 5.),
-//                   glm::vec3( 1., -1., 5.),
-//                   glm::vec3(-1., -1., 5.),
-// 				  glm::vec3( -1., 1., 5.));
-// 	quad->setMaterial(CORNELL_LEFT);
-//      quad->getBoundingBox()->print();
-// 	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
-// 	tree->addObject(&boxCeiling);
-// // 
-// 	Quadrilateral boxBack = CornellBoxFactory::createBack();
-// 	tree->addObject(&boxBack);
-// // 
-// 	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
-// 	tree->addObject(&boxFloor);
-// // 	
-// 	Quadrilateral boxRight = CornellBoxFactory::createRight();
-// 	tree->addObject(&boxRight);
-// 
-// 	Quadrilateral boxLeft = CornellBoxFactory::createLeft();
-// 	tree->addObject(&boxLeft);
+	Quadrilateral *quad = new Quadrilateral(
+				  glm::vec3( 1., 1., 5.),
+                  glm::vec3( 1., -1., 5.),
+                  glm::vec3(-1., -1., 5.),
+				  glm::vec3( -1., 1., 5.));
+	quad->setMaterial(CORNELL_LEFT);
+
+	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
+	boxCeiling.setMaterial(CORNELL_CEIL);
+	tree->addObject(&boxCeiling);
+
+	Quadrilateral boxBack = CornellBoxFactory::createBack();
+	boxBack.setMaterial(CORNELL_BACK);
+	tree->addObject(&boxBack);
+
+	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
+	boxFloor.setMaterial(CORNELL_FLOOR);
+	tree->addObject(&boxFloor);
+	
+	Quadrilateral boxRight = CornellBoxFactory::createRight();
+	boxRight.setMaterial(CORNELL_RIGHT);
+	tree->addObject(&boxRight);
+	
+	Quadrilateral boxLeft = CornellBoxFactory::createLeft();
+	boxLeft.setMaterial(CORNELL_LEFT);
+	tree->addObject(&boxLeft);
 
 
-// 	tree->addObject(sphere);
-// 	tree->addObject(sp2);
-// 	tree->addObject(sp3);
-// 	tree->addObject(sp4);
-// 	tree->addObject(spLight);
-// 	tree->addPointLight(ptLgt);
-// 	tree->addObject(quad);
+	tree->addObject(sphere);
+	tree->addObject(sp2);
+	tree->addObject(sp3);
+	tree->addObject(sp4);
+	tree->addObject(spLight);
+	tree->addPointLight(ptLgt);
+//	tree->addObject(quad);
 	tree->print();
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
@@ -90,8 +89,8 @@ int main(int argc, char **argv) {
 	SimpleRaycaster caster(WIDTH, HEIGHT);
 	WhittedTracer wTracer(WIDTH, HEIGHT);
 
-//	wTracer.render(pixels, tree, cam);
- 	caster.render(pixels, tree, cam);
+	wTracer.render(pixels, tree, cam);
+//  	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);
 // 	GlRenderer renderer(WIDTH, HEIGHT);
