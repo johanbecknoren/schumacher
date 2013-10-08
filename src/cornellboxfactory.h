@@ -18,6 +18,7 @@ class CornellBoxFactory {
 		
 		f.scale(_scaleFactor);
 		f.translate(_t);
+		f.updateAABB();
 		return f;
 	}
 
@@ -30,18 +31,19 @@ class CornellBoxFactory {
 			glm::vec3(0.0f,     548.8f, 0.0f));
 		c.scale(_scaleFactor);
 		c.translate(_t);
+		c.updateAABB();	
 		return c;
 	}
 
 	static Quadrilateral createBack() {
 		Quadrilateral b = Quadrilateral(
-
 			glm::vec3(549.6, 0.0, 559.2),
 			glm::vec3(0.0,   0.0, 559.2), 			
 			glm::vec3(0.0, 548.8, 559.2), 		
 			glm::vec3(556.0, 548.8, 559.2));
 		b.scale(_scaleFactor);
 		b.translate(_t);
+		b.updateAABB();
 		return b;
 	}
 
@@ -54,6 +56,7 @@ class CornellBoxFactory {
 			glm::vec3(0.0, 548.8, 559.2));
 			r.scale(_scaleFactor);
 		r.translate(_t);
+		r.updateAABB();
 		return r;
 	}
 	static Quadrilateral createLeft() {
@@ -65,6 +68,7 @@ class CornellBoxFactory {
 			glm::vec3(556.0, 548.8, 0.0));
 		l.scale(_scaleFactor);
 		l.translate(_t);
+		l.updateAABB();
 		return l;
 	}
 
@@ -72,6 +76,6 @@ class CornellBoxFactory {
 		static float _scaleFactor;
 		static glm::vec3 _t;
 };
-float CornellBoxFactory::_scaleFactor = 0.009;
-glm::vec3 CornellBoxFactory::_t = glm::vec3(-2.5f,-2.5f,1.6f);//glm::vec3(-278.f,-273.f,800.f);
+float CornellBoxFactory::_scaleFactor = 0.02;
+glm::vec3 CornellBoxFactory::_t = glm::vec3(-4.5f,-4.5f,1.6f);//glm::vec3(-278.f,-273.f,800.f);
 #endif

@@ -42,7 +42,7 @@ class Renderable {
 			_material.setAbsorbtion(0.75f);
 		} else if (m == CORNELL_BACK) {
 			_material.setDiffuseColor(glm::vec3(1.0f));
-			_material.setAbsorbtion(0.75f);
+			_material.setAbsorbtion(1.f);
 		} else if (m == CORNELL_RIGHT) {
 			_material.setDiffuseColor(glm::vec3(0.0f, 1.0f, 0.0f));
 			_material.setAbsorbtion(0.75f);
@@ -54,6 +54,7 @@ class Renderable {
 		return;		
 	}
 	Material getMaterial() const { return _material; }
+	void updateAABB() { createAABB(); }
  protected:
 	std::string _name;
     AABB *_boundingBox;
