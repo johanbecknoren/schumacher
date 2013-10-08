@@ -43,8 +43,8 @@ int main(int argc, char **argv) {
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
-	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 5.f, 1.0f), 1, glm::vec3(1.f));
 
+	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 2.f, 1.0f), 1, glm::vec3(1.f));
 	
 	Quadrilateral *quad = new Quadrilateral(
 				  glm::vec3( 1., 1., 5.),
