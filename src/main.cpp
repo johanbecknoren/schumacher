@@ -60,8 +60,10 @@ int main(int argc, char **argv) {
 	Quadrilateral boxBack = CornellBoxFactory::createBack();
 	boxBack.setMaterial(CORNELL_BACK);
 	tree->addObject(&boxBack);
+
 	boxBack.getBoundingBox()->print();
 	std::cout << boxBack.asString() << std::endl;
+
 	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
 	boxFloor.setMaterial(CORNELL_FLOOR);
 	tree->addObject(&boxFloor);
@@ -78,7 +80,7 @@ int main(int argc, char **argv) {
 // 	tree->addObject(sphere);
 // 	tree->addObject(sp2);
 // 	tree->addObject(sp3);
-	tree->addObject(sp4);
+// 	tree->addObject(sp4);
 // 	tree->addObject(spLight);
 	tree->addPointLight(ptLgt);
 //	tree->addObject(quad);
@@ -94,13 +96,13 @@ int main(int argc, char **argv) {
 //  	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);
-// 	GlRenderer renderer(WIDTH, HEIGHT);
+	
 	
 
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
 		pixelsInt[i] = int(pixels[i]*255.0f);
-	
-//renderer.render(pixelsInt);
+	GlRenderer renderer(WIDTH, HEIGHT);
+	renderer.render(pixelsInt);
 
  	if (exportImage)
 		ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
