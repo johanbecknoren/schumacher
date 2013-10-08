@@ -12,7 +12,9 @@ Quadrilateral::Quadrilateral( const glm::vec3& v00, const glm::vec3& v10, const 
 
 std::string Quadrilateral::asString() const {
 	std::stringstream ss;
-	ss << "Quad with verts: "<< glm::to_string(_v00);
+	ss << "Quad with verts: \n\t"<< glm::to_string(_v00) << " \n\t" << glm::to_string(_v01) 
+		<<" \n\t" << glm::to_string(_v10) 
+		<<" \n\t" << glm::to_string(_v11);
 	return ss.str();
 }
 
@@ -278,6 +280,8 @@ void Quadrilateral::createAABB(){
 		glm::max( glm::max(_v00.x,_v01.x), glm::max(_v10.x,_v11.x) ),
 		glm::max( glm::max(_v00.y,_v01.y), glm::max(_v10.y,_v11.y) ),
 		glm::max( glm::max(_v00.z,_v01.z), glm::max(_v10.z,_v11.z) ));
-
+	if (lLB.x == uRF.x) uRF.x += 0.0001;
+	if (lLB.y == uRF.y) uRF.y += 0.0001;
+	if (lLB.z == uRF.z) uRF.z += 0.0001;
 	this->_boundingBox = new AABB(lLB, uRF);
 }
