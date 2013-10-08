@@ -53,7 +53,7 @@ int AABB::getQuadrant(const glm::vec3& p) const {
 		}
 	}
 
-//	return 0;
+	return 0;
 }
 
 bool AABB::IntersectT(Ray *ray, float *tmin, float *tmax) const {
@@ -71,6 +71,7 @@ bool AABB::IntersectT(Ray *ray, float *tmin, float *tmax) const {
 	}
 	if (tmin) *tmin = t0;
 	if (tmax) *tmax = t1;
+
 	return true;
 }
 
@@ -79,7 +80,7 @@ IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  
 	glm::vec3 direction = glm::normalize(ray->getDirection());
 	glm::vec3 dirfrac;
 	float t;
-	
+
 	dirfrac.x = 1.0f / direction.x;
 	dirfrac.y = 1.0f / direction.y;
 	dirfrac.z = 1.0f / direction.z;

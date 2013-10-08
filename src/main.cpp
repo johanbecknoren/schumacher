@@ -10,6 +10,7 @@
 #include "glrenderer.h"
 #include "quadrilateral.h"
 #include "cornellboxfactory.h"
+#include "triangle.h"
 
 int main(int argc, char **argv) {
 	bool exportImage = true;
@@ -42,7 +43,8 @@ int main(int argc, char **argv) {
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 
-	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 2.f, 1.0f), 1, glm::vec3(1.f));
+
+	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(1.f));
 	
 	Quadrilateral *quad = new Quadrilateral(
 				  glm::vec3( 1., 1., 5.),
@@ -91,7 +93,7 @@ int main(int argc, char **argv) {
 //  	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);
-	GlRenderer renderer(WIDTH, HEIGHT);
+// 	GlRenderer renderer(WIDTH, HEIGHT);
 	
 
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
