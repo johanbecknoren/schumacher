@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 	spLight->setMaterial(LIGHT);
 
 
-	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 2.f, 1.0f), 1, glm::vec3(1.f));
+	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(1.f));
 	
 	Quadrilateral *quad = new Quadrilateral(
 				  glm::vec3( 1., 1., 5.),
