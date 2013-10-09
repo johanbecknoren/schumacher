@@ -23,6 +23,7 @@ void Quadrilateral::scale(float v) {
 	_v01 *= v;
 	_v10 *= v;
 	_v11 *= v;
+	createAABB();
 }
 
 void Quadrilateral::translate(const glm::vec3& t){
@@ -30,6 +31,7 @@ void Quadrilateral::translate(const glm::vec3& t){
 	_v01 += t;
 	_v10 += t;
 	_v11 += t;
+	createAABB();
 }
 
 //typedef float real;
@@ -151,6 +153,7 @@ IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
 }
 
 void Quadrilateral::createAABB(){
+	float eps = float(10e06);
 	glm::vec3 lLB(
 		glm::min( glm::min(_v00.x,_v01.x), glm::min(_v10.x,_v11.x) ),
 		glm::min( glm::min(_v00.y,_v01.y), glm::min(_v10.y,_v11.y) ),
@@ -159,8 +162,18 @@ void Quadrilateral::createAABB(){
 		glm::max( glm::max(_v00.x,_v01.x), glm::max(_v10.x,_v11.x) ),
 		glm::max( glm::max(_v00.y,_v01.y), glm::max(_v10.y,_v11.y) ),
 		glm::max( glm::max(_v00.z,_v01.z), glm::max(_v10.z,_v11.z) ));
-	if (lLB.x == uRF.x) uRF.x += 0.0001;
-	if (lLB.y == uRF.y) uRF.y += 0.0001;
-	if (lLB.z == uRF.z) uRF.z += 0.0001;
-	this->_boundingBox = new AABB(lLB, uRF);
+
+	if ( (lLB.x - uRF.x) < eps)
+		uRF.x += 0.0001;
+	if ( (lLB.y - uRF.y) < eps)
+		uRF.y += 0.0001;
+	if ( (lLB.z - uRF.z) < eps)
+		uRF.z += 0.0001;
+
+	if(!(_boundingBox = NULL))
+		this->_boundingBox = new AABB(lLB, uRF);
+	else {
+		_boundingBox->setLowerLeftBack(lLB);
+		_boundingBox->setUpperRightFront(uRF);
+	}
 }
