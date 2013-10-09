@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 	spLight->setMaterial(LIGHT);
 
 
-	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(1.f));
+	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(0.3f));
 	
 // 	Quadrilateral *quad = new Quadrilateral(
 // 				  glm::vec3( 1., 1., 5.),
@@ -53,9 +53,9 @@ int main(int argc, char **argv) {
 // 				  glm::vec3( -1., 1., 5.));
 // 	quad->setMaterial(CORNELL_LEFT);
 
-// 	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
-// 	boxCeiling.setMaterial(CORNELL_CEIL);
-// 	tree->addObject(&boxCeiling);
+ 	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
+ 	boxCeiling.setMaterial(CORNELL_CEIL);
+ 	tree->addObject(&boxCeiling);
 
 	Quadrilateral boxBack = CornellBoxFactory::createBack();
 	boxBack.setMaterial(CORNELL_BACK);

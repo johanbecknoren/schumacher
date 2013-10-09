@@ -35,10 +35,11 @@ class CornellBoxFactory {
 
 	static Quadrilateral createBack() {
 		Quadrilateral b = Quadrilateral(
-			glm::vec3(549.6, 0.0, 559.2),
-			glm::vec3(556.0, 548.8, 559.2), 			
-			glm::vec3(0.0, 548.8, 559.2), 		
-			glm::vec3(0.0,   0.0, 559.2));
+
+			glm::vec3(549.6, 	0.0, 	559.2),
+			glm::vec3(0.0,   	0.0, 	559.2),
+			glm::vec3(0.0, 		548.8, 	559.2), 		
+			glm::vec3(556.0, 	548.8, 	559.2));
 		b.scale(_scaleFactor);
 		b.translate(_t);
 		return b;
