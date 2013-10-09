@@ -34,7 +34,7 @@ void WhittedTracer::render(float *pixels, Octree *tree, Camera *cam) {
 glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
- 	const int maxDepth = 2;
+ 	const int maxDepth = 0;
 	if (tree->intersect(ray, ip)) {
 		if (depth < maxDepth) {
 			color = phongShader(ray, ip, tree);
@@ -67,9 +67,8 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 		L = glm::normalize(L);
 		// Shadow ray test
 		Ray shadowRay = Ray(surfacePosition + L * 0.0001f, L);
-
-//		IntersectionPoint ip;
-		if (tree->intersect(shadowRay, ip)) {
+		IntersectionPoint shadowIntersection;
+		if (tree->intersect(shadowRay, shadowIntersection)) {
 			
 		}
 		else 

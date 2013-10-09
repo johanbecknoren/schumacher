@@ -42,27 +42,24 @@ int main(int argc, char **argv) {
 	
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
-
-
-	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(1.f));
 	
-// 	Quadrilateral *quad = new Quadrilateral(
-// 				  glm::vec3( 1., 1., 5.),
-//                   glm::vec3( 1., -1., 5.),
-//                   glm::vec3(-1., -1., 5.),
-// 				  glm::vec3( -1., 1., 5.));
-// 	quad->setMaterial(CORNELL_LEFT);
+	Triangle *tri = new Triangle(
+			glm::vec3(10.f, 10.f, 5.f),
+			glm::vec3(10.f, -10.f, 5.f),
+			glm::vec3(-10.f, -10.f, 5.f));
+	tree->addObject(tri);
 
-// 	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
-// 	boxCeiling.setMaterial(CORNELL_CEIL);
-// 	tree->addObject(&boxCeiling);
+	PointLight *ptLgt = new PointLight(glm::vec3(.0f, 0.f, -10.0f), 1, glm::vec3(1.f));
+	
 
-	Quadrilateral boxBack = CornellBoxFactory::createBack();
-	boxBack.setMaterial(CORNELL_BACK);
-	tree->addObject(&boxBack);
 
-	boxBack.getBoundingBox()->print();
-	std::cout << boxBack.asString() << std::endl;
+	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
+	boxCeiling.setMaterial(CORNELL_CEIL);
+	tree->addObject(&boxCeiling);
+
+// 	Quadrilateral boxBack = CornellBoxFactory::createBack();
+// 	boxBack.setMaterial(CORNELL_BACK);
+// 	tree->addObject(&boxBack);
 
 	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
 	boxFloor.setMaterial(CORNELL_FLOOR);

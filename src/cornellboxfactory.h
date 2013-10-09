@@ -2,7 +2,7 @@
 #define CORNELLBOXFACTORY_H
 
 #include "quadrilateral.h"
-
+#include "triangle.h"
 
 
 class CornellBoxFactory {
@@ -18,6 +18,7 @@ class CornellBoxFactory {
 		
 		f.scale(_scaleFactor);
 		f.translate(_t);
+		f.updateAABB();
 		return f;
 	}
 
@@ -30,6 +31,7 @@ class CornellBoxFactory {
 			glm::vec3(0.0f,     548.8f, 0.0f));
 		c.scale(_scaleFactor);
 		c.translate(_t);
+		c.updateAABB();
 		return c;
 	}
 
@@ -41,6 +43,7 @@ class CornellBoxFactory {
 			glm::vec3(0.0,   0.0, 559.2));
 		b.scale(_scaleFactor);
 		b.translate(_t);
+		b.updateAABB();
 		return b;
 	}
 
@@ -53,6 +56,7 @@ class CornellBoxFactory {
 			glm::vec3(0.0, 548.8, 559.2));
 			r.scale(_scaleFactor);
 		r.translate(_t);
+		r.updateAABB();
 		return r;
 	}
 	static Quadrilateral createLeft() {
@@ -64,6 +68,7 @@ class CornellBoxFactory {
 			glm::vec3(556.0, 548.8, 0.0));
 		l.scale(_scaleFactor);
 		l.translate(_t);
+		l.updateAABB();
 		return l;
 	}
 

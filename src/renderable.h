@@ -9,9 +9,16 @@ class Renderable {
  public:
     virtual ~Renderable() { delete _boundingBox; };
     AABB *getBoundingBox() { return _boundingBox; };
-    virtual IntersectionPoint *getIntersectionPoint(Ray *ray) const = 0;
+    virtual bool getIntersectionPoint(Ray *ray,  IntersectionPoint &ip) const = 0;
 	std::string getName() const { return _name; };
 	virtual std::string asString() const { return "asString() not implemented for " + getName(); };
+	virtual void scale(const float s) {
+		std::cout << "Using unimplemented scale in " << getName() << std::endl;
+	}
+	virtual void translate(const glm::vec3 &t) {
+		std::cout << "Using unimplemented translate in " << getName() << std::endl;
+
+	}
 	void setMaterial(const material_t& m) {
 		_material = Material();
 		_material.setMaterialType(m);
