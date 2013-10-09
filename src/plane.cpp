@@ -14,7 +14,7 @@ std::string Plane::asString() const {
 	return s.str();
 }
 
-IntersectionPoint *Plane::getIntersectionPoint(Ray *ray) const {
+bool Plane::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
 	float nom, denom;
 	glm::vec3 intVec;
 
@@ -22,10 +22,10 @@ IntersectionPoint *Plane::getIntersectionPoint(Ray *ray) const {
 	denom = glm::dot( ray->getDirection(), _normal);
 
 	if(fabs(denom) < 0.0000001f)
-		return NULL; // Ray outside and/or parallel to plane
+		return false; // Ray outside and/or parallel to plane
 
 	float d = nom/denom;
 	intVec = ray->getOrigin() + d * ray->getDirection();
 
-	return NULL;
+	return false;
 }

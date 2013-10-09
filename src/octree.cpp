@@ -115,9 +115,9 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) {
 		Leaf *leaf = node->getFirstLeaf();
 
 		while(leaf != NULL) {
-			IntersectionPoint *i = leaf->getRenderable()->getIntersectionPoint(&ray);
-			if (i != NULL) {
-				pts.push_back(*i);
+			IntersectionPoint i;
+			if (leaf->getRenderable()->getIntersectionPoint(&ray, i)) {
+				pts.push_back(i);
 				hit = true;
 			}
 			leaf = leaf->getNextSibling();
@@ -176,9 +176,12 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) {
 		float min = FLT_MAX;
 		int id;
 		for (size_t i = 0; i < pts.size(); ++i) {
-			float len = glm::length((pts[i].getPoint() - ray.getOrigin()));
+// 			std::cout << glm::to_string(pts[i].getPoint()) << glm::to_string(ray.getOrigin()) << std::flush;
+			glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
+			float len = glm::length((vec));
 
 			if(len < min) {
+				
 				min = len;
 				id = i;
 			}

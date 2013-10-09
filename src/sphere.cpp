@@ -20,7 +20,7 @@ std::string Sphere::asString() const {
 	return s.str();
 }
 
-IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
+bool Sphere::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
 	/*Algorithm from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection*/
 
 	float A,B,C,t;
@@ -37,7 +37,7 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 		float sqrtTerm = B*B - 4*A*C;
 
 		if(sqrtTerm < 0.0f) {// Imaginary root(s)
-			return NULL;
+			return false;
 		}
 
 		float t0, t1, q;
@@ -57,7 +57,7 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 		}
 
 		if(t1 < 0.0f) {// Intersection, but in the ray's negative direction
-			return NULL;
+			return false;
 		}
 
 		if(t0 < 0.0f) // If t0 <= 0, intersection is at t1
@@ -68,10 +68,10 @@ IntersectionPoint *Sphere::getIntersectionPoint(Ray *ray) const {
 		//ray->print();
 		glm::vec3 intP = ray->getOrigin() + glm::normalize(ray->getDirection())*t;
 		glm::vec3 surfNormal = glm::normalize(intP - _position);
+		ip = IntersectionPoint(intP, surfNormal, getMaterial());
 
-		return new IntersectionPoint(intP, surfNormal, getMaterial());
-  }
+		return true;  }
   else { // No intersection with sphere's AABB
-    return NULL;
+    return false;
   }
 }

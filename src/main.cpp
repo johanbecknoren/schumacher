@@ -42,10 +42,18 @@ int main(int argc, char **argv) {
 	
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
+	
+// 	Triangle *tri = new Triangle(
+// 			glm::vec3(10.f, 10.f, 5.f),
+// 			glm::vec3(-10.f, -10.f, 5.f),
+// 			glm::vec3(10.f, -10.f, 5.f));
+// 	tree->addObject(tri);
 
 
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(0.3f));
-	
+// 	tree->addPointLight(ptLgt);
+	PointLight *l2 = new PointLight(glm::vec3(5.0f, 0.4f, -0.4f), 1, glm::vec3(0.3f));
+	tree->addPointLight(l2);
 // 	Quadrilateral *quad = new Quadrilateral(
 // 				  glm::vec3( 1., 1., 5.),
 //                   glm::vec3( 1., -1., 5.),
@@ -64,6 +72,7 @@ int main(int argc, char **argv) {
 	boxBack.getBoundingBox()->print();
 	std::cout << boxBack.asString() << std::endl;
 
+
 	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
 	boxFloor.setMaterial(CORNELL_FLOOR);
 	tree->addObject(&boxFloor);
@@ -77,12 +86,12 @@ int main(int argc, char **argv) {
 	tree->addObject(&boxLeft);
 
 // 
-// 	tree->addObject(sphere);
-// 	tree->addObject(sp2);
-// 	tree->addObject(sp3);
-// 	tree->addObject(sp4);
+	tree->addObject(sphere);
+	tree->addObject(sp2);
+	tree->addObject(sp3);
+	tree->addObject(sp4);
 // 	tree->addObject(spLight);
-	tree->addPointLight(ptLgt);
+	
 //	tree->addObject(quad);
 	tree->print();
 	float* pixels = new float[3 * WIDTH * HEIGHT];
