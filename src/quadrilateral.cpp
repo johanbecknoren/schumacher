@@ -37,7 +37,7 @@ void Quadrilateral::translate(const glm::vec3& t){
 //typedef float real;
 //typedef glm::vec3 vector;
 
-IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
+bool Quadrilateral::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
 	// Algorithm from http://graphics.cs.kuleuven.be/publications/LD05ERQIT/LD05ERQIT_code.cpp
 
 	static const float eps = float(10e-6);
@@ -50,19 +50,19 @@ IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
 	glm::vec3 P = glm::cross(ray->getDirection(), E_03);
 	float det = glm::dot(E_01, P);
 
-	if (std::fabs(det) < eps) return NULL;
+	if (std::fabs(det) < eps) return false;
 
 	float inv_det = float(1.0) / det;
 	glm::vec3 T = ray->getOrigin() - _v00;
 	float alpha = glm::dot(T, P) * inv_det;
 
-	if (alpha < float(0.0)) return NULL;
+	if (alpha < float(0.0)) return false;
 
 	// if (alpha > real(1.0)) return false; // Uncomment if VR is used.
 	glm::vec3 Q = glm::cross(T, E_01);
 	float beta = glm::dot(ray->getDirection(), Q) * inv_det;
 
-	if (beta < float(0.0)) return NULL; 
+	if (beta < float(0.0)) return false; 
 
 	// if (beta > real(1.0)) return false; // Uncomment if VR is used.
 
@@ -76,25 +76,25 @@ IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
 		glm::vec3 P_prime = glm::cross(ray->getDirection(), E_21);
 		float det_prime = glm::dot(E_23, P_prime);
 
-		if (std::fabs(det_prime) < eps) return NULL;
+		if (std::fabs(det_prime) < eps) return false;
 
 		float inv_det_prime = float(1.0) / det_prime;
 		glm::vec3 T_prime = ray->getOrigin() - _v11;
 		float alpha_prime = glm::dot(T_prime, P_prime) * inv_det_prime;
 
-		if (alpha_prime < float(0.0)) return NULL;
+		if (alpha_prime < float(0.0)) return false;
 
 		glm::vec3 Q_prime = glm::cross(T_prime, E_23);
 		float beta_prime = glm::dot(ray->getDirection(), Q_prime) * inv_det_prime;
 
-		if (beta_prime < float(0.0)) return NULL;
+		if (beta_prime < float(0.0)) return false;
 	}
 
 	// Compute the ray parameter of the intersection point, and
 	// reject the ray if it does not hit Q.
 
 	t = glm::dot(E_03, Q) * inv_det;
-	if (t < float(0.0)) return NULL; 
+	if (t < float(0.0)) return false; 
 
 	// Compute the barycentric coordinates of the fourth vertex.
 	// These do not depend on the ray, and can be precomputed
@@ -148,12 +148,12 @@ IntersectionPoint* Quadrilateral::getIntersectionPoint(Ray *ray) const {
 
 	if(glm::dot(ray->getDirection(), sN) > 0.0f) // Draw the quad from both directions
 		sN *= -1.0f;
+	ip = IntersectionPoint(iPoint, sN, this->getMaterial());
 
-	return new IntersectionPoint(iPoint, sN, this->getMaterial());
+	return true;
 }
-
 void Quadrilateral::createAABB(){
-	float eps = float(10e06);
+	float eps = float(1e06);
 	glm::vec3 lLB(
 		glm::min( glm::min(_v00.x,_v01.x), glm::min(_v10.x,_v11.x) ),
 		glm::min( glm::min(_v00.y,_v01.y), glm::min(_v10.y,_v11.y) ),

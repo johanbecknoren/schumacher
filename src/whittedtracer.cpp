@@ -34,7 +34,7 @@ void WhittedTracer::render(float *pixels, Octree *tree, Camera *cam) {
 glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
- 	const int maxDepth = 2;
+ 	const int maxDepth = 5;
 	if (tree->intersect(ray, ip)) {
 		if (depth < maxDepth) {
 			color = phongShader(ray, ip, tree);
@@ -42,7 +42,8 @@ glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
 
 			Ray reflection = calculateReflection(ray, ip);
 			float absor = 1.0f - ip.getMaterial().getAbsorbtion();
-			if (color.x < 1.f && color.y < 1.f && color.y < 1.f) {
+// 			if (color.x < 1.f && color.y < 1.f && color.y < 1.f) 
+			{
 				glm::vec3 rayColor = iterateRay(reflection, tree, depth + 1);
 				color += absor * rayColor;
 			}
@@ -67,16 +68,15 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 		L = glm::normalize(L);
 		// Shadow ray test
 		Ray shadowRay = Ray(surfacePosition + L * 0.0001f, L);
+		IntersectionPoint shadowIntersection;
+		glm::vec3 V = glm::normalize(incoming.getPosition() - surfacePosition);
+		float nDotL = glm::max(glm::dot(surfaceNormal, L), 0.0f);
+		if (tree->intersect(shadowRay, shadowIntersection)) {
+// 			color += ip.getMaterial().getDiffuseColor() * nDotL * 0.01f; // Diffuse component
 
-//		IntersectionPoint ip;
-		if (tree->intersect(shadowRay, ip)) {
-			
 		}
 		else 
 		{
-			glm::vec3 V = glm::normalize(incoming.getPosition() - surfacePosition);
-			float nDotL = glm::max(glm::dot(surfaceNormal, L), 0.0f);
-			
 			float a = glm::dot(L, surfaceNormal);
 			glm::vec3 R = 2 * a * surfaceNormal - L;
 			float vDotR = pow(glm::max(glm::dot(R, V), 0.0f), 10);

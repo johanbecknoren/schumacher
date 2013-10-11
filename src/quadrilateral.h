@@ -9,7 +9,7 @@ public:
 	Quadrilateral() {};
 	~Quadrilateral() {};
 
-	IntersectionPoint *getIntersectionPoint(Ray *ray) const;
+	bool getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const;
 
 	virtual std::string asString() const;
 

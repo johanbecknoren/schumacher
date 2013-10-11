@@ -6,22 +6,23 @@ Triangle::Triangle(glm::vec3 ix0, glm::vec3 ix1, glm::vec3 ix2) : x1(ix1), x2(ix
 	createAABB();
 }
 
-IntersectionPoint *Triangle::getIntersectionPoint(Ray *ray) const {
+bool Triangle::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
     glm::vec3 edge1 = x1 - x0;
     glm::vec3 edge2 = x2 - x0;
     glm::vec3 pvec = glm::cross(ray->getDirection(), edge2);
     float det = glm::dot(edge1, pvec);
-    if (det == 0) return NULL;
+    if (det == 0) return false;
     float invDet = 1 / det;
     glm::vec3 tvec = ray->getOrigin() - x0;
 	float U = glm::dot(tvec, pvec) * invDet;
-    if (U < 0 || U > 1) return NULL;
+    if (U < 0 || U > 1) return false;
     glm::vec3 qvec = glm::cross(tvec, edge1);
     float V = glm::dot(ray->getDirection(), qvec) * invDet;
-    if (V < 0 || U + V > 1) return NULL;
+    if (V < 0 || U + V > 1) return false;
     float T = glm::dot(edge2, qvec) * invDet;
 	glm::vec3 newPos = ray->getOrigin() + T;
-	return new IntersectionPoint(newPos, ray->getDirection(), getMaterial()); 
+	ip = IntersectionPoint(newPos, normal, getMaterial()); 
+	return true;
 }
 
 
@@ -36,4 +37,16 @@ void Triangle::createAABB() {
 	if (upper.y == lower.y) upper.y += 0.1;
 	if (upper.z == lower.z) upper.z += 0.1;
 	this->_boundingBox = new AABB(lower, upper);
+} 
+
+void Triangle::translate(const glm::vec3 &t) {
+	x1 + t;
+	x2 + t;
+	x0 + t;
+}
+
+void Triangle::scale(float s) {
+	x1 *= s;
+	x2 *= s;
+	x0 *= s;
 }
