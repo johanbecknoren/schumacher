@@ -73,5 +73,5 @@ class CornellBoxFactory {
 		static glm::vec3 _t;
 };
 float CornellBoxFactory::_scaleFactor = 0.02;
-glm::vec3 CornellBoxFactory::_t = glm::vec3(-4.5f,-4.5f,1.6f);//glm::vec3(-278.f,-273.f,800.f);
+glm::vec3 CornellBoxFactory::_t = glm::vec3(-5.5f,-4.5f,1.6f);//glm::vec3(-278.f,-273.f,800.f);
 #endif

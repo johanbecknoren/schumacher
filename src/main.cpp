@@ -28,10 +28,10 @@ int main(int argc, char **argv) {
 
 	Octree *tree = new Octree(&bb);
 
-	Sphere *sphere = new Sphere(0.2f, glm::vec3(-0.05f,-0.2f,1.5f));
+	Sphere *sphere = new Sphere(0.2f, glm::vec3(-0.05f,-0.2f,0.0f));
 	sphere->setMaterial(MARBLE);
 
-	Sphere *sp2 = new Sphere(1.f, glm::vec3(0.02f, 0.13f, 4.23f));
+	Sphere *sp2 = new Sphere(1.f, glm::vec3(1.02f, 0.13f, 4.23f));
 	sp2->setMaterial(MIRROR);
 
 	Sphere *sp3 = new Sphere(1.f, glm::vec3(-2.02f, 0.13f, 4.23f));
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 
 // 
 // 	tree->addObject(sphere);
-// 	tree->addObject(sp2);
+ 	tree->addObject(sp2);
 // 	tree->addObject(sp3);
 // 	tree->addObject(sp4);
 // 	tree->addObject(spLight);
@@ -92,8 +92,8 @@ int main(int argc, char **argv) {
 	SimpleRaycaster caster(WIDTH, HEIGHT);
 	WhittedTracer wTracer(WIDTH, HEIGHT);
 
-	wTracer.render(pixels, tree, cam);
-//  	caster.render(pixels, tree, cam);
+//	wTracer.render(pixels, tree, cam);
+  	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);
 	
