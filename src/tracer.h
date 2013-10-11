@@ -9,7 +9,7 @@ class Tracer {
 	public:
 		Tracer(const int W, const int H) : _W(W), _H(H) {
 			// Godtycklig FOV (http://www.unknownroad.com/rtfm/graphics/rt_eyerays.html)
-			_tanfovx = -(float(M_PI)/4.0f);
+			_tanfovx = -(float(M_PI)/8.0f);
 			_tanfovy = tan((float(H)/float(W)) * _tanfovx);
 			_tanfovx = tan(_tanfovx);
 		}
