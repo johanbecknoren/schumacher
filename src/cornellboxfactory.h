@@ -73,10 +73,129 @@ class CornellBoxFactory {
 		return l;
 	}
 
-	private:
+	static Quadrilateral createShortBlock1() {
+		Quadrilateral sb1 = Quadrilateral(
+			glm::vec3(130.0f,	165.0f,	65.0f),
+			glm::vec3(82.0f,	165.0f,	225.0f),
+			glm::vec3(240.0f,	165.0f,	272.0f),
+			glm::vec3(290.0f,	165.0f,	114.0f));
+		sb1.scale(_scaleFactor);
+		sb1.translate(_t);
+		sb1.updateAABB();
+		return sb1;
+	}
+	static Quadrilateral createShortBlock2() {
+		Quadrilateral sb2 = Quadrilateral(
+			glm::vec3(290.0f,	0.0f,	114.0f),
+			glm::vec3(290.0f,	165.0f,	114.0f),
+			glm::vec3(240.0f,	165.0f,	272.0f),
+			glm::vec3(240.0f,	0.0f,	272.0f));
+		sb2.scale(_scaleFactor);
+		sb2.translate(_t);
+		sb2.updateAABB();
+		return sb2;
+	}
+	static Quadrilateral createShortBlock3() {
+		Quadrilateral sb3 = Quadrilateral(
+			glm::vec3(130.0f,	0.0f,	65.0f),
+			glm::vec3(130.0f,	165.0f,	65.0f),
+			glm::vec3(290.0f,	165.0f,	114.0f),
+			glm::vec3(290.0f,	0.0f,	114.0f));
+		sb3.scale(_scaleFactor);
+		sb3.translate(_t);
+		sb3.updateAABB();
+		return sb3;
+	}
+	static Quadrilateral createShortBlock4() {
+		Quadrilateral sb4 = Quadrilateral(
+			glm::vec3(82.0f,	0.0f,	225.0f),
+			glm::vec3(82.0f,	165.0f,	225.0f),
+			glm::vec3(130.0f,	165.0f,	65.0f),
+			glm::vec3(130.0f,	0.0f,	65.0f));
+		sb4.scale(_scaleFactor);
+		sb4.translate(_t);
+		sb4.updateAABB();
+		return sb4;
+	}
+	static Quadrilateral createShortBlock5() {
+		Quadrilateral sb5 = Quadrilateral(
+			glm::vec3(240.0f,	0.0f,	272.0f),
+			glm::vec3(240.0f,	165.0f,	272.0f),
+			glm::vec3(82.0f,	165.0f,	225.0f),
+			glm::vec3(82.0f,	0.0f,	225.0f));
+		sb5.scale(_scaleFactor);
+		sb5.translate(_t);
+		sb5.updateAABB();
+		return sb5;
+	}
+
+	static Quadrilateral createTallBlock1() {
+		Quadrilateral tb1 = Quadrilateral(
+			glm::vec3(423.0f,	330.0f,	247.0f),
+			glm::vec3(265.0f,	330.0f,	296.0f),
+			glm::vec3(314.0f,	330.0f,	456.0f),
+			glm::vec3(472.0f,	330.0f,	406.0f));
+		tb1.scale(_scaleFactor);
+		tb1.translate(_t);
+		tb1.updateAABB();
+		return tb1;
+	}
+
+	static Quadrilateral createTallBlock2() {
+		Quadrilateral tb2 = Quadrilateral(
+			glm::vec3(423.0f,	0.0f,	247.0f),
+			glm::vec3(423.0f,	330.0f,	247.0f),
+			glm::vec3(472.0f,	330.0f,	406.0f),
+			glm::vec3(472.0f,	0.0f,	406.0f));
+		tb2.scale(_scaleFactor);
+		tb2.translate(_t);
+		tb2.updateAABB();
+		return tb2;
+	}
+
+	static Quadrilateral createTallBlock3() {
+		Quadrilateral tb3 = Quadrilateral(
+			glm::vec3(472.0f,	0.0f,	406.0f),
+			glm::vec3(472.0f,	330.0f,	406.0f),
+			glm::vec3(314.0f,	330.0f,	456.0f),
+			glm::vec3(314.0f,	0.0f,	456.0f));
+		tb3.scale(_scaleFactor);
+		tb3.translate(_t);
+		tb3.updateAABB();
+		return tb3;
+	}
+
+	static Quadrilateral createTallBlock4() {
+		Quadrilateral tb4 = Quadrilateral(
+			glm::vec3(314.0f,	0.0f,	456.0f),
+			glm::vec3(314.0f,	330.0f,	456.0f),
+			glm::vec3(265.0f,	330.0f,	296.0f),
+			glm::vec3(265.0f,	0.0f,	296.0f));
+		tb4.scale(_scaleFactor);
+		tb4.translate(_t);
+		tb4.updateAABB();
+		return tb4;
+	}
+
+	static Quadrilateral createTallBlock5() {
+		Quadrilateral tb5 = Quadrilateral(
+			glm::vec3(265.0f,	0.0f,	296.0f),
+			glm::vec3(265.0f,	330.0f,	296.0f),
+			glm::vec3(423.0f,	330.0f,	247.0f),
+			glm::vec3(423.0f,	0.0f,	247.0f));
+		tb5.scale(_scaleFactor);
+		tb5.translate(_t);
+		tb5.updateAABB();
+		return tb5;
+	}
+
+
+private:
 		static float _scaleFactor;
 		static glm::vec3 _t;
 };
-float CornellBoxFactory::_scaleFactor = 0.02;
-glm::vec3 CornellBoxFactory::_t = glm::vec3(-5.5f,-4.5f,1.6f);//glm::vec3(-278.f,-273.f,800.f);
+
+
+	float CornellBoxFactory::_scaleFactor = 0.022;
+	glm::vec3 CornellBoxFactory::_t = glm::vec3(-5.6f,-5.5f,4.6f);//glm::vec3(-278.f,-273.f,800.f);
 #endif

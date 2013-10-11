@@ -85,10 +85,51 @@ int main(int argc, char **argv) {
 	boxLeft.setMaterial(CORNELL_LEFT);
 	tree->addObject(&boxLeft);
 
-	tree->addObject(sphere);
+	Quadrilateral shortBlock1 = CornellBoxFactory::createShortBlock1();
+	shortBlock1.setMaterial(CORNELL_BACK);
+	tree->addObject(&shortBlock1);
+
+	Quadrilateral shortBlock2 = CornellBoxFactory::createShortBlock2();
+	shortBlock2.setMaterial(CORNELL_BACK);
+	tree->addObject(&shortBlock2);
+
+	Quadrilateral shortBlock3 = CornellBoxFactory::createShortBlock3();
+	shortBlock3.setMaterial(CORNELL_BACK);
+	tree->addObject(&shortBlock3);
+
+	Quadrilateral shortBlock4 = CornellBoxFactory::createShortBlock4();
+	shortBlock4.setMaterial(CORNELL_BACK);
+	tree->addObject(&shortBlock4);
+
+	Quadrilateral shortBlock5 = CornellBoxFactory::createShortBlock5();
+	shortBlock5.setMaterial(CORNELL_BACK);
+	tree->addObject(&shortBlock5);
+
+	Quadrilateral tallBlock1 = CornellBoxFactory::createTallBlock1();
+	tallBlock1.setMaterial(CORNELL_BACK);
+	tree->addObject(&tallBlock1);
+
+	Quadrilateral tallBlock2 = CornellBoxFactory::createTallBlock2();
+	tallBlock2.setMaterial(CORNELL_BACK);
+	tree->addObject(&tallBlock2);
+
+	Quadrilateral tallBlock3 = CornellBoxFactory::createTallBlock3();
+	tallBlock3.setMaterial(CORNELL_BACK);
+	tree->addObject(&tallBlock3);
+
+	Quadrilateral tallBlock4 = CornellBoxFactory::createTallBlock4();
+	tallBlock4.setMaterial(CORNELL_BACK);
+	tree->addObject(&tallBlock4);
+
+	Quadrilateral tallBlock5 = CornellBoxFactory::createTallBlock5();
+	tallBlock5.setMaterial(CORNELL_BACK);
+	tree->addObject(&tallBlock5);
+
+
+/*	tree->addObject(sphere);
 	tree->addObject(sp2);
 	tree->addObject(sp3);
-	tree->addObject(sp4);
+	tree->addObject(sp4);*/
 // 	tree->addObject(spLight);
 	
 //	tree->addObject(quad);
@@ -114,5 +155,10 @@ int main(int argc, char **argv) {
 
  	if (exportImage)
 		ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
+	delete sphere;
+	delete sp2;
+	delete sp3;
+	delete sp4;
+	delete tree;
 	return 0;
 }

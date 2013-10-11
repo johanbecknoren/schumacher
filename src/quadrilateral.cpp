@@ -23,7 +23,7 @@ void Quadrilateral::scale(float v) {
 	_v01 *= v;
 	_v10 *= v;
 	_v11 *= v;
-	createAABB();
+//	createAABB();
 }
 
 void Quadrilateral::translate(const glm::vec3& t){
@@ -31,7 +31,7 @@ void Quadrilateral::translate(const glm::vec3& t){
 	_v01 += t;
 	_v10 += t;
 	_v11 += t;
-	createAABB();
+//	createAABB();
 }
 
 //typedef float real;
