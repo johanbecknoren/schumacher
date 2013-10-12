@@ -224,6 +224,25 @@ TimeTypes::TimePoint Timer::getCurrentTime() {
 	return p; 
 }
 
+std::string Timer::approximateTimeLeft(std::string name, double percentage) const {
+	TimeTypes::TimerList::const_iterator it = timers.find(name);
+
+	if (it != timers.end()) {
+		double time = it->second.getRealtime(getCurrentTime());
+		//percentage = 0, 100
+		if (percentage > 0.0001) {
+			double approx = time / percentage * 100.0;
+			TIME_FORMAT f;
+			double capprox = convertToHighest(f, approx);
+		}
+	}
+	else {
+		std::cout << "No timer called " << name << " found.";
+	}
+	std::cout << std::endl;
+	return "";
+}
+
 double Timer::convertToHighest(TIME_FORMAT &format, double t) const {
 	if (t < 1000.0) {
 		format = TIME_FORMAT::MILLISEC;

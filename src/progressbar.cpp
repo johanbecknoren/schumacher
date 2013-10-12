@@ -1,8 +1,13 @@
 #include "progressbar.h"
 #include <iostream>
+#include "timer.h"
 
 ProgressBar *ProgressBar::_instance;
 std::mutex ProgressBar::progMutex;
+
+void ProgressBar::printTimedProgBar(int count, int total, std::string timerName) {
+	
+}
 
 void ProgressBar::printProgBar(int count, int total) {
 	

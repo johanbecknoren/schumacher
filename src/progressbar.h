@@ -20,6 +20,7 @@ class ProgressBar {
 		
 	public:
 	static void printProgBar(int count, int total);
+	static void printTimedProgBar(int count, int total, std::string timerName);
 
 };
 

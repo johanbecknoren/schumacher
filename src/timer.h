@@ -60,6 +60,7 @@ class Timer {
 		double getRealTime(std::string name) const;
 		double getThreadTime(std::string name, int threadId = -1) const;
 		void printAllTimers(TIME_FORMAT format = TIME_FORMAT::HIGHEST) const;	
+		std::string approximateTimeLeft(std::string name, double percentage) const;
 		void printRealTime(std::string name, 
 						TIME_FORMAT format = TIME_FORMAT::HIGHEST) const;
 		void printThreadTime(std::string name, 

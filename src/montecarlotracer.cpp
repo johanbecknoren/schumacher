@@ -36,8 +36,6 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 }
 
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
-
-	int total = _W * _H;
 	const int NUM_THREADS = std::thread::hardware_concurrency();
 	std::cout << "Starting carlo tracer with " << NUM_THREADS << " threads.\n";
 	std::vector<std::thread> threads;
