@@ -2,11 +2,17 @@
 #include <iostream>
 
 ProgressBar *ProgressBar::_instance;
+std::mutex ProgressBar::progMutex;
 
 void ProgressBar::printProgBar(int count, int total) {
+	
 	int percent = int(100.0f * float(count) / float(total)); 
-	if (getInstance()->currProc == percent) return;
-	else getInstance()->currProc = percent;
+	if (getInstance()->currProc == percent) { 
+		return;
+	}
+	progMutex.lock();
+	
+	getInstance()->currProc = percent;
 	std::string bar;
 
 	for (int i = 0; i < 50; ++i) {
@@ -26,4 +32,7 @@ void ProgressBar::printProgBar(int count, int total) {
 	if (total > 0)
 		std::cout << "% (" << count << "/" << total << ")";
 	std::cout << std::flush;
+
+	progMutex.unlock();
+
 }

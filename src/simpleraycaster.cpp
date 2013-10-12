@@ -1,5 +1,6 @@
 #include "simpleraycaster.h"
 #include "progressbar.h"
+#include "timer.h"
 
 void SimpleRaycaster::render(float* pixels, Octree *tree, Camera *cam){
 	// Skicka en stråle per pixel, hämta normal samt material
@@ -9,12 +10,14 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, Camera *cam){
 	int rayCounter = 0;
 
 	// (u,v) are pixel coords for output image
+	Timer::getInstance()->start("Simple");
 	for(int u=0; u<_W; ++u) {
 		for(int v=0; v<_H; ++v) {
 			rayCounter++;
-			float x = ( (2.0f*float(u)-float(_W))/float(_W) ) * _tanfovx;
-			float y = ( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
-			
+
+			float x;
+			float y;			
+			calculateXnY(u, v, x, y);
 			// TODO: Lägg detta i en funktion som returnerar intensitet (floats) och som
 			// kan anropas rekursivt. Spawna nya strålar (reflekterade och brutna) till
 			// en iterations-tröskel nås
@@ -33,6 +36,8 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, Camera *cam){
 			ProgressBar::printProgBar(rayCounter, total);	
 		}
 	}
+	Timer::getInstance()->stop("Simple");
 	std::cout << std::endl;
+	Timer::getInstance()->printRealTime("Simple");
 	std::cout << "Num pixels: "<<_W*_H<<", num rays: "<<rayCounter<<"\n";
 }

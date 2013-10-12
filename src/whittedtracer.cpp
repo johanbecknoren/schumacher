@@ -11,9 +11,9 @@ void WhittedTracer::render(float *pixels, Octree *tree, Camera *cam) {
 	for(int u=0; u<_W; ++u) {
 		for(int v=0; v<_H; ++v) {
 			rayCounter++;
-			float x = ( (2.0f*float(u)-float(_W))/float(_W) ) * _tanfovx;
-			float y = -( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
-
+			float x;
+			float y;			
+			calculateXnY(u, v, x, y);
 			Ray r = cam->createRay(x, y);
 			glm::vec3 intensity = iterateRay(r, tree, 0);
 			int id = calculateId(u, v);

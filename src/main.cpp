@@ -11,6 +11,7 @@
 #include "quadrilateral.h"
 #include "cornellboxfactory.h"
 #include "triangle.h"
+#include "montecarlotracer.h"
 
 int main(int argc, char **argv) {
 	bool exportImage = true;
@@ -140,9 +141,12 @@ int main(int argc, char **argv) {
 	Raytracer rayTracer(WIDTH, HEIGHT);
 	SimpleRaycaster caster(WIDTH, HEIGHT);
 	WhittedTracer wTracer(WIDTH, HEIGHT);
+	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
-	wTracer.render(pixels, tree, cam);
-//  	caster.render(pixels, tree, cam);
+	mTracer.render(pixels, tree, cam);
+
+// 	wTracer.render(pixels, tree, cam);
+ 	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);
 	

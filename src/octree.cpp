@@ -96,7 +96,7 @@ std::vector<const Renderable*> Octree::getLightList() const {
 	return lightList;
 }
 
-bool Octree::intersect(Ray &ray, IntersectionPoint &isect) {
+bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
 	float tmin = 0, tmax = FLT_MAX;
 	if (!_root->getBoundingBox()->IntersectT(&ray, &tmin, &tmax))
 		return false;

@@ -46,7 +46,7 @@ public:
 	const std::vector<PointLight *> &getPointLights() { return _pointLights; }
 	void print() const;
 	std::vector<const Renderable*> getLightList() const;
-	bool intersect(Ray &ray, IntersectionPoint &isect);
+	bool intersect(Ray &ray, IntersectionPoint &isect) const;
 private:
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);
