@@ -234,6 +234,7 @@ std::string Timer::approximateTimeLeft(std::string name, double percentage) cons
 			double approx = time / percentage * 100.0;
 			TIME_FORMAT f;
 			double capprox = convertToHighest(f, approx);
+            
 		}
 	}
 	else {
