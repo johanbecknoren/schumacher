@@ -27,9 +27,9 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 				pixels[id + 1] = intensity*ip.getMaterial().getDiffuseColor().y;
 				pixels[id + 2] = intensity*ip.getMaterial().getDiffuseColor().z;
 			}
-
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			addToCount();
-			ProgressBar::printProgBar(_rayCounter, _W * _H);
+			ProgressBar::printTimedProgBar(_rayCounter, _W * _H, "Carlo");
 
 		}
 	}

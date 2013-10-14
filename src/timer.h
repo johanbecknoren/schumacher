@@ -72,6 +72,7 @@ class Timer {
 		Timer() {
 
 		};
+		std::string printable(double time, TIME_FORMAT format) const;
 		void printLine(double time, TIME_FORMAT format) const;
 		double convertToHighest(TIME_FORMAT &format, double t) const;
 		double msToS(double d) const;

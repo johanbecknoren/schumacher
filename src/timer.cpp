@@ -1,5 +1,6 @@
 #include "timer.h"
-
+#include <sstream>
+#include <iomanip>
 namespace TimeTypes {
 Times::Times() {
 	_active = false;
@@ -181,6 +182,26 @@ void Timer::printRealTime(std::string name, TIME_FORMAT format) const {
 	std::cout << std::endl;
 }
 
+std::string Timer::printable(double time, TIME_FORMAT format) const {
+	std::ostringstream ss;
+	std::string v = "ms";
+
+	if (format == HIGHEST) {
+		time = convertToHighest(format, time);
+	}
+	if (format == SEC) {
+		v = "s";
+	}
+	else if (format == MIN) {
+		v = "m";
+	}
+	else if (format == HRS) {
+		v = "h";
+	}
+	ss << time << v;
+	return ss.str();
+}
+
 void Timer::printLine(double time, TIME_FORMAT format) const {
 	std::string v = "ms";
 
@@ -199,6 +220,9 @@ void Timer::printLine(double time, TIME_FORMAT format) const {
 	std::cout << time << v;
 
 }
+
+
+
 void Timer::printThreadTime(std::string name, TIME_FORMAT format) const {
 	double time = getThreadTime(name);
 	std::cout << "Timer:";
@@ -226,15 +250,23 @@ TimeTypes::TimePoint Timer::getCurrentTime() {
 
 std::string Timer::approximateTimeLeft(std::string name, double percentage) const {
 	TimeTypes::TimerList::const_iterator it = timers.find(name);
+	std::ostringstream ss;
+	ss.precision(3);
 
 	if (it != timers.end()) {
 		double time = it->second.getRealtime(getCurrentTime());
+		TIME_FORMAT f1;
+		double ctime = convertToHighest(f1, time);
+
+		ss << printable(ctime, f1) << " ";
 		//percentage = 0, 100
 		if (percentage > 0.0001) {
-			double approx = time / percentage * 100.0;
-			TIME_FORMAT f;
-			double capprox = convertToHighest(f, approx);
+			double approx = time / percentage * 100.0;	
+			double capprox = convertToHighest(f1, approx);
+			ss << std::setprecision(1);
+			ss << printable(capprox, f1);
 		}
+		return ss.str();
 	}
 	else {
 		std::cout << "No timer called " << name << " found.";
