@@ -12,24 +12,43 @@ void MonteCarloRayTracer::addToCount() {
 
 void MonteCarloRayTracer::threadRender(int tId, float *pixels, 
 		const Octree &tree, const Camera &cam, const int NUM_THREADS) {
+
+	int raysPerPixel = 4; // Preferrably even sqrt number
+	
+	float sqrtRPP = sqrtf(raysPerPixel);
+
+	float dU = sqrtRPP/float(raysPerPixel);
+	float dV = sqrtRPP/float(raysPerPixel);
+	
 	for (int u = 0; u < _W; ++u) {
 		for (int v = 0; v < _H / NUM_THREADS; ++v) {
-			float x;
-			float y;			
-			calculateXnY(u, v * NUM_THREADS + tId, x, y);
-			Ray r = cam.createRay(x, y);
-			IntersectionPoint ip;
-
-			if (tree.intersect(r, ip)) {
-				float intensity = glm::dot(r.getDirection(), - ip.getNormal());
-				int id = calculateId(u, v * NUM_THREADS + tId);
-				pixels[id + 0] = intensity*ip.getMaterial().getDiffuseColor().x;
-				pixels[id + 1] = intensity*ip.getMaterial().getDiffuseColor().y;
-				pixels[id + 2] = intensity*ip.getMaterial().getDiffuseColor().z;
+			glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
+			for (float rpU=-1.0f/(sqrtRPP); rpU<1.0f - 1.0f/(sqrtRPP); rpU += 1.0f/sqrtRPP) {
+				for (float rpV=-1.0f/(sqrtRPP); rpV<1.0f-1.0f/(sqrtRPP); rpV += 1.0f/sqrtRPP) {
+					float x;
+					float y;
+					float u2 = u + rpU;
+					float v2 = v + rpV;
+					calculateXnY(u2, v2 * NUM_THREADS + tId, x, y);
+					Ray r = cam.createRay(x, y);
+					IntersectionPoint ip;
+	
+					if (tree.intersect(r, ip)) {
+						float intensity = glm::dot(r.getDirection(), - ip.getNormal());
+						accumDiffColor.x += intensity*ip.getMaterial().getDiffuseColor().x;
+						accumDiffColor.y += intensity*ip.getMaterial().getDiffuseColor().y;
+						accumDiffColor.z += intensity*ip.getMaterial().getDiffuseColor().z;
+						
+					}
+				addToCount();
+				}
+// 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+				ProgressBar::printTimedProgBar(_rayCounter, _W * _H * raysPerPixel, "Carlo");
 			}
-// 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			// addToCount();
-			// ProgressBar::printTimedProgBar(_rayCounter, _W * _H, "Carlo");
+			int id = calculateId(u, v * NUM_THREADS + tId);
+			pixels[id + 0] = accumDiffColor.x/float(raysPerPixel);
+			pixels[id + 1] = accumDiffColor.y/float(raysPerPixel);
+			pixels[id + 2] = accumDiffColor.z/float(raysPerPixel);
 
 		}
 	}
