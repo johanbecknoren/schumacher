@@ -266,7 +266,6 @@ std::string Timer::approximateTimeLeft(std::string name, double percentage) cons
 		if (percentage > 0.0001) {
 			double approx = time / percentage * (100.0 - percentage);	
 			double capprox = convertToHighest(f1, approx);
-			ss << std::setprecision(1);
 			ss << printable(capprox, f1);
 		}
 		return ss.str();
