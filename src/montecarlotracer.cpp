@@ -12,8 +12,8 @@ void MonteCarloRayTracer::addToCount() {
 
 void MonteCarloRayTracer::threadRender(int tId, float *pixels, 
 		const Octree &tree, const Camera &cam, const int NUM_THREADS) {
-	int raysPerPixel = 4; // Preferrably even sqrt number
-	
+	int raysPerPixel = 36; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
+	int maxDepth = 4;
 	float sqrtRPP = sqrtf(raysPerPixel);
 
 	float dU = sqrtRPP/float(raysPerPixel);
@@ -22,6 +22,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 	for (int u = 0; u < _W / NUM_THREADS; ++u) {
 		for (int v = 0; v < _H; ++v) {
 			glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
+			// Distributes rays uniformly within the pixel (u,v)
 			for (float rpU=-1.0f/(sqrtRPP); rpU<1.0f - 1.0f/(sqrtRPP); rpU += 1.0f/sqrtRPP) {
 				for (float rpV=-1.0f/(sqrtRPP); rpV<1.0f-1.0f/(sqrtRPP); rpV += 1.0f/sqrtRPP) {
 					float x;
