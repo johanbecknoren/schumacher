@@ -9,6 +9,8 @@ FILE(GLOB HEADERS  ./*.h*)
 
 FILE(GLOB SRCS  ./*.cpp)
 
+
+
 list(APPEND schumacher_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/externals
 	${CMAKE_SOURCE_DIR}/externals/glm
@@ -17,6 +19,22 @@ list(APPEND schumacher_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/externals/assimp
  	${CMAKE_SOURCE_DIR}/externals/FreeImage  
 )
+
+# Random generator stuff
+list(APPEND schumacher_INCLUDE_DIRS
+	${CMAKE_SOURCE_DIR}/sfmt
+)
+
+FILE(GLOB_RECURSE SFMT_H ${CMAKE_SOURCE_DIR}/sfmt/*.h*)
+FILE(GLOB_RECURSE SFMT_CPP ${CMAKE_SOURCE_DIR}/sfmt/*.c)
+
+list(APPEND HEADERS ${SFMT_H})
+
+list(APPEND SRCS ${SFMT_CPP})
+
+add_definitions(-DSFMT_MEXP=19937)
+
+####
 
 include_directories(	
 	${schumacher_INCLUDE_DIRS}

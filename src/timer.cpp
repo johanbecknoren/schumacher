@@ -202,6 +202,11 @@ std::string Timer::printable(double time, TIME_FORMAT format) const {
 	return ss.str();
 }
 
+std::string Timer::approximateExact(double time) const {
+	std::ostringstream ss;
+	return "";
+}
+
 void Timer::printLine(double time, TIME_FORMAT format) const {
 	std::string v = "ms";
 
