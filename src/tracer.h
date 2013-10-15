@@ -28,6 +28,11 @@ class Tracer {
 			y = -( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
 		}
 
+		void calculateXnY(const float u, const float v, float &x, float &y) {
+			x = ( (2.0f*float(u)-float(_W))/float(_W) ) * _tanfovx;
+			y = -( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
+		}
+
 // 		Ray calculateRefraction() {
 // 
 // 		}

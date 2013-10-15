@@ -12,25 +12,38 @@ void MonteCarloRayTracer::addToCount() {
 
 void MonteCarloRayTracer::threadRender(int tId, float *pixels, 
 		const Octree &tree, const Camera &cam, const int NUM_THREADS) {
+	int raysPerPixel = 16; // Preferrably even sqrt number
+	
+	float sqrtRPP = sqrtf(raysPerPixel);
+
+	float dU = sqrtRPP/float(raysPerPixel);
+	float dV = sqrtRPP/float(raysPerPixel);
+	
 	for (int u = 0; u < _W / NUM_THREADS; ++u) {
 		for (int v = 0; v < _H; ++v) {
-			float x;
-			float y;			
-			calculateXnY(u * NUM_THREADS + tId, v, x, y);
-			Ray r = cam.createRay(x, y);
-			IntersectionPoint ip;
-
-			if (tree.intersect(r, ip)) {
-				float intensity = glm::dot(r.getDirection(), - ip.getNormal());
-				int id = calculateId(u * NUM_THREADS + tId, v);
-				pixels[id + 0] = intensity*ip.getMaterial().getDiffuseColor().x;
-				pixels[id + 1] = intensity*ip.getMaterial().getDiffuseColor().y;
-				pixels[id + 2] = intensity*ip.getMaterial().getDiffuseColor().z;
+			for (int rpU=1; rpU<=int(sqrtRPP); ++rpU) {
+				for (int rpV=1; rpV<=int(sqrtRPP); ++rpV) {
+					float x;
+					float y;
+					float u2 = u + rpU*dU;
+					float v2 = v + rpV*dV;
+					//calculateXnY(u * NUM_THREADS + tId, v, x, y);
+					calculateXnY(u2 * NUM_THREADS + tId, v2, x, y);
+					Ray r = cam.createRay(x, y);
+					IntersectionPoint ip;
+	
+					if (tree.intersect(r, ip)) {
+						float intensity = glm::dot(r.getDirection(), - ip.getNormal());
+						int id = calculateId(u * NUM_THREADS + tId, v);
+						pixels[id + 0] = intensity*ip.getMaterial().getDiffuseColor().x;
+						pixels[id + 1] = intensity*ip.getMaterial().getDiffuseColor().y;
+						pixels[id + 2] = intensity*ip.getMaterial().getDiffuseColor().z;
+					}
+				addToCount();
+				}
+// 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+				ProgressBar::printTimedProgBar(_rayCounter, _W * _H * raysPerPixel, "Carlo");
 			}
-// 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			addToCount();
-			ProgressBar::printTimedProgBar(_rayCounter, _W * _H, "Carlo");
-
 		}
 	}
 }
