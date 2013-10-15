@@ -198,7 +198,7 @@ std::string Timer::printable(double time, TIME_FORMAT format) const {
 	else if (format == HRS) {
 		v = "h";
 	}
-	ss << time << v;
+	ss << (int) time << v;
 	return ss.str();
 }
 
@@ -221,6 +221,9 @@ void Timer::printLine(double time, TIME_FORMAT format) const {
 
 }
 
+void Timer::printAllTimers(TIME_FORMAT format) const {
+
+}
 
 
 void Timer::printThreadTime(std::string name, TIME_FORMAT format) const {
@@ -261,12 +264,10 @@ std::string Timer::approximateTimeLeft(std::string name, double percentage) cons
 		ss << printable(ctime, f1) << " ";
 		//percentage = 0, 100
 		if (percentage > 0.0001) {
-
-			double approx = time / percentage * 100.0;	
+			double approx = time / percentage * (100.0 - percentage);	
 			double capprox = convertToHighest(f1, approx);
 			ss << std::setprecision(1);
 			ss << printable(capprox, f1);
-
 		}
 		return ss.str();
 	}
