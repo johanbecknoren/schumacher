@@ -10,9 +10,15 @@ void MonteCarloRayTracer::addToCount() {
 	_mutex.unlock();
 }
 
+#define UNIFORM_DIST 1
+
 void MonteCarloRayTracer::threadRender(int tId, float *pixels, 
 		const Octree &tree, const Camera &cam, const int NUM_THREADS) {
-	int raysPerPixel = 36; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
+#if UNIFORM_DIST
+	int raysPerPixel = 16; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
+#else
+	int raysPerPixel = 30;
+#endif
 	int maxDepth = 4;
 	float sqrtRPP = sqrtf(raysPerPixel);
 
@@ -22,6 +28,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 	for (int u = 0; u < _W / NUM_THREADS; ++u) {
 		for (int v = 0; v < _H; ++v) {
 			glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
+#if UNIFORM_DIST
 			// Distributes rays uniformly within the pixel (u,v)
 			for (float rpU=-1.0f/(sqrtRPP); rpU<1.0f - 1.0f/(sqrtRPP); rpU += 1.0f/sqrtRPP) {
 				for (float rpV=-1.0f/(sqrtRPP); rpV<1.0f-1.0f/(sqrtRPP); rpV += 1.0f/sqrtRPP) {
@@ -29,7 +36,6 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 					float y;
 					float u2 = u + rpU;
 					float v2 = v + rpV;
-					//calculateXnY(u * NUM_THREADS + tId, v, x, y);
 					calculateXnY(u2 * NUM_THREADS + tId, v2, x, y);
 					Ray r = cam.createRay(x, y);
 					IntersectionPoint ip;
@@ -43,13 +49,43 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 					}
 				addToCount();
 				}
-// 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				ProgressBar::printTimedProgBar(_rayCounter, _W * _H * raysPerPixel, "Carlo");
 			}
 			int id = calculateId(u * NUM_THREADS + tId, v);
 			pixels[id + 0] = accumDiffColor.x/float(raysPerPixel);
 			pixels[id + 1] = accumDiffColor.y/float(raysPerPixel);
 			pixels[id + 2] = accumDiffColor.z/float(raysPerPixel);
+#else
+			float randU, randV;
+			
+			for(int rpp=1; rpp<=raysPerPixel; ++rpp) {
+				randU = glm::linearRand(-0.5f,0.5f);
+				randV = glm::linearRand(-0.5f,0.5f);
+				float x;
+				float y;
+				float u2 = u + randU;
+				float v2 = v + randV;
+				calculateXnY(u2 * NUM_THREADS + tId, v2, x, y);
+				Ray r = cam.createRay(x, y);
+				IntersectionPoint ip;
+	
+				if (tree.intersect(r, ip)) {
+					float intensity = glm::dot(r.getDirection(), - ip.getNormal());
+						accumDiffColor.x += intensity*ip.getMaterial().getDiffuseColor().x;
+						accumDiffColor.y += intensity*ip.getMaterial().getDiffuseColor().y;
+						accumDiffColor.z += intensity*ip.getMaterial().getDiffuseColor().z;
+					
+					}
+			
+			addToCount();
+		}
+		ProgressBar::printTimedProgBar(_rayCounter, _W * _H * raysPerPixel, "Carlo");
+	
+	int id = calculateId(u * NUM_THREADS + tId, v);
+	pixels[id + 0] = accumDiffColor.x/float(raysPerPixel);
+	pixels[id + 1] = accumDiffColor.y/float(raysPerPixel);
+	pixels[id + 2] = accumDiffColor.z/float(raysPerPixel);
+#endif
 		}
 	}
 }
