@@ -12,7 +12,7 @@ void MonteCarloRayTracer::addToCount() {
 
 void MonteCarloRayTracer::threadRender(int tId, float *pixels, 
 		const Octree &tree, const Camera &cam, const int NUM_THREADS) {
-	int raysPerPixel = 16; // Preferrably even sqrt number
+	int raysPerPixel = 4; // Preferrably even sqrt number
 	
 	float sqrtRPP = sqrtf(raysPerPixel);
 
@@ -21,12 +21,13 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 	
 	for (int u = 0; u < _W / NUM_THREADS; ++u) {
 		for (int v = 0; v < _H; ++v) {
-			for (int rpU=1; rpU<=int(sqrtRPP); ++rpU) {
-				for (int rpV=1; rpV<=int(sqrtRPP); ++rpV) {
+			glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
+			for (float rpU=-1.0f/(sqrtRPP); rpU<1.0f - 1.0f/(sqrtRPP); rpU += 1.0f/sqrtRPP) {
+				for (float rpV=-1.0f/(sqrtRPP); rpV<1.0f-1.0f/(sqrtRPP); rpV += 1.0f/sqrtRPP) {
 					float x;
 					float y;
-					float u2 = u + rpU*dU;
-					float v2 = v + rpV*dV;
+					float u2 = u + rpU;
+					float v2 = v + rpV;
 					//calculateXnY(u * NUM_THREADS + tId, v, x, y);
 					calculateXnY(u2 * NUM_THREADS + tId, v2, x, y);
 					Ray r = cam.createRay(x, y);
@@ -34,16 +35,20 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 	
 					if (tree.intersect(r, ip)) {
 						float intensity = glm::dot(r.getDirection(), - ip.getNormal());
-						int id = calculateId(u * NUM_THREADS + tId, v);
-						pixels[id + 0] = intensity*ip.getMaterial().getDiffuseColor().x;
-						pixels[id + 1] = intensity*ip.getMaterial().getDiffuseColor().y;
-						pixels[id + 2] = intensity*ip.getMaterial().getDiffuseColor().z;
+						accumDiffColor.x += intensity*ip.getMaterial().getDiffuseColor().x;
+						accumDiffColor.y += intensity*ip.getMaterial().getDiffuseColor().y;
+						accumDiffColor.z += intensity*ip.getMaterial().getDiffuseColor().z;
+						
 					}
 				addToCount();
 				}
 // 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				ProgressBar::printTimedProgBar(_rayCounter, _W * _H * raysPerPixel, "Carlo");
 			}
+			int id = calculateId(u * NUM_THREADS + tId, v);
+			pixels[id + 0] = accumDiffColor.x/float(raysPerPixel);
+			pixels[id + 1] = accumDiffColor.y/float(raysPerPixel);
+			pixels[id + 2] = accumDiffColor.z/float(raysPerPixel);
 		}
 	}
 }
