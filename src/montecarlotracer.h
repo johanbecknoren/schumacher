@@ -14,6 +14,7 @@ public:
 		std::cout << "hej" << "\n";
 	};
 private:
+	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth);
 	struct Rng
 	{
 		unsigned int m_z, m_w;

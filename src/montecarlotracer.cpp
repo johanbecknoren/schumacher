@@ -13,6 +13,19 @@ void MonteCarloRayTracer::addToCount() {
 	_mutex.unlock();
 }
 
+glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int depth) {
+	IntersectionPoint ip;
+	glm::vec3 color(0.0f);
+	int maxDepth = 4;
+	
+	if(tree.intersect(ray, ip)) {
+		if(depth < maxDepth) {
+		}
+	}
+
+	return glm::vec3();
+}
+
 #define UNIFORM_DIST 0
 
 void MonteCarloRayTracer::threadRender(int tId, float *pixels, 
@@ -22,9 +35,8 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 	int raysPerPixel = 16; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
 	float sqrtRPP = sqrtf(raysPerPixel);
 #else
-	int raysPerPixel = 10;
+	int raysPerPixel = 16;
 #endif
-	int maxDepth = 4;
 	
 	
 	for (int u = 0; u < _W / NUM_THREADS; ++u) {
@@ -53,6 +65,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels,
 					IntersectionPoint ip;
 					
 					if (tree.intersect(r, ip)) {
+						accumDiffColor = iterateRay(r, tree, 0);
 						float intensity = glm::dot(r.getDirection(), - ip.getNormal());
 						accumDiffColor.x += intensity*ip.getMaterial().getDiffuseColor().x;
 						accumDiffColor.y += intensity*ip.getMaterial().getDiffuseColor().y;
@@ -101,7 +114,7 @@ void MonteCarloRayTracer::testTimers(){
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
 	const int NUM_THREADS = std::thread::hardware_concurrency();
 	sfmt_init_gen_rand(&_randomGenerator, 1234);
-	int i = sfmt_genrand_uint32(&_randomGenerator);
+//	int i = sfmt_genrand_uint32(&_randomGenerator);
 	_rgen = Rng();
 
 	testTimers();
