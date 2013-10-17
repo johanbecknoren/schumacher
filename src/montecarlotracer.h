@@ -14,6 +14,7 @@ public:
 		std::cout << "hej" << "\n";
 	};
 private:
+	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth);
 	struct Rng
 	{
 		unsigned int m_z, m_w;
@@ -36,6 +37,7 @@ private:
 			return (m_z << 16) + m_w; /* 32-bit result */
 		}
 	};
+
 	void threadRender(int tId, float *pixels, const Octree &tree, 
 			const Camera &cam, const int NUM_THREADS);
 	

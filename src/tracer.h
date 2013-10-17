@@ -19,6 +19,21 @@ class Tracer {
 			Ray r = Ray(ip.getPoint() + 0.001f * reflection, reflection);
 			return r;
 		}
+
+		Ray calclulateRefraction(const Ray &inRay, const IntersectionPoint &ip) {
+			float cosIn = glm::dot(ip.getNormal(), -inRay.getDirection());
+			float n1overn2 = inRay.getRefractionIndex()/ip.getMaterial().getRefractionIndex();
+			float cosOut = sqrtf(1 - n1overn2*(1 - cosIn*cosIn));
+			
+			glm::vec3 refr_dir;
+			if(cosIn > 0.0f)
+				refr_dir = (n1overn2) * inRay.getDirection() + (n1overn2*cosIn - cosOut)*ip.getNormal();
+			else		
+				refr_dir = (n1overn2) * inRay.getDirection() + (n1overn2*cosIn + cosOut)*ip.getNormal();
+
+			return Ray(ip.getPoint(), glm::normalize(refr_dir), ip.getMaterial().getRefractionIndex());
+		}
+
 		int calculateId(const int u, const int v) const {
 			return u * 3 + _W * v * 3;
 		}
