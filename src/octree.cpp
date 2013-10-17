@@ -131,7 +131,7 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
 
 				float max, tplane;
 				if (node->getChild(i)->getBoundingBox()->IntersectT(&ray, &tplane, &max)) {
-					if(tplane < mint) {
+					if(tplane < mint && tplane > 0) {
 						if (id != -1) {
 							todo[todoPos].node = node->getChild(i);
 							todo[todoPos].tmin = mint;
@@ -178,6 +178,7 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
 		for (size_t i = 0; i < pts.size(); ++i) {
 // 			std::cout << glm::to_string(pts[i].getPoint()) << glm::to_string(ray.getOrigin()) << std::flush;
 			glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
+
 			float len = glm::length((vec));
 
 			if(len < min) {

@@ -5,11 +5,12 @@ Ray::Ray() {
 	this->_direction = glm::vec3(0.0f);
 }
 
-Ray::Ray(const glm::vec3& o, const glm::vec3 &dir) {
+Ray::Ray(const glm::vec3& o, const glm::vec3 &dir, const float rInd) {
 	this->_origin = o;
 	this->_direction = glm::normalize(dir);
 	_tmin = -100000;
 	_tmax = 10000;
+	_refractionIndex = rInd;
 }
 
 void Ray::updateT(const float tmin, const float tmax) { 

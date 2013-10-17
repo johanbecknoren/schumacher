@@ -37,6 +37,7 @@ private:
 			return (m_z << 16) + m_w; /* 32-bit result */
 		}
 	};
+
 	void threadRender(int tId, float *pixels, const Octree &tree, 
 			const Camera &cam, const int NUM_THREADS);
 	

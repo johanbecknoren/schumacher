@@ -63,20 +63,21 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 
 	glm::vec3 color = glm::vec3(0.0f);
 	for (size_t i = 0; i < lights.size(); ++i) {
-		glm::vec3 L = (lights[i]->getPosition() - surfacePosition);
+		glm::vec3 L1 = (lights[i]->getPosition() - surfacePosition);
 // 		float length = glm::length(L);	
-		L = glm::normalize(L);
+		glm::vec3 L = glm::normalize(L1);
 		// Shadow ray test
 		Ray shadowRay = Ray(surfacePosition + L * 0.0001f, L);
 		IntersectionPoint shadowIntersection;
-		glm::vec3 V = glm::normalize(incoming.getPosition() - surfacePosition);
-		float nDotL = glm::max(glm::dot(surfaceNormal, L), 0.0f);
+
 		if (tree->intersect(shadowRay, shadowIntersection)) {
 // 			color += ip.getMaterial().getDiffuseColor() * nDotL * 0.01f; // Diffuse component
-
+			
 		}
 		else 
 		{
+			glm::vec3 V = glm::normalize(incoming.getPosition() - surfacePosition);
+			float nDotL = glm::max(glm::dot(surfaceNormal, L), 0.0f);
 			float a = glm::dot(L, surfaceNormal);
 			glm::vec3 R = 2 * a * surfaceNormal - L;
 			float vDotR = pow(glm::max(glm::dot(R, V), 0.0f), 10);
