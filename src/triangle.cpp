@@ -20,8 +20,10 @@ bool Triangle::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
     float V = glm::dot(ray->getDirection(), qvec) * invDet;
     if (V < 0 || U + V > 1) return false;
     float T = glm::dot(edge2, qvec) * invDet;
-	glm::vec3 newPos = ray->getOrigin() + T;
+	if (T < 0) return false;
+	glm::vec3 newPos = ray->getOrigin() + T * ray->getDirection();
 	ip = IntersectionPoint(newPos, normal, getMaterial()); 
+	
 	return true;
 }
 
