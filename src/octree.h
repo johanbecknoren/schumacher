@@ -8,25 +8,31 @@ class Leaf {
 public:
     Leaf(Renderable *renderable);
     ~Leaf(){};
-    void setNextSibling(Leaf *sibling) { _nextSibling = sibling; };
+
+	void setNextSibling(Leaf *sibling) { _nextSibling = sibling; };
 	Leaf *getNextSibling() { return _nextSibling; };
     const Renderable *getRenderable() const { return _renderable; };
+	
 private:
-    Renderable *_renderable;
-    Leaf *_nextSibling;
+	Renderable *_renderable;
+	Leaf *_nextSibling;
+	
 };
 
 class Node {
+
 public:
     Node(int nodeDepth, AABB boundingBox);
     ~Node(){};
-    const AABB *getBoundingBox() const { return &_boundingBox; };
+
+	const AABB *getBoundingBox() const { return &_boundingBox; };
     Node *getChild(const int octant) const { return _childs[octant]; };
 	void setChild(const int octant, Node *node);
     const int getDepth() const { return _depth; };
     void addLeaf(Leaf *leaf);
     Leaf *getFirstLeaf() const { return _firstLeaf; };
 	void setFirstLeaf(Leaf *leaf) { _firstLeaf = leaf; }
+
 private:
     AABB _boundingBox;
     Node *_parent;
@@ -34,20 +40,25 @@ private:
     Node *_nextSibling;
     Leaf *_firstLeaf;
     int _depth;
+
 };
 
 class Octree {
+
 public:
     Octree(AABB *sceneBoundingBox);
     ~Octree();
-
+	
     void addObject(Renderable *object);
 	void addPointLight(PointLight *pointLight) { _pointLights.push_back(pointLight); }
 	const std::vector<PointLight *> &getPointLights() { return _pointLights; }
 	void print() const;
 	std::vector<const Renderable*> getLightList() const;
 	bool intersect(Ray &ray, IntersectionPoint &isect) const;
+
 private:
+	bool intersectSimple(Ray &ray, IntersectionPoint &isect) const;
+	bool intersectHard(Ray &ray, IntersectionPoint &isect) const;
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);
 	AABB *createBoundingBox(const Node *node, const int octant);
@@ -57,6 +68,7 @@ private:
 	std::vector<Node> _nodes;
 	std::vector<Leaf> _leafs;
 	std::vector<PointLight *> _pointLights;
+
 };
 struct ToDo {
 	const Node *node;

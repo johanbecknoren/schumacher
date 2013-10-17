@@ -79,7 +79,7 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 		{
 			float a = glm::dot(L, surfaceNormal);
 			glm::vec3 R = 2 * a * surfaceNormal - L;
-			float vDotR = pow(glm::max(glm::dot(R, V), 0.0f), 10);
+			float vDotR =0 * pow(glm::max(glm::dot(R, V), 0.0f), 4);
 			
 			color += ip.getMaterial().getDiffuseColor() * nDotL; // Diffuse component
 			color += vDotR * ip.getMaterial().getDiffuseColor(); // Specular component

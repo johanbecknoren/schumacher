@@ -44,11 +44,11 @@ int main(int argc, char **argv) {
 	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
 	spLight->setMaterial(LIGHT);
 	
-// 	Triangle *tri = new Triangle(
-// 			glm::vec3(10.f, 10.f, 5.f),
-// 			glm::vec3(-10.f, -10.f, 5.f),
-// 			glm::vec3(10.f, -10.f, 5.f));
-// 	tree->addObject(tri);
+	Triangle *tri = new Triangle(
+			glm::vec3(10.f, 10.f, 30.f),
+			glm::vec3(-10.f, -10.f, 30.f),
+			glm::vec3(10.f, -10.f, 30.f));
+	tree->addObject(tri);
 
 
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(0.3f));
@@ -143,9 +143,9 @@ int main(int argc, char **argv) {
 	WhittedTracer wTracer(WIDTH, HEIGHT);
 	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
-	mTracer.render(pixels, tree, cam);
+	// mTracer.render(pixels, tree, cam);
 
-// 	wTracer.render(pixels, tree, cam);
+	wTracer.render(pixels, tree, cam);
 // 	caster.render(pixels, tree, cam);
 // 	int iters = 1;
 // 	rayTracer.render(pixels, tree, cam, iters);

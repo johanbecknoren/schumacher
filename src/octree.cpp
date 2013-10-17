@@ -97,6 +97,35 @@ std::vector<const Renderable*> Octree::getLightList() const {
 }
 
 bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
+	return intersectSimple(ray, isect);
+	// return intersectHard(ray, isect);
+}
+
+bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
+	float lMin = FLT_MAX;
+	bool found = false;
+	std::vector<IntersectionPoint> ipvec;
+	
+	for (size_t i = 0; i < _leafs.size(); ++i) {
+		IntersectionPoint ip;
+		if (_leafs[i].getRenderable()->getIntersectionPoint(&ray, ip)) {
+			glm::vec3 vec = ip.getPoint() - ray.getOrigin();
+			float len = glm::length((vec));
+			if(len < lMin && len < ray.getTMax()) {
+				lMin = len;
+				isect = ip;
+				found = true;
+				
+			}
+		}
+	}
+	
+	return found;
+}
+
+
+
+bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 	float tmin = 0, tmax = FLT_MAX;
 	if (!_root->getBoundingBox()->IntersectT(&ray, &tmin, &tmax))
 		return false;
