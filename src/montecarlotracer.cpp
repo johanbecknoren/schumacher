@@ -17,13 +17,57 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
 	int maxDepth = 4;
-	
+	glm::vec3 rad(0.0f);
 	if(tree.intersect(ray, ip)) {
+		rad = ip.getMaterial().getEmission();
+		bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
+		
 		if(depth < maxDepth) {
+			if(isInsideObj) { // If coming from inside obj going out into air (refraction needed)
+				float n2overn1 = REFRACTION_AIR / ray.getRefractionIndex();
+				float critical_angle = asin(n2overn1);
+				float cosIn = glm::dot(ip.getNormal(), -ray.getDirection());
+				
+				if(acos(cosIn) > critical_angle) { // Total internal reflection
+//					float new_refr_index = ray.getRefractionIndex();
+					ip.setNormal(-1.0f*ip.getNormal());
+					Ray new_ray = calculateReflection(ray, ip);
+					rad += ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth);
+				} else { // Calc and spawn refracted and reflected rays
+					Material m = ip.getMaterial();
+					m.setRefractionIndex(REFRACTION_AIR);
+					ip.setMaterial(m);
+
+					Ray new_ray = calculateRefraction(ray, ip);
+					rad += 0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth);
+
+					new_ray = calculateReflection(ray, ip);
+					rad += 0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth);
+				}
+			} else { // Check for opacity (-> refraction + reflection), otherwise just reflect
+				if(ip.getMaterial().getOpacity() < 1.f-2.0f*EPSILON) { // Do refraction + reflection
+					float n2overn1 = ip.getMaterial().getRefractionIndex() / REFRACTION_AIR;
+					float critical_angle = asin(n2overn1);
+					float cosIn = glm::dot(ip.getNormal(), -ray.getDirection());
+					
+					if(acos(cosIn) < critical_angle) { // Refraction + reflection
+						Ray new_ray = calculateRefraction(ray, ip);
+						rad += 0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth);
+
+						new_ray = calculateReflection(ray, ip);
+						rad += 0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth);
+					}
+				} else { // Only reflection
+					Ray new_ray = calculateReflection(ray, ip);
+					rad += ip.getMaterial().getDiffuseColor()*iterateRay(ray, tree, ++depth);
+				}
+			}
+		} else {
+			rad += ip.getMaterial().getDiffuseColor();
 		}
 	}
 
-	return glm::vec3();
+	return rad;
 }
 
 #define UNIFORM_DIST 0
@@ -71,10 +115,10 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 					
 					if (tree.intersect(r, ip)) {
 						accumDiffColor = iterateRay(r, tree, 0);
-						float intensity = glm::dot(r.getDirection(), - ip.getNormal());
+						/*float intensity = glm::dot(r.getDirection(), - ip.getNormal());
 						accumDiffColor.x += intensity*ip.getMaterial().getDiffuseColor().x;
 						accumDiffColor.y += intensity*ip.getMaterial().getDiffuseColor().y;
-						accumDiffColor.z += intensity*ip.getMaterial().getDiffuseColor().z;
+						accumDiffColor.z += intensity*ip.getMaterial().getDiffuseColor().z;*/
 					}
 					addToCount();
 				}

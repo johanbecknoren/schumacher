@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#define EPSILON float(1e06)
+
 // Viewport dimensions
 #define WIDTH 512
 #define HEIGHT 512

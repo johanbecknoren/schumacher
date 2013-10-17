@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "imageexporter.h"
 #include "simpleraycaster.h"
-#include "raytracer.h"
 #include "whittedtracer.h"
 #include "timer.h"
 #include "glrenderer.h"
@@ -63,7 +62,7 @@ int main(int argc, char **argv) {
 // 	quad->setMaterial(CORNELL_LEFT);
 
  	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
- 	boxCeiling.setMaterial(CORNELL_CEIL);
+ 	boxCeiling.setMaterial(LIGHT);//CORNELL_CEIL);
  	tree->addObject(&boxCeiling);
 
 	Quadrilateral boxBack = CornellBoxFactory::createBack();
@@ -138,18 +137,15 @@ int main(int argc, char **argv) {
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
 
-	Raytracer rayTracer(WIDTH, HEIGHT);
 	SimpleRaycaster caster(WIDTH, HEIGHT);
 	WhittedTracer wTracer(WIDTH, HEIGHT);
 	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
-	// mTracer.render(pixels, tree, cam);
+//	mTracer.render(pixels, tree, cam);
 
 	wTracer.render(pixels, tree, cam);
 // 	caster.render(pixels, tree, cam);
-// 	int iters = 1;
-// 	rayTracer.render(pixels, tree, cam, iters);
-	
+// 	int iters = 1;	
 	
 
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
