@@ -110,7 +110,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 	int raysPerPixel = 36; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
 	float sqrtRPP = sqrtf(raysPerPixel);
 #else
-	int raysPerPixel = 625;
+	int raysPerPixel = 10;
 
 #endif
 	
@@ -147,7 +147,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 					
 					if (tree.intersect(r, ip)) {
 
-						accumDiffColor = iterateRay(r, tree, 0);
+						accumDiffColor += iterateRay(r, tree, 0);
 						/*float intensity = glm::dot(r.getDirection(), - ip.getNormal());
 						accumDiffColor.x += intensity*ip.getMaterial().getDiffuseColor().x;
 						accumDiffColor.y += intensity*ip.getMaterial().getDiffuseColor().y;
