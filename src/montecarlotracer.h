@@ -4,11 +4,13 @@
 #include "octree.h"
 #include <mutex>
 #include "SFMT.h"
+#include "glrenderer.h"
 
 class MonteCarloRayTracer : Tracer {
 public:
 	MonteCarloRayTracer(const int W, const int H) : Tracer(W, H),
-		_rayCounter(0){};
+													working(true),
+													_rayCounter(0){};
 	void render(float *pixels, Octree *tree, Camera *cam);	
 	void test() {
 		std::cout << "hej" << "\n";
@@ -38,12 +40,15 @@ private:
 		}
 	};
 
+	void glRender(float *pixels);
+	
 	void threadRender(int tId, float *pixels, const Octree &tree, 
 			const Camera &cam, const int NUM_THREADS);
-	
+	bool working;
 	void addToCount();
 	void testTimers();
 	std::mutex _mutex;
+	std::mutex _renderMutex;
 	volatile int _rayCounter;
 	sfmt_t _randomGenerator;
 	Rng _rgen;

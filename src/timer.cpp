@@ -237,6 +237,10 @@ std::string Timer::approximateExact(double time) const {
 	return "";
 }
 
+double Timer::getRealTime(std::string name) const {
+	return getRealTime(name);
+}
+
 void Timer::printLine(double time, TIME_FORMAT format) const {
 	std::string v = "ms";
 

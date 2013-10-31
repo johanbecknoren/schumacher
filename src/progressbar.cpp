@@ -28,12 +28,13 @@ std::string getBar(int percent) {
 
 void ProgressBar::printTimedProgBar(int count, int total, std::string timerName) {	
 	int percent = int(100.0f * float(count) / float(total));
-	Timer::getInstance()->start("timeElapsed");
-//	double t = Timer::getInstance()->getRealTime("timeElapsed");
-/*	if (getInstance()->currProc == percent || t < 1000) { 
+	// Timer::getInstance()->start("timeElapsed");
+	// double t = Timer::getInstance()->getRealTime("timeElapsed");
+	if (getInstance()->currProc == percent) { 
 		return;
-	}*/
-	Timer::getInstance()->reset("timeElapsed");
+	}
+	// Timer::getInstance()->reset("timeElapsed");
+
 	progMutex.lock();
 	getInstance()->currProc = percent;
 	std::string bar = getBar(percent);
