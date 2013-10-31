@@ -22,6 +22,11 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 		float rand = glm::linearRand(0.0f, 1.0f);
 		rad = ip.getMaterial().getEmission();
 		bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
+
+		if (ip.getMaterial().getMaterialType() == LIGHT) {
+
+			return ip.getMaterial().getDiffuseColor();
+		}
 		
 		if(depth < maxDepth) {
 			if(isInsideObj) { // If coming from inside obj going out into air (refraction needed)
@@ -49,22 +54,17 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				glm::vec3 origin = ip.getPoint();
 				
 				// Calc vectors for plane of intersection point
-				// glm::vec3 a = glm::vec3(1,0,0)*ip.getNormal() - origin;
-				// glm::vec3 b = glm::cross(ip.getNormal(), a);
+				glm::vec3 a = glm::vec3(1,0,0)*ip.getNormal() - origin;
+				glm::vec3 b = glm::cross(ip.getNormal(), a);
 
 				// Diffuse refl in random direction
 				float phi = glm::linearRand(0.0f,2.0f*PI);
-				// glm::vec3 diffuse_dir = a*rand*glm::cos(phi) + b*rand*glm::sin(phi) + ip.getNormal()*glm::sqrt(1.0f-rand*rand);
-
-				float azimut = 2.f * PI * _rgen.nextFloat();
-				float uval = 2.f * _rgen.nextFloat() - 1.f;
-				float wval = sqrt(1 - uval * uval);
-				glm::vec3 diff_dir(wval * cos(azimut), wval * sin(azimut), abs(uval));
+				glm::vec3 diffuse_dir = a*rand*glm::cos(phi) + b*rand*glm::sin(phi) + ip.getNormal()*glm::sqrt(1.0f-rand*rand);
 				
 				// Not sure if the diffuse dir is in sphere or half-sphere. Seems like
 				// sphere.
-				if (glm::dot(diff_dir, ip.getNormal()) < 0) {
-					diff_dir = -diff_dir;
+				if (glm::dot(diffuse_dir, ip.getNormal()) < 0) {
+					diffuse_dir = -diffuse_dir;
 				}
 				// Perfect refl ray
 				Ray refl_ray = calculateReflection(ray,ip);
@@ -72,7 +72,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				// Interpolate between diffuse and perf refl to get new reflected ray
 				float t = ip.getMaterial().getSpecular();
 				// glm::vec3 dir = glm::normalize(diffuse_dir*(1.0f-t) + refl_ray.getDirection()*t);
-				glm::vec3 dir2 = glm::normalize(diff_dir);
+				glm::vec3 dir2 = glm::normalize(diffuse_dir);
 				refl_ray = Ray(origin, dir2);
 
 				if(ip.getMaterial().getOpacity() < 1.f) { // Do refraction + reflection
@@ -107,10 +107,10 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tree, const Camera &cam, const int NUM_THREADS) {
 
 #if UNIFORM_DIST
-	int raysPerPixel = 16; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
+	int raysPerPixel = 36; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
 	float sqrtRPP = sqrtf(raysPerPixel);
 #else
-	int raysPerPixel = 4;
+	int raysPerPixel = 625;
 
 #endif
 	
@@ -147,8 +147,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 					
 					if (tree.intersect(r, ip)) {
 
-						for (int i = 0; i < 10; ++i)
-							accumDiffColor = iterateRay(r, tree, 0);
+						accumDiffColor = iterateRay(r, tree, 0);
 						/*float intensity = glm::dot(r.getDirection(), - ip.getNormal());
 						accumDiffColor.x += intensity*ip.getMaterial().getDiffuseColor().x;
 						accumDiffColor.y += intensity*ip.getMaterial().getDiffuseColor().y;
