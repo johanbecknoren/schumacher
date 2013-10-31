@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #define EPSILON float(1e06)
+#define PI 3.1415926535897932384626433832795f
 
 // Viewport dimensions
 #define WIDTH 512

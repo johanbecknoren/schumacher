@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(0.3f));
 // 	tree->addPointLight(ptLgt);
-	PointLight *l2 = new PointLight(glm::vec3(5.0f, 0.4f, -0.4f), 1, glm::vec3(0.3f));
+	PointLight *l2 = new PointLight(glm::vec3(5.0f, 1.4f, -0.4f), 1, glm::vec3(0.3f));
 	tree->addPointLight(l2);
 // 	Quadrilateral *quad = new Quadrilateral(
 // 				  glm::vec3( 1., 1., 5.),
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 // 	quad->setMaterial(CORNELL_LEFT);
 
  	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
- 	boxCeiling.setMaterial(LIGHT);//CORNELL_CEIL);
+ 	boxCeiling.setMaterial(CORNELL_CEIL);
  	tree->addObject(&boxCeiling);
 
 	Quadrilateral boxBack = CornellBoxFactory::createBack();
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 	tree->addObject(&boxLeft);
 
 	Quadrilateral shortBlock1 = CornellBoxFactory::createShortBlock1();
-	shortBlock1.setMaterial(CORNELL_BACK);
+	shortBlock1.setMaterial(LIGHT);//CORNELL_BACK);
 	tree->addObject(&shortBlock1);
 
 	Quadrilateral shortBlock2 = CornellBoxFactory::createShortBlock2();
@@ -141,9 +141,9 @@ int main(int argc, char **argv) {
 	WhittedTracer wTracer(WIDTH, HEIGHT);
 	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
-//	mTracer.render(pixels, tree, cam);
+	mTracer.render(pixels, tree, cam);
 
-	wTracer.render(pixels, tree, cam);
+//	wTracer.render(pixels, tree, cam);
 // 	caster.render(pixels, tree, cam);
 // 	int iters = 1;	
 	
