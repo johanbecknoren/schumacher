@@ -34,16 +34,16 @@ class Tracer {
 			return Ray(ip.getPoint(), glm::normalize(refr_dir), ip.getMaterial().getRefractionIndex());
 		}
 
-		int calculateId(const int u, const int v) const {
+		inline int calculateId(const int u, const int v) const {
 			return u * 3 + _W * v * 3;
 		}
 
-		void calculateXnY(const int u, const int v, float &x, float &y) {
+		inline void calculateXnY(const int u, const int v, float &x, float &y) {
 			x = ( (2.0f*float(u)-float(_W))/float(_W) ) * _tanfovx;
 			y = -( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
 		}
 
-		void calculateXnY(const float u, const float v, float &x, float &y) {
+		inline void calculateXnY(const float u, const float v, float &x, float &y) {
 			x = ( (2.0f*float(u)-float(_W))/float(_W) ) * _tanfovx;
 			y = -( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
 		}

@@ -1,6 +1,8 @@
 #include "timer.h"
 #include <sstream>
 #include <iomanip>
+#include <cmath>
+
 namespace TimeTypes {
 Times::Times() {
 	_active = false;
@@ -46,6 +48,7 @@ TimeTracker::TimeTracker() {
 }
 
 double TimeTracker::getRealtime(TimePoint current) const {
+	
 	return _realTime.timeElapsed(current).count();
 }
 
@@ -187,7 +190,34 @@ std::string Timer::printable(double time, TIME_FORMAT format) const {
 	std::string v = "ms";
 
 	if (format == HIGHEST) {
-		time = convertToHighest(format, time);
+		double secs = time / 1000.;
+		int is = int(secs) % 60;
+		std::ostringstream se;
+		if (is > 0) {
+			se << is << "s ";
+		}
+		else {
+			ss << se.str();
+			return ss.str();
+		}
+		double rest = secs - is;
+		double mins = rest / 60.;
+		int sm = int(mins) % 60;
+		std::ostringstream stm;
+		if (mins > 1.) {
+			stm << sm << "m ";
+		}
+		else {
+			ss << se.str() << stm.str();
+			return ss.str();
+		}
+		rest = mins - sm;
+		double hrs = rest / 60;
+		if (hrs > 1.) {
+			ss << int(hrs) << "h ";
+		}
+		ss << stm.str() << se.str();
+		return ss.str();
 	}
 	if (format == SEC) {
 		v = "s";
@@ -211,6 +241,7 @@ void Timer::printLine(double time, TIME_FORMAT format) const {
 	std::string v = "ms";
 
 	if (format == HIGHEST) {
+
 		time = convertToHighest(format, time);
 	}
 	if (format == SEC) {
@@ -266,12 +297,12 @@ std::string Timer::approximateTimeLeft(std::string name, double percentage) cons
 		TIME_FORMAT f1;
 		double ctime = convertToHighest(f1, time);
 
-		ss << printable(ctime, f1) << " ";
+		ss << printable(time, HIGHEST) << " ";
 		//percentage = 0, 100
 		if (percentage > 0.0001) {
 			double approx = time / percentage * (100.0 - percentage);	
 			double capprox = convertToHighest(f1, approx);
-			ss << printable(capprox, f1);
+			ss << printable(approx, HIGHEST);
 		}
 		return ss.str();
 	}

@@ -81,9 +81,9 @@ int main(int argc, char **argv) {
 	WhittedTracer wTracer(WIDTH, HEIGHT);
 	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
-//	mTracer.render(pixels, tree, cam);
+	mTracer.render(pixels, tree, cam);
 
-	wTracer.render(pixels, tree, cam);
+	// wTracer.render(pixels, tree, cam);
 // 	caster.render(pixels, tree, cam);
 // 	int iters = 1;	
 	

@@ -161,7 +161,7 @@ void MonteCarloRayTracer::testTimers(){
 }
 
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
-	const int NUM_THREADS = std::thread::hardware_concurrency();
+	const int NUM_THREADS = 1;//std::thread::hardware_concurrency();
 	sfmt_init_gen_rand(&_randomGenerator, 1234);
 //	int i = sfmt_genrand_uint32(&_randomGenerator);
 
