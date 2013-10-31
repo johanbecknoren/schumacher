@@ -99,7 +99,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 	int raysPerPixel = 16; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
 	float sqrtRPP = sqrtf(raysPerPixel);
 #else
-	int raysPerPixel = 20;
+	int raysPerPixel = 4;
 
 #endif
 	

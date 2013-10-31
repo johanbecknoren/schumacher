@@ -11,6 +11,7 @@
 #include "cornellboxfactory.h"
 #include "triangle.h"
 #include "montecarlotracer.h"
+#include "scenebuilder.h"
 
 int main(int argc, char **argv) {
 	bool exportImage = true;
@@ -61,74 +62,14 @@ int main(int argc, char **argv) {
 // 				  glm::vec3( -1., 1., 5.));
 // 	quad->setMaterial(CORNELL_LEFT);
 
- 	Quadrilateral boxCeiling = CornellBoxFactory::createCeil();
- 	boxCeiling.setMaterial(CORNELL_CEIL);
- 	tree->addObject(&boxCeiling);
 
-	Quadrilateral boxBack = CornellBoxFactory::createBack();
-	boxBack.setMaterial(CORNELL_BACK);
-	tree->addObject(&boxBack);
+	std::vector<Renderable *> scene = SceneBuilder::createCornellBox();
 
-	boxBack.getBoundingBox()->print();
-	std::cout << boxBack.asString() << std::endl;
-
-
-	Quadrilateral boxFloor = CornellBoxFactory::createFloor();
-	boxFloor.setMaterial(CORNELL_FLOOR);
-	tree->addObject(&boxFloor);
-	
-	Quadrilateral boxRight = CornellBoxFactory::createRight();
-	boxRight.setMaterial(CORNELL_RIGHT);
-	tree->addObject(&boxRight);
-	
-	Quadrilateral boxLeft = CornellBoxFactory::createLeft();
-	boxLeft.setMaterial(CORNELL_LEFT);
-	tree->addObject(&boxLeft);
-
-	Quadrilateral shortBlock1 = CornellBoxFactory::createShortBlock1();
-	shortBlock1.setMaterial(LIGHT);//CORNELL_BACK);
-	tree->addObject(&shortBlock1);
-
-	Quadrilateral shortBlock2 = CornellBoxFactory::createShortBlock2();
-	shortBlock2.setMaterial(CORNELL_BACK);
-	tree->addObject(&shortBlock2);
-
-	Quadrilateral shortBlock3 = CornellBoxFactory::createShortBlock3();
-	shortBlock3.setMaterial(CORNELL_BACK);
-	tree->addObject(&shortBlock3);
-
-	Quadrilateral shortBlock4 = CornellBoxFactory::createShortBlock4();
-	shortBlock4.setMaterial(CORNELL_BACK);
-	tree->addObject(&shortBlock4);
-
-	Quadrilateral shortBlock5 = CornellBoxFactory::createShortBlock5();
-	shortBlock5.setMaterial(CORNELL_BACK);
-	tree->addObject(&shortBlock5);
-
-	Quadrilateral tallBlock1 = CornellBoxFactory::createTallBlock1();
-	tallBlock1.setMaterial(CORNELL_BACK);
-	tree->addObject(&tallBlock1);
-
-	Quadrilateral tallBlock2 = CornellBoxFactory::createTallBlock2();
-	tallBlock2.setMaterial(CORNELL_BACK);
-	tree->addObject(&tallBlock2);
-
-	Quadrilateral tallBlock3 = CornellBoxFactory::createTallBlock3();
-	tallBlock3.setMaterial(CORNELL_BACK);
-	tree->addObject(&tallBlock3);
-
-	Quadrilateral tallBlock4 = CornellBoxFactory::createTallBlock4();
-	tallBlock4.setMaterial(CORNELL_BACK);
-	tree->addObject(&tallBlock4);
-
-	Quadrilateral tallBlock5 = CornellBoxFactory::createTallBlock5();
-	tallBlock5.setMaterial(CORNELL_BACK);
-	tree->addObject(&tallBlock5);
-
-
+	tree->addObject(scene);
 /*	tree->addObject(sphere);
 	tree->addObject(sp2);
 	tree->addObject(sp3);
+
 	tree->addObject(sp4);*/
 // 	tree->addObject(spLight);
 	
@@ -160,5 +101,6 @@ int main(int argc, char **argv) {
 	delete sp3;
 	delete sp4;
 	delete tree;
+	SceneBuilder::destructCornellBox(scene);
 	return 0;
 }
