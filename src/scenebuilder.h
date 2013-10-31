@@ -9,7 +9,7 @@ class SceneBuilder {
 private:
 	static void createShortBox(std::vector<Renderable *> &scene, material_t m) {
 		Quadrilateral *shortBlock1 = new Quadrilateral(CornellBoxFactory::createShortBlock1());
-		shortBlock1->setMaterial(m);
+		shortBlock1->setMaterial(LIGHT);//m);
 		scene.push_back(shortBlock1);
 
 		Quadrilateral *shortBlock2 = new Quadrilateral(CornellBoxFactory::createShortBlock2());

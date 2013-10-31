@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(0.3f));
 // 	tree->addPointLight(ptLgt);
-	PointLight *l2 = new PointLight(glm::vec3(5.0f, 0.4f, -0.4f), 1, glm::vec3(0.3f));
+	PointLight *l2 = new PointLight(glm::vec3(5.0f, 1.4f, -0.4f), 1, glm::vec3(0.3f));
 	tree->addPointLight(l2);
 // 	Quadrilateral *quad = new Quadrilateral(
 // 				  glm::vec3( 1., 1., 5.),
@@ -61,6 +61,7 @@ int main(int argc, char **argv) {
 //                   glm::vec3(-1., -1., 5.),
 // 				  glm::vec3( -1., 1., 5.));
 // 	quad->setMaterial(CORNELL_LEFT);
+
 
 	std::vector<Renderable *> scene = SceneBuilder::createCornellBox();
 
@@ -84,6 +85,7 @@ int main(int argc, char **argv) {
 	mTracer.render(pixels, tree, cam);
 
 	// wTracer.render(pixels, tree, cam);
+
 // 	caster.render(pixels, tree, cam);
 // 	int iters = 1;	
 	

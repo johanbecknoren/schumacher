@@ -44,7 +44,7 @@ class Renderable {
 			_material.setDiffuseColor(glm::vec3(1.0f));
 			_material.setAbsorbtion(1.f);
 		} else if (m == CORNELL_FLOOR) {
-			_material.setDiffuseColor(glm::vec3(1.0f));
+			_material.setDiffuseColor(glm::vec3(1.0f,0.5f,0.5f));
 			_material.setAbsorbtion(0.9f);
 		} else if (m == CORNELL_BACK) {
 			_material.setDiffuseColor(glm::vec3(1.0f));
