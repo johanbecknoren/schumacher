@@ -32,6 +32,10 @@ public:
 	glm::vec3 getNormal() const { return _surfaceNormal; }
 	Material getMaterial() const { return _material; }
 
+	void setPoint(const glm::vec3 &p) { _point = p; }
+	void setNormal(const glm::vec3 &n) { _surfaceNormal = n; }
+	void setMaterial(const Material &m) { _material = m; }
+
 private:
 	glm::vec3 _point;
 	glm::vec3 _surfaceNormal;

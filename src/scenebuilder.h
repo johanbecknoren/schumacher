@@ -7,7 +7,7 @@
 class SceneBuilder {
 
 private:
-	static void createShortBox(std::vector<Renderable *> &scene, material_t &m) {
+	static void createShortBox(std::vector<Renderable *> &scene, material_t m) {
 		Quadrilateral *shortBlock1 = new Quadrilateral(CornellBoxFactory::createShortBlock1());
 		shortBlock1->setMaterial(m);
 		scene.push_back(shortBlock1);
@@ -29,7 +29,7 @@ private:
 		scene.push_back(shortBlock5);
 	}
 
-	static void createTallBox(std::vector<Renderable *> &scene, material_t &m) {
+	static void createTallBox(std::vector<Renderable *> &scene, material_t m) {
 		Quadrilateral *tallBlock1 = new Quadrilateral(CornellBoxFactory::createTallBlock1());
 		tallBlock1->setMaterial(m);
 		scene.push_back(tallBlock1);
@@ -77,7 +77,7 @@ public:
 
 		
 		createTallBox(scene, STONE);
-		createSmallBox(scene, LIGHT);
+		createShortBox(scene, LIGHT);
 
 		return scene;
 	}

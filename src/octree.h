@@ -1,6 +1,7 @@
 #ifndef OCTREE_H
 #define OCTREE_H
 #include <vector>
+#include <algorithm>
 #include "pointlight.h"
 
 
@@ -50,6 +51,7 @@ public:
     ~Octree();
 	
     void addObject(Renderable *object);
+	void addObject(std::vector<Renderable *> &scene) { for (auto r : scene) addObject(r); }
 	void addPointLight(PointLight *pointLight) { _pointLights.push_back(pointLight); }
 	const std::vector<PointLight *> &getPointLights() { return _pointLights; }
 	void print() const;
