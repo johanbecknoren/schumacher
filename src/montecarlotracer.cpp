@@ -50,7 +50,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				
 				// Calc vectors for plane of intersection point
 				glm::vec3 a = glm::vec3(1,0,0)*ip.getNormal() - origin;
-				glm::vec3 b = glm::cross(ip.getNormal(), a);
+				glm::vec3 b = glm::cross(a,ip.getNormal());
 
 				// Diffuse refl in random direction
 				float phi = glm::linearRand(0.0f,2.0f*PI);
@@ -73,10 +73,9 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 					if(acos(cosIn) < critical_angle) { // Refraction + reflection
 						Ray refr_ray = calculateRefraction(ray, ip);
 						
-						// TODO: use importance here instead of 50/50
-						rad += 0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth);
+						rad += (1.0f-ip.getMaterial().getOpacity())*ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth);
 
-						rad += 0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
+						rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
 					}
 				} else { // Only reflection
 					Ray new_ray = calculateReflection(ray, ip);
@@ -84,7 +83,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				}
 			}
 		} else {
-//			rad += ip.getMaterial().getDiffuseColor();
+			//rad += ip.getMaterial().getDiffuseColor();
 		}
 	}
 
@@ -99,7 +98,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 	int raysPerPixel = 16; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
 	float sqrtRPP = sqrtf(raysPerPixel);
 #else
-	int raysPerPixel = 4;
+	int raysPerPixel = 50;
 
 #endif
 	
@@ -136,7 +135,7 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 					
 					if (tree.intersect(r, ip)) {
 
-						for (int i = 0; i < 10; ++i)
+//						for (int i = 0; i < 10; ++i)
 							accumDiffColor = iterateRay(r, tree, 0);
 						/*float intensity = glm::dot(r.getDirection(), - ip.getNormal());
 						accumDiffColor.x += intensity*ip.getMaterial().getDiffuseColor().x;
