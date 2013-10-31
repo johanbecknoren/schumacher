@@ -76,7 +76,7 @@ public:
 		scene.push_back(boxLeft);
 
 		
-		createTallBox(scene, STONE);
+		createTallBox(scene, LIGHT);
 		createShortBox(scene, LIGHT);
 
 		return scene;
