@@ -84,9 +84,9 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 					if(acos(cosIn) < critical_angle) { // Refraction + reflection
 						Ray refr_ray = calculateRefraction(ray, ip);
 						
-						rad += /*(1.0f-ip.getMaterial().getOpacity())*/0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth);
+						rad += (1.0f-ip.getMaterial().getOpacity())*ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth);
 
-						rad += /*ip.getMaterial().getOpacity()*/0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
+						rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
 					}
 				} else { // Only reflection
 					Ray new_ray = calculateReflection(ray, ip);
