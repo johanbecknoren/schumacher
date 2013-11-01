@@ -69,8 +69,8 @@ int main(int argc, char **argv) {
 /*	tree->addObject(sphere);
 	tree->addObject(sp2);
 	tree->addObject(sp3);
-
 	tree->addObject(sp4);*/
+
 // 	tree->addObject(spLight);
 	
 //	tree->addObject(quad);
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
 
 	mTracer.render(pixels, tree, cam);
 
-	// wTracer.render(pixels, tree, cam);
+//	wTracer.render(pixels, tree, cam);
 
 // 	caster.render(pixels, tree, cam);
 // 	int iters = 1;	

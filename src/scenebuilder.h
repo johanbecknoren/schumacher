@@ -31,23 +31,23 @@ private:
 
 	static void createTallBox(std::vector<Renderable *> &scene, material_t m) {
 		Quadrilateral *tallBlock1 = new Quadrilateral(CornellBoxFactory::createTallBlock1());
-		tallBlock1->setMaterial(m);
+		tallBlock1->setMaterial(GLASS);//m);
 		scene.push_back(tallBlock1);
 
 		Quadrilateral *tallBlock2 = new Quadrilateral(CornellBoxFactory::createTallBlock2());
-		tallBlock2->setMaterial(m);
+		tallBlock2->setMaterial(GLASS);//m);
 		scene.push_back(tallBlock2);
 
 		Quadrilateral *tallBlock3 = new Quadrilateral(CornellBoxFactory::createTallBlock3());
-		tallBlock3->setMaterial(m);
+		tallBlock3->setMaterial(GLASS);//m);
 		scene.push_back(tallBlock3);
 
 		Quadrilateral *tallBlock4 = new Quadrilateral(CornellBoxFactory::createTallBlock4());
-		tallBlock4->setMaterial(m);
+		tallBlock4->setMaterial(GLASS);//m);
 		scene.push_back(tallBlock4);
 
 		Quadrilateral *tallBlock5 = new Quadrilateral(CornellBoxFactory::createTallBlock5());
-		tallBlock5->setMaterial(m);
+		tallBlock5->setMaterial(GLASS);//m);
 		scene.push_back(tallBlock5);
 	}
 	

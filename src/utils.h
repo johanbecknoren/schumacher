@@ -8,6 +8,7 @@
 #define WIDTH 100
 #define HEIGHT 100
 
+
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)
 #define REFRACTION_AIR 1.000293f
 #define REFRACTION_GLASS 1.52f
