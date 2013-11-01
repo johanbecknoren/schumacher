@@ -19,9 +19,6 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 	int maxDepth = 4;
 	glm::vec3 rad(0.0f);
 	if(tree.intersect(ray, ip)) {
-		float rand = glm::linearRand(0.0f, 1.0f);
-		rad = ip.getMaterial().getEmission();
-		bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
 		
 		if (ip.getMaterial().getMaterialType() == LIGHT) {
 			return ip.getMaterial().getDiffuseColor();
@@ -32,6 +29,10 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 		float killRange = 0.9f;
 		if (killRange > russianRandom) kill = true;
 		if(depth < maxDepth || !kill) {
+			
+			rad = ip.getMaterial().getEmission();
+			bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
+
 			if(isInsideObj) { // If coming from inside obj going out into air (refraction needed)
 					//std::cout<<"No!!!\n";
 				float n2overn1 = REFRACTION_AIR / ray.getRefractionIndex();
@@ -64,6 +65,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 
 				// Diffuse refl in random direction
 				float phi = glm::linearRand(0.0f,2.0f*PI);
+				float rand = _rgen.nextFloat();
 				glm::vec3 diffuse_dir = a*rand*glm::cos(phi) + b*rand*glm::sin(phi) + ip.getNormal()*glm::sqrt(1.0f-rand*rand);
 				
 				// Not sure if the diffuse dir is in sphere or half-sphere. Seems like
@@ -156,10 +158,12 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 }
 
 void MonteCarloRayTracer::glRender(float *pixels) {
+#ifdef USE_OPENGL
 	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawPixels(_W, _H, GL_RGB, GL_FLOAT, pixels);
 	glfwSwapBuffers();
+#endif
 }
  
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {

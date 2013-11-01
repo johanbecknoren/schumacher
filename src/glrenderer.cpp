@@ -1,5 +1,5 @@
 #include "glrenderer.h"
-
+/*
 GlRenderer::GlRenderer(const int W, const int H) : texId(0), _W(W), _H(H)  {
     if(!glfwInit())
     {
@@ -146,3 +146,4 @@ void GlRenderer::render(int *image) {
 		running = glfwGetWindowParam( GLFW_OPENED );
 	}
 }
+*/

@@ -1,6 +1,6 @@
 #ifndef GLRENDERER_H
 #define GLRENDERER_H
-
+#ifdef USE_OPENGL
 #include <GL/glfw.h>
 #include <iostream>
 #include <vector>
@@ -15,5 +15,5 @@ public:
 	const int _W;
 	const int _H;
 };
-
+#endif
 #endif
