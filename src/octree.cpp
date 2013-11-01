@@ -2,6 +2,8 @@
 #include "sphere.h"
 #include <climits>
 
+#define USE_OCTREE
+
 Node::Node(int nodeDepth, AABB nodeBoundingBox) {
 	_boundingBox = nodeBoundingBox;
 	_parent = NULL;
@@ -46,7 +48,7 @@ void Octree::print() const {
 void Octree::print(Node *node) const {
 	std::cout << "====== D" << node->getDepth() << " ";
 	std::string s;
-	for(int i = 0; i < 8; ++i) {
+	for(size_t i = 0; i < 8; ++i) {
 		Node *n = node->getChild(i);
 		if (n != NULL) {
 			s += '-';
@@ -83,106 +85,141 @@ void Octree::addChild(Node *parent, int octant) {
 	}
 }
 
-IntersectionPoint *Octree::findIntersection(Ray *ray) {
-	std::string s;
-	ray->print();
-	//std::cin >> s;
-	bool b;
-	if (!_root->getBoundingBox()->isInside(ray->getOrigin())) {
-		IntersectionPoint *ip = _root->getBoundingBox()->getIntersection(ray);
-		Ray *r = new Ray(ip->getPoint(), ray->getDirection());
-		
-		return iterateRay(r, _root, b);
+std::vector<const Renderable*> Octree::getLightList() const {
+	std::vector<const Renderable*> lightList;
+	for (size_t i = 0; i < _leafs.size(); ++i) {
+		const Renderable *r = _leafs[i].getRenderable();
+		if (r->getMaterial().getMaterialType() == LIGHT) {
+			lightList.push_back(r);
+		}
 	}
-	else {
-		return iterateRay(ray, _root, b);
-	}
+	return lightList;
 }
 
-IntersectionPoint *Octree::iterateRay(Ray *ray, Node *node, bool &active) {
-	bool findNew = false;
-	if (node->getBoundingBox()->isInside(ray->getOrigin())) {
-		//std::cout << "Inside\n";
-		Leaf *leaf = node->getFirstLeaf();
-		std::vector<IntersectionPoint> pts;
-		while(leaf != NULL) {
-			//std::cout << "Testing leaf "<< leaf->getRenderable()->asString() << " \n";
-			IntersectionPoint *i = leaf->getRenderable()->getIntersectionPoint(ray);
-			if (i != NULL) {
-				//std::cout << "Intersection found at: " << i->getPoint().x
-						//<< " " << i->getPoint().y << " "
-					//	<< i->getPoint().z << std::endl;
-				active = true;
-				pts.push_back(*i);
+bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
+	return intersectSimple(ray, isect);
+	// return intersectHard(ray, isect);
+}
+
+bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
+	float lMin = FLT_MAX;
+	bool found = false;
+	std::vector<IntersectionPoint> ipvec;
+	
+	for (size_t i = 0; i < _leafs.size(); ++i) {
+		IntersectionPoint ip;
+		if (_leafs[i].getRenderable()->getIntersectionPoint(&ray, ip)) {
+			glm::vec3 vec = ip.getPoint() - ray.getOrigin();
+			float len = glm::length((vec));
+			if(len < lMin && len < ray.getTMax()) {
+				lMin = len;
+				isect = ip;
+				found = true;
+				
 			}
-			
+		}
+	}
+	
+	return found;
+}
+
+
+
+bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
+	float tmin = 0, tmax = FLT_MAX;
+	if (!_root->getBoundingBox()->IntersectT(&ray, &tmin, &tmax))
+		return false;
+	
+	// Prepare for traversal
+#define MAX_TODO 64
+	ToDo todo[MAX_TODO];
+	int todoPos = 0;
+	bool hit = false;
+	const Node *node = _root;
+	std::vector<IntersectionPoint> pts;
+	while (node != NULL) {
+		// Exit if we found hit closer
+		if (ray.getTMax() < tmin) break;
+		// Check intersections inside leaf node
+		Leaf *leaf = node->getFirstLeaf();
+
+		while(leaf != NULL) {
+			IntersectionPoint i;
+			if (leaf->getRenderable()->getIntersectionPoint(&ray, i)) {
+				pts.push_back(i);
+				hit = true;
+			}
 			leaf = leaf->getNextSibling();
 		}
-		if (pts.size() > 0) {
-			float min = FLT_MAX;
-			int id;
-			for (int i = 0; i < pts.size(); ++i) {
-				float len = abs(glm::dot(pts[i].getPoint(), ray->getOrigin()));
-
-				if(len < min) {
-					min = len;
-					id = i;
-				}
-			}
-			//std::cout << "Smallest intersection at: " << pts[id].getPoint().x
-					//	<< " " << pts[id].getPoint().y << " "
-						//<< pts[id].getPoint().z << std::endl;
-
-			return &pts[id];
-
-		}
+		// Process interior nodes				
+		int id = -1;
+		float mint = FLT_MAX;
+		float maxt = 0;
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
-			//	std::cout << "octree.cpp - oct: " << i << " d:" << node->getDepth()  << " \n";
-				bool act;
-				IntersectionPoint *ip = iterateRay(ray, node->getChild(i), act);
-				if (ip != NULL) return ip;	
-				if (!act) {
-					findNew = true;
+
+				float max, tplane;
+				if (node->getChild(i)->getBoundingBox()->IntersectT(&ray, &tplane, &max)) {
+					if(tplane < mint && tplane > 0) {
+						if (id != -1) {
+							todo[todoPos].node = node->getChild(i);
+							todo[todoPos].tmin = mint;
+							todo[todoPos].tmax = maxt;
+							++todoPos;
+						}
+						id = i;
+						mint = tplane;
+						maxt = max;
+					}
+					else {
+						todo[todoPos].node = node->getChild(i);
+						todo[todoPos].tmin = tplane;
+						todo[todoPos].tmax = max;
+						++todoPos;
+					}
 				}
 			}
 		}
-	}
-	else { 
-		findNew = true;
-		std::cout << "Outside of ";
-		node->getBoundingBox()->print();
-	}
-	if (findNew) {
-		//std::cout << "octree.cpp - Break at depth: " << node->getDepth() << " " << " No collision\n";
-		node->getBoundingBox()->print();
-		//std::cout << "Hej " << node->getDepth() << std::endl << std::endl;
-		std::vector<IntersectionPoint *> pts;
-		for (int p = 0; p < 8; ++p) {
-			if (node->getChild(p) != NULL) {
-				if (!node->getChild(p)->getBoundingBox()->isInside(ray->getOrigin())) {
-					IntersectionPoint *ip =
-						node->getChild(p)->getBoundingBox()->getIntersection(ray);
-					if (ip != NULL) {
-						pts.push_back(ip);
-					}
-				}
-			}				
-		}
 
-		for (int p = 0; p < pts.size(); ++p) {
-			ray->print();
-			std::cout << pts[p]->asString() << " | ";
-			Ray *r = new Ray(pts[p]->getPoint() + ray->getDirection() * 0.00001f,
-									ray->getDirection());
-			findIntersection(r);
-			
+		if (id == -1) {
+			// Grab next node to process
+			if (todoPos > 0 ) {
+				--todoPos;
+				node = todo[todoPos].node;
+				tmin = todo[todoPos].tmin;
+				tmax = todo[todoPos].tmax;
+			}
+			else {
+				
+				break;
+			}
 		}
-		active = false;
-		return NULL;
+		else {
+			node = node->getChild(id);
+			tmin = mint;
+			tmax = maxt;
+		}
 	}
-	active = true;
-	return NULL;
+	// Find closest intersection
+	if (pts.size() > 0) {
+		float min = FLT_MAX;
+		int id = 0;
+		for (size_t i = 0; i < pts.size(); ++i) {
+// 			std::cout << glm::to_string(pts[i].getPoint()) << glm::to_string(ray.getOrigin()) << std::flush;
+			glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
+
+			float len = glm::length((vec));
+
+			if(len < min) {
+				
+				min = len;
+				id = i;
+			}
+		}
+		isect = IntersectionPoint(pts[id]);
+	}
+
+	return hit;	
 }
 
 AABB *Octree::createBoundingBox(const Node *node, const int octant) {
@@ -196,42 +233,27 @@ AABB *Octree::createBoundingBox(const Node *node, const int octant) {
 
 		} break;
 		case 1: {
-			lowerLeft += glm::vec3(diff.x,
-									0.0f,
-									0.0f);
+			lowerLeft += glm::vec3(diff.x, 0.0f, 0.0f);
 		} break;
 		case 2: {
-			lowerLeft += glm::vec3(0.0f,
-									0.0f,
-									diff.z);
+			lowerLeft += glm::vec3(0.0f, 0.0f, diff.z);
 		} break;
 		case 3: {
-			lowerLeft += glm::vec3(diff.x,
-									0.0f,
-									diff.z);
-		}
+			lowerLeft += glm::vec3(diff.x, 0.0f, diff.z);
+		} break;
 		case 4: {
-			lowerLeft += glm::vec3(0.0f,
-									diff.y,
-									0.0f);
-		}
+			lowerLeft += glm::vec3(0.0f, diff.y, .0f);
+		} break;
 		case 5: {
-			lowerLeft += glm::vec3(diff.x,
-									diff.y,
-									0.0f);
+			lowerLeft += glm::vec3(diff.x, diff.y, .0f);
 		} break;
 		case 6: {
-			lowerLeft += glm::vec3(0.0f,
-									diff.y,
-									diff.z);
+			lowerLeft += glm::vec3(0.0f, diff.y, diff.z);
 		} break;
 		case 7: {
-			lowerLeft += glm::vec3(diff.x,
-									diff.y,
-									diff.z);
+			lowerLeft += glm::vec3(diff.x, diff.y, diff.z);
 		}
 		default: {
-
 		} break;
 	}
 	upperRight = lowerLeft + diff;
@@ -246,25 +268,31 @@ void Octree::addObject(Renderable *object) {
 }
 // Calculate sub bounding box in specified octant
 void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
-	const AABB *parentBox = parent->getBoundingBox();
-	const AABB *objectBox = object->getBoundingBox();
 
-	const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
-	const glm::vec3 upperRight = objectBox->getUpperRightFront();
-	int q1 = parentBox->getQuadrant(lowerLeft);
-	int q2 = parentBox->getQuadrant(upperRight);
+#ifdef USE_OCTREE	
 	// If whole boundingbox is in same quadrant,
 	// add node and continue subdividing.
-#ifdef USE_OCTREE
-	if(q1 != -1 && q2 != -1 && q1 == q2) {
-#else
-	if(false) {
-#endif
-		if(parent->getChild(q1) == NULL)
+	const AABB *parentBox = parent->getBoundingBox();
+	const AABB *objectBox = object->getBoundingBox();	
+	
+	const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
+	int q1 = parentBox->getQuadrant(lowerLeft);
+
+	const glm::vec3 upperRight = objectBox->getUpperRightFront();
+	int q2 = parentBox->getQuadrant(upperRight);
+
+	if(q1 != -1 && q2 != -1 && q1 == q2) {		
+		if(parent->getChild(q1) == NULL) {
 			addChild(parent, q1);
+		}
 		subdivideBoundingBox(parent->getChild(q1), object);
 	}
 	else {
+#else
+	// We are not using octree, so we dont need to do anything 
+	// with the bounding boxes when adding objects.
+	{
+#endif
 		Leaf *leaf = new Leaf(object);
 		_leafs.push_back(*leaf);
 		parent->addLeaf(leaf);

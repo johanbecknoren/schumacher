@@ -75,6 +75,10 @@ packages/
 #Test files
 *.testsettings
 
+# CMake
+CMakeCache.txt
+CMakeFiles/
+
 #########################
 # .gitignore file for Xcode4 / OS X Source projects
 #

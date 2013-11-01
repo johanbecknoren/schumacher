@@ -6,12 +6,12 @@ AABB::AABB() {
 	this->_upperRightFront = glm::vec3(1.0f);
 }
 
-AABB::AABB(const glm::vec3& lLB, const glm::vec3& uRF,
-          const glm::vec3 o)
+AABB::AABB(const glm::vec3& lLB, const glm::vec3& uRF, const glm::vec3& trash)//,
+//          const glm::vec3 o)
 {
 	this->_lowerLeftBack = lLB;
 	this->_upperRightFront = uRF;
-	this->_origin = o;
+	this->_origin = (_lowerLeftBack + _upperRightFront)/2.0f;
 }
 
 // Check if point is inside AABB
@@ -53,7 +53,26 @@ int AABB::getQuadrant(const glm::vec3& p) const {
 		}
 	}
 
-//	return 0;
+	return 0;
+}
+
+bool AABB::IntersectT(Ray *ray, float *tmin, float *tmax) const {
+	float t0 = ray->getTMin();
+	float t1 = ray->getTMax();
+	for(int i = 0; i < 3; ++i) {
+		float invRayDir = 1.0f / ray->getDirection()[i];
+		float tNear = (_lowerLeftBack[i] - ray->getOrigin()[i]) * invRayDir;
+		float tFar = (_upperRightFront[i] - ray->getOrigin()[i]) * invRayDir;
+		if (tNear > tFar) std::swap(tNear, tFar);
+		
+		t0 = tNear > t0 ? tNear : t0;
+		t1 = tFar < t1 ? tFar : t1;
+		if (t0 > t1) return false;
+	}
+	if (tmin) *tmin = t0;
+	if (tmax) *tmax = t1;
+
+	return true;
 }
 
 IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  const {
@@ -61,7 +80,7 @@ IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  
 	glm::vec3 direction = glm::normalize(ray->getDirection());
 	glm::vec3 dirfrac;
 	float t;
-	
+
 	dirfrac.x = 1.0f / direction.x;
 	dirfrac.y = 1.0f / direction.y;
 	dirfrac.z = 1.0f / direction.z;
@@ -103,7 +122,7 @@ IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  
 		midpoints.push_back( glm::vec3(0.0f, 0.0f, _lowerLeftBack.z) - _origin );
 		midpoints.push_back( glm::vec3(0.0f, 0.0f, _upperRightFront.z) - _origin );
 
-		for(int i=0; i<midpoints.size(); ++i) { // Remove impossible normal results
+		for(size_t i=0; i<midpoints.size(); ++i) { // Remove impossible normal results
 			if(glm::dot(intP, midpoints.at(i)) <= 0.0f) {
 				midpoints.erase(midpoints.begin()+i);
 				--i;
@@ -113,8 +132,8 @@ IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  
 			surfNormal = midpoints.at(0);
 		else {	// midpoints borde vara <=3 stor här
 			float t_max = FLT_MIN;
-			int t_max_index;
-			for(int i=0; i<midpoints.size(); ++i) {
+			int t_max_index = 0;
+			for(size_t i=0; i<midpoints.size(); ++i) {
 				float nom = glm::dot(midpoints.at(i), midpoints.at(i));
 				float denom = glm::dot(intP, midpoints.at(i));
 				float dist = nom/denom;
