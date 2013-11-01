@@ -96,9 +96,9 @@ int main(int argc, char **argv) {
 
 	mTracer.render(pixels, tree, cam);
 
-//	wTracer.render(pixels, tree, cam);
+	// wTracer.render(pixels, tree, cam);
 
-// 	caster.render(pixels, tree, cam);
+	// caster.render(pixels, tree, cam);
 // 	int iters = 1;	
 	
 

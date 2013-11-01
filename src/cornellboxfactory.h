@@ -22,6 +22,18 @@ class CornellBoxFactory {
 		return f;
 	}
 
+	static Quadrilateral createFront() {
+		Quadrilateral f = Quadrilateral(
+										glm::vec3(0.f, 0.f, 0.f),
+										glm::vec3(0.f, 548.8f, 0.f),
+										glm::vec3(556.f, 548.8f, 0.f),
+										glm::vec3(552.8, 0.f, 0.f));
+		f.scale(_scaleFactor);
+		f.translate(_t);
+		f.updateAABB();
+		return f;
+	}
+	
 	static Quadrilateral createCeil() {
 		Quadrilateral c = Quadrilateral(
 

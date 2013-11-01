@@ -11,7 +11,10 @@ public:
 	MonteCarloRayTracer(const int W, const int H) : Tracer(W, H),
 													working(true),
 													_rayCounter(0),
-													threadDone()
+													threadDone(),
+													_meanRayDepth(0),
+													_maxDepth(4),
+													_raysPerPixel(300)
 	{};
 	void render(float *pixels, Octree *tree, Camera *cam);	
 	void test() {
@@ -49,13 +52,18 @@ private:
 					  const Camera &cam, int row, const int NUM_THREADS);
 	bool working;
 	void addToCount();
+	void addToMeanDepth(int d);
 	void testTimers();
 	std::mutex _mutex;
+	std::mutex _depthMutex;
 	std::mutex _renderMutex;
 	volatile int _rayCounter;
 	sfmt_t _randomGenerator;
 	Rng _rgen;
 	std::vector<bool> threadDone;
+	int _meanRayDepth;
+	int _maxDepth;
+	int _raysPerPixel;
 };
 
 
