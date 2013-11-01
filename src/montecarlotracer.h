@@ -46,7 +46,7 @@ private:
 	void glRender(float *pixels);
 	
 	void threadRender(int tId, float *pixels, const Octree &tree, 
-			const Camera &cam, const int NUM_THREADS);
+					  const Camera &cam, int row, const int NUM_THREADS);
 	bool working;
 	void addToCount();
 	void testTimers();
