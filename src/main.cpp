@@ -83,7 +83,6 @@ int main(int argc, char **argv) {
 	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
 	mTracer.render(pixels, tree, cam);
-
 //	wTracer.render(pixels, tree, cam);
 
 // 	caster.render(pixels, tree, cam);

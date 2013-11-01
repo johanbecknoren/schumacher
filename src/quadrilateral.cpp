@@ -144,10 +144,10 @@ bool Quadrilateral::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const 
 	}
 
 	glm::vec3 iPoint = ray->getOrigin() + t * ray->getDirection();
-	glm::vec3 sN = -1.0f*glm::normalize( glm::cross(_v00-_v10, _v00-_v11) );
+	glm::vec3 sN = glm::normalize( glm::cross(_v00-_v10, _v00-_v11) );
 
-	if(glm::dot(ray->getDirection(), sN) > 0.0f) // Draw the quad from both directions
-		sN *= -1.0f;
+/*	if(glm::dot(ray->getDirection(), sN) > 0.0f) // Draw the quad from both directions
+		sN *= -1.0f;*/
 	ip = IntersectionPoint(iPoint, sN, this->getMaterial());
 
 	return true;
