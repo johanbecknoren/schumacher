@@ -132,7 +132,7 @@ IntersectionPoint* AABB::getIntersection(Ray* ray, bool getIntersectionNormal)  
 			surfNormal = midpoints.at(0);
 		else {	// midpoints borde vara <=3 stor här
 			float t_max = FLT_MIN;
-			int t_max_index;
+			int t_max_index = 0;
 			for(size_t i=0; i<midpoints.size(); ++i) {
 				float nom = glm::dot(midpoints.at(i), midpoints.at(i));
 				float denom = glm::dot(intP, midpoints.at(i));

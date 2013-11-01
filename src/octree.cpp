@@ -203,7 +203,7 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 	// Find closest intersection
 	if (pts.size() > 0) {
 		float min = FLT_MAX;
-		int id;
+		int id = 0;
 		for (size_t i = 0; i < pts.size(); ++i) {
 // 			std::cout << glm::to_string(pts[i].getPoint()) << glm::to_string(ray.getOrigin()) << std::flush;
 			glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();

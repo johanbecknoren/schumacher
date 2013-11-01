@@ -49,10 +49,10 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 
 					Ray new_ray = calculateRefraction(ray, ip);
 
-					rad += (1.0f-ip.getMaterial().getOpacity())*ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth);
+					rad += (1.0f-ip.getMaterial().getOpacity())*ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth, kill);
 
 					new_ray = calculateReflection(ray, ip);
-					rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth);
+					rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth, kill);
 
 				}
 			} else { // Check for opacity (-> refraction + reflection), otherwise just reflect
@@ -90,9 +90,9 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 						Ray refr_ray = calculateRefraction(ray, ip);
 						
 
-						rad += /*(1.0f-ip.getMaterial().getOpacity())*/0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth);
+						rad += /*(1.0f-ip.getMaterial().getOpacity())*/0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
 
-						rad += /*ip.getMaterial().getOpacity()*/0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
+						rad += /*ip.getMaterial().getOpacity()*/0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth, kill);
 
 					}
 				} else { // Only reflection
