@@ -105,6 +105,9 @@ int main(int argc, char **argv) {
 	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
 		pixelsInt[i] = int(pixels[i]*255.0f);
 
+	if (exportImage)
+		ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
+	
 	bool quitProgram = false;
 #ifdef USE_OPENGL
 	while(!quitProgram) {
@@ -112,7 +115,6 @@ int main(int argc, char **argv) {
 		glDrawPixels(WIDTH,HEIGHT,GL_RGB,GL_FLOAT,pixels);
 		glfwSwapBuffers();
 
-		// check if time to quit
 		if(glfwGetKey('Q') || !glfwGetWindowParam(GLFW_OPENED)) {
 			quitProgram = true;
 		}
@@ -120,8 +122,7 @@ int main(int argc, char **argv) {
 	glfwTerminate();
 #endif
 
- 	if (exportImage)
-		ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);
+
 	delete sphere;
 	delete sp2;
 	delete sp3;

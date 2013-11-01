@@ -100,7 +100,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				Ray refl_ray = calculateReflection(ray,ip);
 				
 				// Interpolate between diffuse and perf refl to get new reflected ray
-				float t = 0.f; // ip.getMaterial().getSpecular();
+				float t = ip.getMaterial().getSpecular();
 				glm::vec3 dir = glm::normalize(diffuse_dir*(1.0f-t) + refl_ray.getDirection()*t);
 				
 				refl_ray = Ray(origin + dir * 0.0001f, dir);
