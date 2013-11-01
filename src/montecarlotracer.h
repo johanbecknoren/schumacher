@@ -10,13 +10,16 @@ class MonteCarloRayTracer : Tracer {
 public:
 	MonteCarloRayTracer(const int W, const int H) : Tracer(W, H),
 													working(true),
-													_rayCounter(0){};
+													_rayCounter(0),
+													threadDone()
+	{};
 	void render(float *pixels, Octree *tree, Camera *cam);	
 	void test() {
 		std::cout << "hej" << "\n";
 	};
 private:
-	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth);
+	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
+	
 	struct Rng
 	{
 		unsigned int m_z, m_w;
@@ -52,6 +55,7 @@ private:
 	volatile int _rayCounter;
 	sfmt_t _randomGenerator;
 	Rng _rgen;
+	std::vector<bool> threadDone;
 };
 
 
