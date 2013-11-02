@@ -9,16 +9,24 @@ FILE(GLOB HEADERS  ./*.h*)
 
 FILE(GLOB SRCS  ./*.cpp)
 
-
+option (USE_OPENGL
+  "Use openGL to render scene while calculating" ON)
 
 list(APPEND schumacher_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/externals
 	${CMAKE_SOURCE_DIR}/externals/glm
-	${CMAKE_SOURCE_DIR}/externals/GL
-	${CMAKE_SOURCE_DIR}/externals/GL/GL
 	${CMAKE_SOURCE_DIR}/externals/assimp
  	${CMAKE_SOURCE_DIR}/externals/FreeImage  
 )
+
+if (USE_OPENGL)
+  list(APPEND schumacher_INCLUDE_DIRS
+	${CMAKE_SOURCE_DIR}/externals/GL
+	${CMAKE_SOURCE_DIR}/externals/GL/GL)
+  set(EXTRA_LIBS ${EXTRA_LIBS} GL glfw glut)
+  set(EXTRA_LIB_FILES ${EXTRA_LIB_FILES} ${CMAKE_SOURCE_DIR}/externals/GL/lib)
+  add_definitions(-DUSE_OPENGL)
+endif (USE_OPENGL)
 
 # Random generator stuff
 list(APPEND schumacher_INCLUDE_DIRS
@@ -41,8 +49,9 @@ include_directories(
 	)
 
 link_directories(
-	${CMAKE_SOURCE_DIR}/externals/GL/lib
+  ${EXTRA_LIB_FILES}
 	${CMAKE_SOURCE_DIR}/externals/libs
+	${EXTRA_LIB_FILES}
 	) 
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/export)
@@ -60,7 +69,7 @@ if(WIN32)
 endif(WIN32)
 
 if(UNIX)
-	target_link_libraries(schumacher freeimage GL glfw glut)
+	target_link_libraries(schumacher freeimage ${EXTRA_LIBS})
 endif(UNIX)
 
 

@@ -13,20 +13,33 @@ void MonteCarloRayTracer::addToCount() {
 	_mutex.unlock();
 }
 
-glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int depth) {
+void MonteCarloRayTracer::addToMeanDepth(int d) {
+	_depthMutex.lock();
+	_meanRayDepth += d;
+	_depthMutex.unlock();
+}
+
+glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int depth, bool kill) {
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
-	int maxDepth = 4;
 	glm::vec3 rad(0.0f);
 	if(tree.intersect(ray, ip)) {
-		float rand = glm::linearRand(0.0f, 1.0f);
-		rad = ip.getMaterial().getEmission();
-		bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
 
-		if (ip.getMaterial().getMaterialType() == LIGHT) // Terminate ray if hit light source
-			return ip.getMaterial().getDiffuseColor();
 		
-		if(depth < maxDepth) {
+		if (ip.getMaterial().getMaterialType() == LIGHT) {
+			return ip.getMaterial().getDiffuseColor();
+		}
+
+		// Do russian roulette to terminate rays.
+		float russianRandom = _rgen.nextFloat();
+		float killRange = 0.98f;
+		if (killRange < russianRandom) kill = true;
+		
+		if(depth < _maxDepth || !kill) {
+			
+			rad = ip.getMaterial().getEmission();
+			bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
+
 			if(isInsideObj) { // If coming from inside obj going out into air (refraction needed)
 				float n2overn1 = REFRACTION_AIR / ray.getRefractionIndex();
 				float critical_angle = asin(n2overn1);
@@ -35,44 +48,65 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				if(acos(cosIn) > critical_angle && ray.getRefractionIndex() > REFRACTION_AIR) { // Total internal reflection, no refraction
 					std::cout << "Total internal reflection!\n";
 					ip.setNormal(-1.0f*ip.getNormal());
-					Ray refl_ray = calculateReflection(ray, ip);
-					rad += ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
-				} else { // Spawn refracted and reflected rays
-					//TODO DENNA KÖRS ALDRIG
-					std::cerr << "Both refr and refl!\n";
+
+					Ray new_ray = calculateReflection(ray, ip);
+					rad += ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth, kill);
+				} else { // Calc and spawn refracted and reflected rays
 					Material m = ip.getMaterial();
 					m.setRefractionIndex(REFRACTION_AIR);
 					ip.setMaterial(m);
 
-					Ray refr_ray = Ray(ip.getPoint()+0.001f*ray.getDirection(), ray.getDirection(),ip.getMaterial().getRefractionIndex());//calculateRefraction(ray, ip);
-					rad += (1.0f-ip.getMaterial().getOpacity())*ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth);
 
-					Ray refl_ray = calculateReflection(ray, ip);
-					rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
+					Ray new_ray = calculateRefraction(ray, ip);
+
+					rad += (1.0f-ip.getMaterial().getOpacity()) *
+						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth, kill);
+
+					new_ray = calculateReflection(ray, ip);
+					rad += ip.getMaterial().getOpacity() *
+						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth, kill);
+
 				}
-			} else { 
+			}
+			else { // Check for opacity (-> refraction + reflection), otherwise just reflect
 				glm::vec3 origin = ip.getPoint();
 				
-				// Calc vectors for plane of intersection point
-				glm::vec3 a = glm::vec3(1,0,0)*ip.getNormal() - origin;
-				glm::vec3 b = glm::cross(a,ip.getNormal());
+				// // Calc vectors for plane of intersection point
+				// glm::vec3 a = glm::vec3(1,0,0)*ip.getNormal() - origin;
+				// glm::vec3 b = glm::cross(a,ip.getNormal());
 
-				// Diffuse refl in random direction
-				float phi = glm::linearRand(0.0f,2.0f*PI);
-				glm::vec3 diffuse_dir = a*rand*glm::cos(phi) + b*rand*glm::sin(phi) + ip.getNormal()*glm::sqrt(1.0f-rand*rand);
-				
-				// Not sure if the diffuse dir is in sphere or half-sphere. Seems like
-				// sphere.
+				// // Diffuse refl in random direction
+				// float phi = glm::linearRand(0.0f,2.0f*PI);
+				// float rand = _rgen.nextFloat();
+				// glm::vec3 diffuse_dir = a*rand*glm::cos(phi) + b*rand*glm::sin(phi) + ip.getNormal()*glm::sqrt(1.0f-rand*rand);
+
+				// float x1 = _rgen.nextFloat(), x2 = , x3 = _rgen.nextFloat();
+				glm::vec3 diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f,
+												  2.f * _rgen.nextFloat() - 1.f,
+												  2.f * _rgen.nextFloat() - 1.f);
+				glm::normalize(diffuse_dir);
+				// float x1, x2, S;
+				// do {
+				// 	x1 = 2.0f * _rgen.nextFloat() - 1.0f;
+				// 	x2 = 2.0f * _rgen.nextFloat() - 1.0f;
+				// 	S = x1 * x1 + x2 * x2;
+				// } while (S > 1.f);
+				// glm::vec3 diffuse_dir = glm::vec3(2.0f * x1 * sqrt(1.0f - S),
+				// 								  2.0f * x2 * sqrt(1.0f - S),
+				// 								  abs(1.0f - 2.0f * S));
 				if (glm::dot(diffuse_dir, ip.getNormal()) < 0) {
 					diffuse_dir = -diffuse_dir;
 				}
+				// Not sure if the diffuse dir is in sphere or half-sphere. Seems like
+				// sphere.
 				// Perfect refl ray
 				Ray refl_ray = calculateReflection(ray,ip);
 				
 				// Interpolate between diffuse and perf refl to get new reflected ray
 				float t = ip.getMaterial().getSpecular();
 				glm::vec3 dir = glm::normalize(diffuse_dir*(1.0f-t) + refl_ray.getDirection()*t);
-				refl_ray = Ray(origin+0.001f*dir, dir);
+				
+				refl_ray = Ray(origin + dir * 0.0001f, dir);
 
 				if(ip.getMaterial().getOpacity() < 1.f) { // Do refraction + reflection
 					float n2overn1 = ip.getMaterial().getRefractionIndex() / REFRACTION_AIR;
@@ -81,18 +115,21 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 					
 					if(acos(cosIn) < critical_angle) { // Refraction + reflection
 						Ray refr_ray = Ray(ip.getPoint()+0.001f*ray.getDirection(), ray.getDirection(),ip.getMaterial().getRefractionIndex());//calculateRefraction(ray, ip);
-						
-						rad += (1.0f-ip.getMaterial().getOpacity())*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
+						rad += /*(1.0f-ip.getMaterial().getOpacity())*/0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
 
-						rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
+						rad += /*ip.getMaterial().getOpacity()*/0.5f*ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth, kill);
+
 					}
 				} else { // Only reflection
 					Ray new_ray = calculateReflection(ray, ip);
-					rad += ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth);
+					rad +=ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, ++depth, kill);
 				}
 			}
-		} else {
-			// Do nothing
+
+		}
+		else {
+			addToMeanDepth(depth);
+			//rad += ip.getMaterial().getDiffuseColor();
 		}
 	}
 
@@ -101,113 +138,89 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 
 #define UNIFORM_DIST 0
 
-void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tree, const Camera &cam, const int NUM_THREADS) {
+void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tree, const Camera &cam, int row, const int NUM_THREADS) {
 
-#if UNIFORM_DIST
-	int raysPerPixel = 36; // Must be even sqrt number (2, 4, 9, 16, 25 etc..)
-	float sqrtRPP = sqrtf(raysPerPixel);
-#else
-	int raysPerPixel = 10;
-#endif
-	
-	
+
+	int *tex = new int[_W * _H * 3];
 	for (int u = 0; u < _W / NUM_THREADS; ++u) {
-		for (int v = 0; v < _H; ++v) {
-			glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
-			int counter=0;
 
-#if UNIFORM_DIST
-			// Distributes rays uniformly within the pixel (u,v)
-			for (float rpU=-1.0f/(sqrtRPP); rpU<1.0f - 1.0f/(sqrtRPP); rpU += 1.0f/sqrtRPP) {
-				for (float rpV=-1.0f/(sqrtRPP); rpV<1.0f-1.0f/(sqrtRPP); rpV += 1.0f/sqrtRPP) {
+		glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
 
-					// Reason for this code? ^
+		float randU, randV;
+		for(int rpp=1; rpp<=_raysPerPixel; ++rpp) {
 
-			// for (float rpU = 0.f; rpU < 1.0f; rpU += 1.0f / sqrtRPP) {
-			// 	for (float rpV = 0.f; rpV < 1.f; rpV += 1.0f / sqrtRPP) {
-					float u2 = u * NUM_THREADS + tId + rpU;
-					float v2 = v + rpV;
-#else
-			float randU, randV;
-			for(int rpp=1; rpp<=raysPerPixel; ++rpp) {
-				{
-					randU = _rgen.nextFloat() / 1.f;
-					randV = _rgen.nextFloat() / 1.f;
-					
-					float u2 = u * NUM_THREADS + tId + randU;
-					float v2 = v + randV;
-#endif
-					float x;
-					float y;
-					calculateXnY(u2, v2, x, y);
-					Ray r = cam.createRay(x, y);
-					IntersectionPoint ip;
-					if (tree.intersect(r, ip)) {
-						accumDiffColor += iterateRay(r, tree, 0);
-					}
-					addToCount();
-				}
-				ProgressBar::printTimedProgBar(_rayCounter, _W * _H * raysPerPixel, "Carlo");
+			randU = _rgen.nextFloat() / 1.f;
+			randV = _rgen.nextFloat() / 1.f;
+				
+			float u2 = u * NUM_THREADS + tId + randU;
+			float v2 = row + randV;
+				
+			float x;
+			float y;
+			calculateXnY(u2, v2, x, y);
+			Ray r = cam.createRay(x, y);
+			IntersectionPoint ip;
+				
+			if (tree.intersect(r, ip)) {
+				Ray ray(ip.getPoint() + r.getDirection() * 0.00001f, r.getDirection());
+				glm::vec3 color = iterateRay(ray, tree, 0, false);
+				accumDiffColor += color;
 			}
-			
-			int id = calculateId(u * NUM_THREADS + tId, v);
-			pixels[id + 0] = accumDiffColor.x/float(raysPerPixel);
-			pixels[id + 1] = accumDiffColor.y/float(raysPerPixel);
-			pixels[id + 2] = accumDiffColor.z/float(raysPerPixel);
+			addToCount();
+				
+			ProgressBar::printTimedProgBar(_rayCounter, _W * _H * _raysPerPixel, "Carlo");
+
 		}
-	}
-}
+			
+		int id = calculateId(u * NUM_THREADS + tId, row);
 
-void MonteCarloRayTracer::testTimers(){
-	Timer::getInstance()->start("GLMR");
-	int s = 1000000;
-	for ( int i = 0; i < s; ++i) {
+		pixels[id + 0] = accumDiffColor.x/float(_raysPerPixel);
+		pixels[id + 1] = accumDiffColor.y/float(_raysPerPixel);
+		pixels[id + 2] = accumDiffColor.z/float(_raysPerPixel);
+
 		
-		glm::linearRand(-0.5f, 0.5f);
-		glm::linearRand(-0.5f, 0.5f);
 	}
-	Timer::getInstance()->stop("GLMR");
-	Timer::getInstance()->start("RNG");	
-	for (int i = 0; i < s; ++i) {
-		(void)(_rgen.nextFloat() - 0.5f);
-		(void)(_rgen.nextFloat() - 0.5f);
-	}
-	Timer::getInstance()->stop("RNG");
-
-	Timer::getInstance()->start("SFMT");
-	for (int i = 0; i < s; ++i) {
-		(void)(sfmt_genrand_uint32(&_randomGenerator) - 0.5f);
-		(void)(sfmt_genrand_uint32(&_randomGenerator) - 0.5f);
-	}
-	Timer::getInstance()->stop("SFMT");
-	Timer::getInstance()->printRealTime("SFMT");
-	Timer::getInstance()->printRealTime("GLMR");
-	Timer::getInstance()->printRealTime("RNG");
+	threadDone[tId] = true;
+	delete tex;
 }
 
+void MonteCarloRayTracer::glRender(float *pixels) {
+#ifdef USE_OPENGL
+	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDrawPixels(_W, _H, GL_RGB, GL_FLOAT, pixels);
+	glfwSwapBuffers();
+#endif
+}
+ 
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
+
 	const int NUM_THREADS = std::thread::hardware_concurrency();
-	sfmt_init_gen_rand(&_randomGenerator, 1234);
-//	int i = sfmt_genrand_uint32(&_randomGenerator);
 
 	_rgen = Rng();
-
-	testTimers();
 
 	std::cout << "Starting carlo tracer with " << NUM_THREADS << " threads.\n";
 	std::vector<std::thread> threads;
 	// Start threads
 	Timer::getInstance()->start("Carlo");
-	for (int i = 0; i < NUM_THREADS; ++i) {
-		threads.push_back(std::thread(&MonteCarloRayTracer::threadRender, this,
-					i, pixels, *tree, *cam, NUM_THREADS));
+	for (int row = 0; row < _H; ++row) {
+		for (int i = 0; i < NUM_THREADS; ++i) {
+			threads.push_back(std::thread(&MonteCarloRayTracer::threadRender, this,
+										  i, pixels, *tree, *cam, row, NUM_THREADS));
+			threadDone.push_back(false);
+		}
+		for (auto &thread : threads) {
+			thread.join();
+		}
+		threads.clear();
+		threadDone.clear();
+		glRender(pixels);
 	}
-
+	
 	// Join threads
-	for (auto &thread : threads) {
-		thread.join();
-	}
+	
 	std::cout << std::endl;
 	Timer::getInstance()->stop("Carlo");
 	Timer::getInstance()->printRealTime("Carlo");
+	std::cout << "Mean depth: " << float(_meanRayDepth) / float(_W * _H * _raysPerPixel) << std::endl;
 }

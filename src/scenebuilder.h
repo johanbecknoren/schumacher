@@ -75,9 +75,12 @@ public:
 		boxLeft->setMaterial(CORNELL_LEFT);
 		scene.push_back(boxLeft);
 
+		Quadrilateral *boxFront = new Quadrilateral(CornellBoxFactory::createFront());
+		boxFront->setMaterial(CORNELL_CEIL);
+		scene.push_back(boxFront);
 		
-		createTallBox(scene, LIGHT);
-		createShortBox(scene, GLASS);
+		createTallBox(scene, CORNELL_LEFT);
+		createShortBox(scene, LIGHT);
 
 		return scene;
 	}
