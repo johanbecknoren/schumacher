@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 			glm::vec3(10.f, 10.f, 30.f),
 			glm::vec3(-10.f, -10.f, 30.f),
 			glm::vec3(10.f, -10.f, 30.f));
-	tree->addObject(tri);
+//	tree->addObject(tri);
 
 
 	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(0.3f));
@@ -90,8 +90,8 @@ int main(int argc, char **argv) {
     glfwSwapInterval(0);
 #endif
 	
-	SimpleRaycaster caster(WIDTH, HEIGHT);
-	WhittedTracer wTracer(WIDTH, HEIGHT);
+//	SimpleRaycaster caster(WIDTH, HEIGHT);
+//	WhittedTracer wTracer(WIDTH, HEIGHT);
 	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
 	mTracer.render(pixels, tree, cam);

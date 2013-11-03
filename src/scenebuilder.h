@@ -79,8 +79,8 @@ public:
 		boxFront->setMaterial(CORNELL_CEIL);
 		scene.push_back(boxFront);
 		
-		createTallBox(scene, CORNELL_LEFT);
-		createShortBox(scene, LIGHT);
+		createTallBox(scene, LIGHT);
+		createShortBox(scene, GLASS);
 
 		return scene;
 	}

@@ -104,7 +104,7 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
 bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
 	float lMin = FLT_MAX;
 	bool found = false;
-	std::vector<IntersectionPoint> ipvec;
+//	std::vector<IntersectionPoint> ipvec;
 	
 	for (size_t i = 0; i < _leafs.size(); ++i) {
 		IntersectionPoint ip;
