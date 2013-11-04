@@ -49,7 +49,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				ip.setNormal(-1.0f*ip.getNormal());
 //				std::cout<<"n2overn1="<<n2overn1<<std::endl;
 				if(fabs(n2overn1) > 1.0f) {
-					std::cout<<"BOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOM\n";
+					std::cout<<"NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!\n";
 //					n2overn1 = 0.99f;
 				}
 //				float critical_angle = asin(n2overn1);
@@ -58,31 +58,18 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 
 				Ray refl_ray = calculateReflection(ray, ip);		
 				
-				if(angle_in > critical_angle) { // Total internal reflection, no refraction
-					//std::cout << "Inside, Total internal reflection!\n";					
-					} else { // Calc and spawn refracted and reflected rays
-					//std::cout << "Inside, Both internal refl and refraction\n";
-					
+				if(angle_in < critical_angle) {// Calc and spawn refracted and reflected rays
 					ip.getMaterial().setRefractionIndex(REFRACTION_AIR);
-//					std::cout<<"Inside, before";
 					Ray refr_ray = calculateRefraction(ray, ip);
-					
-//					Ray refr_ray = Ray(ip.getPoint() + 0.001f*ray.getDirection(), ray.getDirection(), ip.getMaterial().getRefractionIndex());
-					
-					//rad += (1.0f-ip.getMaterial().getOpacity()) *
-						//ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
-
-//					std::cout<<"Inside, after";
-					/*Ray new_ray2 = calculateReflection(ray, ip);
-					rad += ip.getMaterial().getOpacity() *
-						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray2, tree, ++depth, kill);*/
-				}
+					rad += (1.0f-ip.getMaterial().getOpacity()) *
+						ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
+				} else {
 				rad += ip.getMaterial().getOpacity() * 
 					ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, ++depth, kill);
+				}
 			}
-			else { // Check for opacity (-> refraction + reflection), otherwise just reflect
+			else { // Ray coming from air
 				glm::vec3 origin = ip.getPoint();
-				
 				glm::vec3 diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f,
 												  2.f * _rgen.nextFloat() - 1.f,
 												  2.f * _rgen.nextFloat() - 1.f);
@@ -107,30 +94,19 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 					float n2overn1 = REFRACTION_AIR / ip.getMaterial().getRefractionIndex();
 					float snell = n2overn1;
 						
-//					std::cout<<"Ray origin before: "<<glm::to_string(ray.getOrigin())<<"Ray dir: "<<glm::to_string(ray.getDirection())<<std::endl;
 					Ray refr_ray = calculateRefraction(ray, ip);
-					//glm::vec3 refr_dir = glm::refract(ray.getDirection(), ip.getNormal(), n2overn1);
-					//Ray refr_ray = Ray(ip.getPoint() + 0.01f*refr_dir, refr_dir, ip.getMaterial().getRefractionIndex());
-//					Ray refr_ray = Ray(ip.getPoint() - 0.001f*ray.getDirection(), ray.getDirection(), ip.getMaterial().getRefractionIndex());
-//					std::cout<<"Ray origin after: "<<glm::to_string(refr_ray.getOrigin())<<"Ray dir: "<<glm::to_string(refr_ray.getDirection())<<std::endl;
 
 					rad += (1.0f-ip.getMaterial().getOpacity()) * 
 						ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
-//					rad += ip.getMaterial().getOpacity() * 
-//					ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth, kill);
-					//}
-
-				}
-//				Ray new_ray = calculateReflection(ray, ip);
+				} else {
 				rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor() * 
 					iterateRay(refl_ray, tree, ++depth, kill);
-				
+				}
 			}
 
 		}
 		else {
 			addToMeanDepth(depth);
-			//rad += ip.getMaterial().getDiffuseColor();
 		}
 	}
 

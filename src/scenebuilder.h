@@ -80,7 +80,7 @@ public:
 		scene.push_back(boxFront);
 
 		Sphere* sp_glass = new Sphere(1.5f, glm::vec3(3.f,-4.5f,20.0f) );
-		sp_glass->setMaterial(MIRROR);
+		sp_glass->setMaterial(GLASS);
 		scene.push_back(sp_glass);
 
 		Sphere* sp_mirror = new Sphere(1.5f, glm::vec3(-3.f,0.f,22.0f) );
