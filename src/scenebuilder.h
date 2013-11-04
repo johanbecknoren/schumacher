@@ -86,7 +86,8 @@ public:
 	}
 	static void destructCornellBox(std::vector<Renderable *> r) {
 		for (size_t i = 0; i < r.size(); ++i) {
-			delete r[i];
+            if (r[i] != NULL)
+                delete r[i];
 		}
 		
 	}

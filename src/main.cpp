@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
 
 	delete tree;
 	delete pixels;
-
-	SceneBuilder::destructCornellBox(scene);
+    delete pixelsInt;
+	//SceneBuilder::destructCornellBox(scene);
 	return 0;
 }
