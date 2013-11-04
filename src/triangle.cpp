@@ -6,22 +6,22 @@ Triangle::Triangle(glm::vec3 ix0, glm::vec3 ix1, glm::vec3 ix2) : x1(ix1), x2(ix
 	createAABB();
 }
 
-bool Triangle::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
+bool Triangle::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
     glm::vec3 edge1 = x1 - x0;
     glm::vec3 edge2 = x2 - x0;
-    glm::vec3 pvec = glm::cross(ray->getDirection(), edge2);
+    glm::vec3 pvec = glm::cross(ray.getDirection(), edge2);
     float det = glm::dot(edge1, pvec);
     if (det == 0.f) return false;
     float invDet = 1.0f / det;
-    glm::vec3 tvec = ray->getOrigin() - x0;
+    glm::vec3 tvec = ray.getOrigin() - x0;
 	float U = glm::dot(tvec, pvec) * invDet;
     if (U < 0.f || U > 1.f) return false;
     glm::vec3 qvec = glm::cross(tvec, edge1);
-    float V = glm::dot(ray->getDirection(), qvec) * invDet;
+    float V = glm::dot(ray.getDirection(), qvec) * invDet;
     if (V < 0.f || U + V > 1.f) return false;
     float T = glm::dot(edge2, qvec) * invDet;
 	if (T < 0.f) return false;
-	glm::vec3 newPos = ray->getOrigin() + T * ray->getDirection();
+	glm::vec3 newPos = ray.getOrigin() + T * ray.getDirection();
 	ip = IntersectionPoint(newPos, normal, getMaterial()); 
 	
 	return true;

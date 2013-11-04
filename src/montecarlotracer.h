@@ -13,8 +13,7 @@ public:
 													_rayCounter(0),
 													_meanRayDepth(0),
 													_maxDepth(4),
-													_raysPerPixel(100)
-
+													_raysPerPixel(400)
 	{};
 	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 

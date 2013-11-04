@@ -34,6 +34,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 
 		// Do russian roulette to terminate rays.
 		float russianRandom = _rgen.nextFloat();
+
 		float killRange = 0.9f;
 		if (killRange < russianRandom) kill = true;
 		
@@ -43,40 +44,30 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 			bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
 
 			if(isInsideObj && ip.getMaterial().getMaterialType() == GLASS) { // If coming from inside obj going out into air (refraction needed)
-//				float n2overn1 = REFRACTION_AIR / ray.getRefractionIndex();
-				
+				float n2overn1 = REFRACTION_AIR / ip.getMaterial().getRefractionIndex(); // Should always be < 1
+				float n1overn2 = ray.getRefractionIndex() / REFRACTION_AIR;
+				float snell = n1overn2;
 				ip.setNormal(-1.0f*ip.getNormal());
-				
-				float n2overn1 = ray.getRefractionIndex() / REFRACTION_AIR;
+//				float critical_angle = asin(n2overn1);
+				float critical_angle = acos(snell);
+				float angle_in = acos(glm::dot(ip.getNormal(), ray.getDirection() * -1.0f));
 
-				float critical_angle = asin(n2overn1);
-				float angle_in = acos(glm::dot(ip.getNormal(), -ray.getDirection()));
+				Ray refl_ray = calculateReflection(ray, ip);		
 				
-				if(angle_in > critical_angle) { // Total internal reflection, no refraction
-					//std::cout << "Inside, Total internal reflection!\n";
-					
-					Ray new_ray = calculateReflection(ray, ip);
-					
-					rad += ip.getMaterial().getDiffuseColor() * iterateRay(new_ray, tree, depth + 1, kill);
-				} else { // Calc and spawn refracted and reflected rays
-					//std::cout << "Inside, Both internal refl and refraction\n";
-					
+				if(angle_in > critical_angle) {// Calc and spawn refracted and reflected rays
+					// Only internal reflection
+				} else {
 					ip.getMaterial().setRefractionIndex(REFRACTION_AIR);
-					
-					Ray new_ray = Ray(ip.getPoint() + 0.001f*ray.getDirection(), ray.getDirection(), ip.getMaterial().getRefractionIndex());
-					
+					Ray refr_ray = calculateRefraction(ray, ip);
 					rad += (1.0f-ip.getMaterial().getOpacity()) *
-						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, depth + 1, kill);
+						ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, depth + 1, kill);
+				} 
+				rad += ip.getMaterial().getOpacity() * 
+					ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, depth + 1, kill);
 
-					new_ray = calculateReflection(ray, ip);
-
-					rad += ip.getMaterial().getOpacity() *
-						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, depth + 1, kill);
-				}
 			}
-			else { // Check for opacity (-> refraction + reflection), otherwise just reflect
+			else { // Ray coming from air
 				glm::vec3 origin = ip.getPoint();
-				
 				glm::vec3 diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f,
 												  2.f * _rgen.nextFloat() - 1.f,
 												  2.f * _rgen.nextFloat() - 1.f);
@@ -96,37 +87,18 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				
 				refl_ray = Ray(origin + dir * 0.0001f, dir);
 
-				if(ip.getMaterial().getOpacity() < 1.0f-0.0001f) { // Do refraction + reflection
-					//float n2overn1 = ip.getMaterial().getRefractionIndex() / REFRACTION_AIR;
-					float n2overn1 = ray.getRefractionIndex() / ip.getMaterial().getRefractionIndex();
-					float critical_angle = asin(n2overn1);
-					float cosIn = glm::dot(ip.getNormal(), -ray.getDirection());
-					
-					if(acos(cosIn) < critical_angle) { // Refraction + reflection
-//						std::cout<<"Outside, refraction+reflection\n";
-						
-//						std::cout<<"Ray origin before: "<<glm::to_string(ray.getOrigin())<<"Ray dir: "<<glm::to_string(ray.getDirection())<<std::endl;
-						Ray refr_ray = calculateRefraction(ray, ip);
-//						Ray refr_ray = Ray(ip.getPoint() - 0.001f*ray.getDirection(), ray.getDirection(), ip.getMaterial().getRefractionIndex());
-
-//						std::cout<<"Ray origin after: "<<glm::to_string(refr_ray.getOrigin())<<"Ray dir: "<<glm::to_string(refr_ray.getDirection())<<std::endl;
-
-						rad += (1.0f-ip.getMaterial().getOpacity()) * 
-							ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, depth + 1, kill);
-						rad += ip.getMaterial().getOpacity() * 
-							ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, depth + 1, kill);
-					}
-
-				} else { // Only reflection
-					Ray new_ray = calculateReflection(ray, ip);
-					rad +=ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, depth + 1, kill);
+				if(ip.getMaterial().getOpacity() < 0.99) { // Do refraction + reflection						
+					Ray refr_ray = calculateRefraction(ray, ip);
+					rad += (1.0f-ip.getMaterial().getOpacity()) * 
+						ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, depth + 1, kill);
 				}
+				rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor() * 
+					iterateRay(refl_ray, tree, depth + 1, kill);
 			}
 
 		}
 		else {
 			addToMeanDepth(depth);
-			//rad += ip.getMaterial().getDiffuseColor();
 		}
 	}
 

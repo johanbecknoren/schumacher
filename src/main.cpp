@@ -39,7 +39,6 @@ int main(int argc, char **argv) {
 	tree->addPointLight(l2);
 
 	std::vector<Renderable *> scene = SceneBuilder::createCornellBox();
-
 	tree->addObject(scene);
 
 	tree->print();
