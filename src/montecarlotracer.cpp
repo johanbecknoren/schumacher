@@ -34,7 +34,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 
 		// Do russian roulette to terminate rays.
 		float russianRandom = _rgen.nextFloat();
-		float killRange = 0.98f;
+		float killRange = 0.78f;
 		if (killRange < russianRandom) kill = true;
 		
 		if(depth < _maxDepth || !kill) {
@@ -47,26 +47,23 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				float n1overn2 = ray.getRefractionIndex() / REFRACTION_AIR;
 				float snell = n1overn2;
 				ip.setNormal(-1.0f*ip.getNormal());
-//				std::cout<<"n2overn1="<<n2overn1<<std::endl;
-				if(fabs(n2overn1) > 1.0f) {
-					std::cout<<"NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!\n";
-//					n2overn1 = 0.99f;
-				}
 //				float critical_angle = asin(n2overn1);
 				float critical_angle = acos(snell);
 				float angle_in = acos(glm::dot(ip.getNormal(), ray.getDirection() * -1.0f));
 
 				Ray refl_ray = calculateReflection(ray, ip);		
 				
-				if(angle_in < critical_angle) {// Calc and spawn refracted and reflected rays
+				if(angle_in > critical_angle) {// Calc and spawn refracted and reflected rays
+					// Only internal reflection
+				} else {
 					ip.getMaterial().setRefractionIndex(REFRACTION_AIR);
 					Ray refr_ray = calculateRefraction(ray, ip);
 					rad += (1.0f-ip.getMaterial().getOpacity()) *
 						ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
-				} else {
+				} 
 				rad += ip.getMaterial().getOpacity() * 
 					ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, ++depth, kill);
-				}
+				
 			}
 			else { // Ray coming from air
 				glm::vec3 origin = ip.getPoint();
@@ -87,21 +84,15 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				float t = ip.getMaterial().getSpecular();
 				glm::vec3 dir = glm::normalize(diffuse_dir*(1.0f-t) + refl_ray.getDirection()*t);
 				
-				refl_ray = Ray(origin + dir * 0.01f, dir);
+				refl_ray = Ray(origin + dir * 0.0001f, dir);
 
-				if(ip.getMaterial().getOpacity() < 0.99) { // Do refraction + reflection
-//					float n2overn1 = ip.getMaterial().getRefractionIndex() / REFRACTION_AIR;
-					float n2overn1 = REFRACTION_AIR / ip.getMaterial().getRefractionIndex();
-					float snell = n2overn1;
-						
+				if(ip.getMaterial().getOpacity() < 0.99) { // Do refraction + reflection						
 					Ray refr_ray = calculateRefraction(ray, ip);
-
 					rad += (1.0f-ip.getMaterial().getOpacity()) * 
 						ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
-				} else {
+				}
 				rad += ip.getMaterial().getOpacity()*ip.getMaterial().getDiffuseColor() * 
 					iterateRay(refl_ray, tree, ++depth, kill);
-				}
 			}
 
 		}
@@ -171,7 +162,7 @@ void MonteCarloRayTracer::glRender(float *pixels) {
  
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
 
-	const int NUM_THREADS = 1;//std::thread::hardware_concurrency();
+	const int NUM_THREADS = std::thread::hardware_concurrency();
 
 	_rgen = Rng();
 
