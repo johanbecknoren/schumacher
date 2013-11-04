@@ -14,7 +14,7 @@ public:
 													threadDone(),
 													_meanRayDepth(0),
 													_maxDepth(4),
-													_raysPerPixel(100)
+													_raysPerPixel(10)
 	{};
 	void render(float *pixels, Octree *tree, Camera *cam);	
 	void test() {
