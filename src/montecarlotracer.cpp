@@ -34,7 +34,8 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 
 		// Do russian roulette to terminate rays.
 		float russianRandom = _rgen.nextFloat();
-		float killRange = 0.78f;
+
+		float killRange = 0.9f;
 		if (killRange < russianRandom) kill = true;
 		
 		if(depth < _maxDepth || !kill) {
@@ -63,7 +64,6 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				} 
 				rad += ip.getMaterial().getOpacity() * 
 					ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, ++depth, kill);
-				
 			}
 			else { // Ray coming from air
 				glm::vec3 origin = ip.getPoint();
@@ -104,13 +104,8 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 	return rad;
 }
 
-#define UNIFORM_DIST 0
-
-void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tree, const Camera &cam, int row, const int NUM_THREADS) {
-
-	int *tex = new int[_W * _H * 3];
-	for (int u = 0; u < _W / NUM_THREADS; ++u) {
-
+void MonteCarloRayTracer::threadRender(float *pixels, const Octree &tree, const Camera &cam, MonteCarloRayTracer::ThreadData thd) {
+	for (int u = 0; u < _W / thd.NUM_THREADS; ++u) {
 		glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
 
 		float randU, randV;
@@ -119,8 +114,8 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 			randU = _rgen.nextFloat() / 1.f;
 			randV = _rgen.nextFloat() / 1.f;
 				
-			float u2 = u * NUM_THREADS + tId + randU;
-			float v2 = row + randV;
+			float u2 = u * thd.NUM_THREADS + thd.tId + randU;
+			float v2 = thd.row + randV;
 				
 			float x;
 			float y;
@@ -136,10 +131,8 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 			addToCount();
 				
 			ProgressBar::printTimedProgBar(_rayCounter, _W * _H * _raysPerPixel, "Carlo");
-
 		}
-			
-		int id = calculateId(u * NUM_THREADS + tId, row);
+		int id = calculateId(u * thd.NUM_THREADS + thd.tId, thd.row);
 
 		pixels[id + 0] = accumDiffColor.x/float(_raysPerPixel);
 		pixels[id + 1] = accumDiffColor.y/float(_raysPerPixel);
@@ -147,8 +140,6 @@ void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tre
 
 		
 	}
-	threadDone[tId] = true;
-	delete tex;
 }
 
 void MonteCarloRayTracer::glRender(float *pixels) {
@@ -162,7 +153,7 @@ void MonteCarloRayTracer::glRender(float *pixels) {
  
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
 
-	const int NUM_THREADS = std::thread::hardware_concurrency();
+	int NUM_THREADS = std::thread::hardware_concurrency();
 
 	_rgen = Rng();
 
@@ -172,15 +163,15 @@ void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
 	Timer::getInstance()->start("Carlo");
 	for (int row = 0; row < _H; ++row) {
 		for (int i = 0; i < NUM_THREADS; ++i) {
+            MonteCarloRayTracer::ThreadData thd(i, row, NUM_THREADS);
+            
 			threads.push_back(std::thread(&MonteCarloRayTracer::threadRender, this,
-										  i, pixels, *tree, *cam, row, NUM_THREADS));
-			threadDone.push_back(false);
+                pixels, *tree, *cam, thd));
 		}
 		for (auto &thread : threads) {
 			thread.join();
 		}
 		threads.clear();
-		threadDone.clear();
 		glRender(pixels);
 	}
 	
