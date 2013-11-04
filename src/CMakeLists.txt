@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6.0)
 project(schumacher)
 
 IF(UNIX)
-	SET(CMAKE_CXX_FLAGS "-std=c++11 -Werror -Wall -Werror=sign-compare -Wno-error=unused-variable -Wno-error=unused-but-set-variable")
+SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -Werror -Wall -Werror=sign-compare -Wno-error=unused-variable -Wno-error=unused-but-set-variable")
 ENDIF(UNIX)
 
 FILE(GLOB HEADERS  ./*.h*)

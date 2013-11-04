@@ -3,7 +3,7 @@
 #include <mutex>
 class ProgressBar {	
 	private:
-		ProgressBar(){};
+        ProgressBar() : currProc(-1){};
  		static ProgressBar *_instance;
 		static std::mutex progMutex;
 		static ProgressBar *getInstance() {
@@ -16,7 +16,7 @@ class ProgressBar {
 			}
 			return _instance;
 		}
-		int currProc = -1;
+		int currProc;
 		
 	public:
 	static void printProgBar(int count, int total);
