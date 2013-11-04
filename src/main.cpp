@@ -15,16 +15,22 @@
 
 int main(int argc, char **argv) {
 	bool exportImage = true;
+    bool singleThread = false;
+    bool renderDuring = true;
 	for (int i = 0; i < argc; ++i) {
 		if (std::string(argv[i]) == "-e") {
 			exportImage = false;
 		}
+        else if (std::string(argv[i]) == "-s") {
+            singleThread = true;
+        }
+        else if (std::string(argv[i]) == "-r") {
+            renderDuring = false;
+        }
 	}
 
 	Camera *cam = new Camera();
-	//Plane *plane = new Plane(glm::vec3(0.f), glm::vec3(1.0f),5.f,5.f);
 
-	std::cout << "Creating AABB!\n";
 	AABB bb(glm::vec3(-10.0f), glm::vec3(10.0f));
 
 	Octree *tree = new Octree(&bb);
@@ -47,16 +53,16 @@ int main(int argc, char **argv) {
 		glfwTerminate(); // glfwOpenWindow failed, quit the program.
 		return 0;
 	}
-	
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);        // making default background color black
     glfwSwapInterval(0);
 #endif
 	
 //	SimpleRaycaster caster(WIDTH, HEIGHT);
 //	WhittedTracer wTracer(WIDTH, HEIGHT);
+
 	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
-	mTracer.render(pixels, tree, cam);
+    mTracer.render(pixels, tree, cam, singleThread, renderDuring);
 //	wTracer.render(pixels, tree, cam);
 
 	// caster.render(pixels, tree, cam);
@@ -73,10 +79,10 @@ int main(int argc, char **argv) {
 #ifdef USE_OPENGL
 	while(!quitProgram) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glDrawPixels(WIDTH,HEIGHT,GL_RGB,GL_FLOAT,pixels);
-		glfwSwapBuffers();
+		glDrawPixels(WIDTH, HEIGHT, GL_RGB, GL_FLOAT, pixels);
+        glfwSwapBuffers();
 
-		if(glfwGetKey('Q') || !glfwGetWindowParam(GLFW_OPENED)) {
+        if(glfwGetKey('Q') || !glfwGetWindowParam(GLFW_OPENED)) {
 			quitProgram = true;
 		}
 	}

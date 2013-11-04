@@ -238,7 +238,12 @@ std::string Timer::approximateExact(double time) const {
 }
 
 double Timer::getRealTime(std::string name) const {
-	return getRealTime(name);
+    TimeTypes::TimerList::const_iterator it = timers.find(name);
+
+	if (it != timers.end()) {
+		return it->second.getRealtime(getCurrentTime());
+	}
+    return 0;    
 }
 
 void Timer::printLine(double time, TIME_FORMAT format) const {

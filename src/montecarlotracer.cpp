@@ -19,7 +19,7 @@ void MonteCarloRayTracer::addToMeanDepth(int d) {
 	_depthMutex.unlock();
 }
 
-glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth, bool kill) {
+glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int depth, bool kill) {
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
 	glm::vec3 rad(0.0f);
@@ -68,10 +68,10 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 					rad += (1.0f-ip.getMaterial().getOpacity()) *
 						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, depth + 1, kill);
 
-					Ray new_ray2 = calculateReflection(ray, ip);
+					new_ray = calculateReflection(ray, ip);
 
 					rad += ip.getMaterial().getOpacity() *
-						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray2, tree, depth + 1, kill);
+						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, depth + 1, kill);
 				}
 			}
 			else { // Check for opacity (-> refraction + reflection), otherwise just reflect
@@ -176,34 +176,47 @@ void MonteCarloRayTracer::glRender(float *pixels) {
 	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawPixels(_W, _H, GL_RGB, GL_FLOAT, pixels);
-	glfwSwapBuffers();
 #endif
 }
  
-void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
-
-	int NUM_THREADS = std::thread::hardware_concurrency();
-
-	_rgen = Rng();
-
-	std::cout << "Starting carlo tracer with " << NUM_THREADS << " threads.\n";
-	std::vector<std::thread> threads;
-	// Start threads
-	Timer::getInstance()->start("Carlo");
-	for (int row = 0; row < _H; ++row) {
-		for (int i = 0; i < NUM_THREADS; ++i) {
-            MonteCarloRayTracer::ThreadData thd(i, row, NUM_THREADS);
-            
-			threads.push_back(std::thread(&MonteCarloRayTracer::threadRender, this,
-                pixels, *tree, *cam, thd));
-		}
-		for (auto &thread : threads) {
-			thread.join();
-		}
-		threads.clear();
-		glRender(pixels);
-	}
-	
+void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
+    Timer::getInstance()->start("Carlo");
+    int NUM_THREADS = std::thread::hardware_concurrency();
+    if (singleThread || NUM_THREADS == 1) {
+        std::cout << "Starting carlo tracer with " << 1 << " thread.\n";
+        for (int row = 0; row < _H; ++row) {
+            ThreadData td(0, row, 1);
+            threadRender(pixels, *tree, *cam, td);
+#ifdef USE_OPENGL
+            if (renderDuring) {
+                glRender(pixels);
+            }
+#endif
+        }
+    }
+    else {
+        std::cout << "Starting carlo tracer with " << NUM_THREADS << " threads.\n";
+	    _rgen = Rng();
+	    std::vector<std::thread> threads;
+	    // Start threads
+	    
+	    for (int row = 0; row < _H; ++row) {
+		    for (int i = 0; i < NUM_THREADS; ++i) {
+                MonteCarloRayTracer::ThreadData thd(i, row, NUM_THREADS);
+			    threads.push_back(std::thread(&MonteCarloRayTracer::threadRender, this,
+                    pixels, *tree, *cam, thd));
+		    }
+		    for (auto &thread : threads) {
+			    thread.join();
+		    }
+		    threads.clear();
+#ifdef USE_OPENGL
+            if (renderDuring) {
+                glRender(pixels);
+            }
+#endif
+	    }
+    }
 	// Join threads
 	
 	std::cout << std::endl;

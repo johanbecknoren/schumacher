@@ -24,7 +24,6 @@ if (USE_OPENGL)
 	${CMAKE_SOURCE_DIR}/externals/GL
 	${CMAKE_SOURCE_DIR}/externals/GL/GL)
   set(EXTRA_LIBS ${EXTRA_LIBS} GL glfw glut)
-  set(EXTRA_LIB_FILES ${EXTRA_LIB_FILES} ${CMAKE_SOURCE_DIR}/externals/GL/lib)
   add_definitions(-DUSE_OPENGL)
 endif (USE_OPENGL)
 
@@ -49,9 +48,7 @@ include_directories(
 	)
 
 link_directories(
-  ${EXTRA_LIB_FILES}
 	${CMAKE_SOURCE_DIR}/externals/libs
-	${EXTRA_LIB_FILES}
 	) 
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/export)
@@ -65,7 +62,7 @@ endif()
 add_executable(schumacher ${HEADERS} ${SRCS} )
 
 if(WIN32)
-	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib)
+	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib glew32.lib)
 endif(WIN32)
 
 if(UNIX)

@@ -35,9 +35,9 @@ void Triangle::createAABB() {
 	glm::vec3 upper(glm::max(glm::max(x1.x, x2.x), x0.x),
 			glm::max(glm::max(x1.y, x2.y), x0.y),
 			glm::max(glm::max(x1.z, x2.z), x0.z));
-	if (upper.x == lower.x) upper.x += 0.1;
-	if (upper.y == lower.y) upper.y += 0.1;
-	if (upper.z == lower.z) upper.z += 0.1;
+	if (upper.x == lower.x) upper.x += 0.1f;
+	if (upper.y == lower.y) upper.y += 0.1f;
+	if (upper.z == lower.z) upper.z += 0.1f;
 	this->_boundingBox = new AABB(lower, upper);
 } 
 

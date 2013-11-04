@@ -13,13 +13,13 @@ public:
 													_rayCounter(0),
 													_meanRayDepth(0),
 													_maxDepth(4),
-													_raysPerPixel(300)
+													_raysPerPixel(100)
 
 	{};
-	void render(float *pixels, Octree *tree, Camera *cam);	
+	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 
 private:
-	glm::vec3 iterateRay(Ray ray, const Octree &tree, int depth, bool kill);
+	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
 	
 	struct Rng
 	{
@@ -46,14 +46,15 @@ private:
         ThreadData(int i, int row, const int NUM_THREADS) : tId(i), row(row), NUM_THREADS(NUM_THREADS) {};
     };
 	void glRender(float *pixels);
-	
+
 	void threadRender(float *pixels, const Octree &tree, 
         const Camera &cam, ThreadData thd);
 	bool working;
 	void addToCount();
 	void addToMeanDepth(int d);
 	void testTimers();
-	std::mutex _mutex;
+
+    std::mutex _mutex;
 	std::mutex _depthMutex;
 	std::mutex _renderMutex;
 	volatile int _rayCounter;
@@ -62,6 +63,7 @@ private:
 	int _meanRayDepth;
 	int _maxDepth;
 	int _raysPerPixel;
+
 };
 
 
