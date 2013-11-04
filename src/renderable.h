@@ -27,6 +27,7 @@ class Renderable {
 			_material.setRefractionIndex(REFRACTION_GLASS);
 			_material.setOpacity(0.5f);
 			_material.setSpecular(1.0f);
+			_material.setAbsorbtion(1.f);
 		} else if (m == MARBLE) {
 			_material.setDiffuseColor(glm::vec3(1.0f, 1.0f,0.0f));
 			_material.setSpecular(0.8f);

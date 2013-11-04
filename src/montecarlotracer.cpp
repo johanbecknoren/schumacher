@@ -26,6 +26,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 	if(tree.intersect(ray, ip)) {
 		
 		if (ip.getMaterial().getMaterialType() == LIGHT) {
+			addToMeanDepth(depth);
 			return ip.getMaterial().getDiffuseColor();
 		} else if(ip.getMaterial().getMaterialType() == GLASS) {
 		//	return glm::vec3(0.0f,0.0f,1.0f);
@@ -43,9 +44,9 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 
 			if(isInsideObj && ip.getMaterial().getMaterialType() == GLASS) { // If coming from inside obj going out into air (refraction needed)
 //				float n2overn1 = REFRACTION_AIR / ray.getRefractionIndex();
-
+				
 				ip.setNormal(-1.0f*ip.getNormal());
-
+				
 				float n2overn1 = ray.getRefractionIndex() / REFRACTION_AIR;
 
 				float critical_angle = asin(n2overn1);
@@ -55,22 +56,26 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 					//std::cout << "Inside, Total internal reflection!\n";
 					
 					Ray new_ray = calculateReflection(ray, ip);
+					
 					rad += ip.getMaterial().getDiffuseColor() * iterateRay(new_ray, tree, ++depth, kill);
 				} else { // Calc and spawn refracted and reflected rays
 					//std::cout << "Inside, Both internal refl and refraction\n";
-
+					
 					ip.getMaterial().setRefractionIndex(REFRACTION_AIR);
 //					std::cout<<"Inside, before";
 //					Ray new_ray = calculateRefraction(ray, ip);
 					
 					Ray new_ray = Ray(ip.getPoint() + 0.001f*ray.getDirection(), ray.getDirection(), ip.getMaterial().getRefractionIndex());
-
+					
 					rad += (1.0f-ip.getMaterial().getOpacity()) *
 						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth, kill);
+
 //					std::cout<<"Inside, after";
-					new_ray = calculateReflection(ray, ip);
+					Ray new_ray2 = calculateReflection(ray, ip);
+					return rad;
 					rad += ip.getMaterial().getOpacity() *
-						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth, kill);
+						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray2, tree, ++depth, kill);
+
 
 				}
 
