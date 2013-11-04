@@ -37,7 +37,7 @@ void Quadrilateral::translate(const glm::vec3& t){
 //typedef float real;
 //typedef glm::vec3 vector;
 
-bool Quadrilateral::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
+bool Quadrilateral::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 	// Algorithm from http://graphics.cs.kuleuven.be/publications/LD05ERQIT/LD05ERQIT_code.cpp
 
 	static const float eps = float(10e-6);
@@ -47,20 +47,20 @@ bool Quadrilateral::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const 
 
 	glm::vec3 E_01 = _v10 - _v00;
 	glm::vec3 E_03 = _v01 - _v00;
-	glm::vec3 P = glm::cross(ray->getDirection(), E_03);
+	glm::vec3 P = glm::cross(ray.getDirection(), E_03);
 	float det = glm::dot(E_01, P);
 
 	if (std::fabs(det) < eps) return false;
 
 	float inv_det = float(1.0) / det;
-	glm::vec3 T = ray->getOrigin() - _v00;
+	glm::vec3 T = ray.getOrigin() - _v00;
 	float alpha = glm::dot(T, P) * inv_det;
 
 	if (alpha < float(0.0)) return false;
 
 	// if (alpha > real(1.0)) return false; // Uncomment if VR is used.
 	glm::vec3 Q = glm::cross(T, E_01);
-	float beta = glm::dot(ray->getDirection(), Q) * inv_det;
+	float beta = glm::dot(ray.getDirection(), Q) * inv_det;
 
 	if (beta < float(0.0)) return false; 
 
@@ -73,19 +73,19 @@ bool Quadrilateral::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const 
 
 		glm::vec3 E_23 = _v01 - _v11;
 		glm::vec3 E_21 = _v10 - _v11;
-		glm::vec3 P_prime = glm::cross(ray->getDirection(), E_21);
+		glm::vec3 P_prime = glm::cross(ray.getDirection(), E_21);
 		float det_prime = glm::dot(E_23, P_prime);
 
 		if (std::fabs(det_prime) < eps) return false;
 
 		float inv_det_prime = float(1.0) / det_prime;
-		glm::vec3 T_prime = ray->getOrigin() - _v11;
+		glm::vec3 T_prime = ray.getOrigin() - _v11;
 		float alpha_prime = glm::dot(T_prime, P_prime) * inv_det_prime;
 
 		if (alpha_prime < float(0.0)) return false;
 
 		glm::vec3 Q_prime = glm::cross(T_prime, E_23);
-		float beta_prime = glm::dot(ray->getDirection(), Q_prime) * inv_det_prime;
+		float beta_prime = glm::dot(ray.getDirection(), Q_prime) * inv_det_prime;
 
 		if (beta_prime < float(0.0)) return false;
 	}
@@ -143,10 +143,10 @@ bool Quadrilateral::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const 
 		v = beta / ((u * (beta_11 - float(1.0))) + float(1.0)); 
 	}
 
-	glm::vec3 iPoint = ray->getOrigin() + t * ray->getDirection();
+	glm::vec3 iPoint = ray.getOrigin() + t * ray.getDirection();
 	glm::vec3 sN = glm::normalize( glm::cross(_v00-_v10, _v00-_v11) );
 
-/*	if(glm::dot(ray->getDirection(), sN) > 0.0f) // Draw the quad from both directions
+/*	if(glm::dot(ray.getDirection(), sN) > 0.0f) // Draw the quad from both directions
 		sN *= -1.0f;*/
 	ip = IntersectionPoint(iPoint, sN, this->getMaterial());
 

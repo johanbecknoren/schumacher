@@ -9,7 +9,7 @@ class Renderable {
  public:
     virtual ~Renderable() { delete _boundingBox; };
     AABB *getBoundingBox() { return _boundingBox; };
-    virtual bool getIntersectionPoint(Ray *ray,  IntersectionPoint &ip) const = 0;
+    virtual bool getIntersectionPoint(Ray &ray,  IntersectionPoint &ip) const = 0;
 	std::string getName() const { return _name; };
 	virtual std::string asString() const { return "asString() not implemented for " + getName(); };
 	virtual void scale(const float s) {
@@ -25,8 +25,9 @@ class Renderable {
 		if (m == GLASS) {
 			_material.setDiffuseColor(glm::vec3(1.0f));
 			_material.setRefractionIndex(REFRACTION_GLASS);
-			_material.setOpacity(0.5f);
+			_material.setOpacity(0.05f);
 			_material.setSpecular(1.0f);
+			_material.setAbsorbtion(1.0f);
 		} else if (m == MARBLE) {
 			_material.setDiffuseColor(glm::vec3(1.0f, 1.0f,0.0f));
 			_material.setSpecular(0.8f);

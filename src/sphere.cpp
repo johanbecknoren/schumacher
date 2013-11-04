@@ -20,19 +20,19 @@ std::string Sphere::asString() const {
 	return s.str();
 }
 
-bool Sphere::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
+bool Sphere::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 	/*Algorithm from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection*/
 
 	float A,B,C,t;
-
-	IntersectionPoint* d = _boundingBox->getIntersection(ray);
-	glm::vec3 dir = glm::normalize(ray->getDirection());
+	Ray ray_cp = Ray(ray);
+	IntersectionPoint* d = _boundingBox->getIntersection(ray_cp);
+	glm::vec3 dir = glm::normalize(ray.getDirection());
 
 	if(d != NULL) {// Intersection with AABB exists
 		A = glm::dot(dir, dir);
-		B = 2 * glm::dot((ray->getOrigin() - _position), dir);
-		C = glm::dot((ray->getOrigin() - _position),
-                 (ray->getOrigin() - _position)) - _radius*_radius;
+		B = 2 * glm::dot((ray.getOrigin() - _position), dir);
+		C = glm::dot((ray.getOrigin() - _position),
+                 (ray.getOrigin() - _position)) - _radius*_radius;
 
 		float sqrtTerm = B*B - 4*A*C;
 
@@ -65,8 +65,8 @@ bool Sphere::getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const {
 		else
 			t = t0;
 
-		//ray->print();
-		glm::vec3 intP = ray->getOrigin() + glm::normalize(ray->getDirection())*t;
+		//ray.print();
+		glm::vec3 intP = ray.getOrigin() + glm::normalize(ray.getDirection())*t;
 		glm::vec3 surfNormal = glm::normalize(intP - _position);
 		ip = IntersectionPoint(intP, surfNormal, getMaterial());
 

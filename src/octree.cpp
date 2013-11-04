@@ -104,11 +104,11 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
 bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
 	float lMin = FLT_MAX;
 	bool found = false;
-//	std::vector<IntersectionPoint> ipvec;
+	std::vector<IntersectionPoint> ipvec;
 	
 	for (size_t i = 0; i < _leafs.size(); ++i) {
 		IntersectionPoint ip;
-		if (_leafs[i].getRenderable()->getIntersectionPoint(&ray, ip)) {
+		if (_leafs[i].getRenderable()->getIntersectionPoint(ray, ip)) {
 			glm::vec3 vec = ip.getPoint() - ray.getOrigin();
 			float len = glm::length((vec));
 			if(len < lMin && len < ray.getTMax()) {
@@ -145,7 +145,7 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 
 		while(leaf != NULL) {
 			IntersectionPoint i;
-			if (leaf->getRenderable()->getIntersectionPoint(&ray, i)) {
+			if (leaf->getRenderable()->getIntersectionPoint(ray, i)) {
 				pts.push_back(i);
 				hit = true;
 			}
