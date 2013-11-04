@@ -57,28 +57,22 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 					
 					Ray new_ray = calculateReflection(ray, ip);
 					
-					rad += ip.getMaterial().getDiffuseColor() * iterateRay(new_ray, tree, ++depth, kill);
+					rad += ip.getMaterial().getDiffuseColor() * iterateRay(new_ray, tree, depth + 1, kill);
 				} else { // Calc and spawn refracted and reflected rays
 					//std::cout << "Inside, Both internal refl and refraction\n";
 					
 					ip.getMaterial().setRefractionIndex(REFRACTION_AIR);
-//					std::cout<<"Inside, before";
-//					Ray new_ray = calculateRefraction(ray, ip);
 					
 					Ray new_ray = Ray(ip.getPoint() + 0.001f*ray.getDirection(), ray.getDirection(), ip.getMaterial().getRefractionIndex());
 					
 					rad += (1.0f-ip.getMaterial().getOpacity()) *
-						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, ++depth, kill);
+						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray, tree, depth + 1, kill);
 
-//					std::cout<<"Inside, after";
 					Ray new_ray2 = calculateReflection(ray, ip);
-					return rad;
+
 					rad += ip.getMaterial().getOpacity() *
-						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray2, tree, ++depth, kill);
-
-
+						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray2, tree, depth + 1, kill);
 				}
-
 			}
 			else { // Check for opacity (-> refraction + reflection), otherwise just reflect
 				glm::vec3 origin = ip.getPoint();
@@ -118,14 +112,14 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 //						std::cout<<"Ray origin after: "<<glm::to_string(refr_ray.getOrigin())<<"Ray dir: "<<glm::to_string(refr_ray.getDirection())<<std::endl;
 
 						rad += (1.0f-ip.getMaterial().getOpacity()) * 
-							ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
+							ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, depth + 1, kill);
 						rad += ip.getMaterial().getOpacity() * 
-							ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth, kill);
+							ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, depth + 1, kill);
 					}
 
 				} else { // Only reflection
 					Ray new_ray = calculateReflection(ray, ip);
-					rad +=ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, ++depth, kill);
+					rad +=ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, depth + 1, kill);
 				}
 			}
 
