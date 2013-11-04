@@ -29,51 +29,12 @@ int main(int argc, char **argv) {
 
 	Octree *tree = new Octree(&bb);
 
-	Sphere *sphere = new Sphere(0.2f, glm::vec3(-0.05f,-0.2f,0.0f));
-	sphere->setMaterial(MARBLE);
-
-	Sphere *sp2 = new Sphere(1.f, glm::vec3(1.02f, 0.13f, 4.23f));
-	sp2->setMaterial(MIRROR);
-
-	Sphere *sp3 = new Sphere(1.f, glm::vec3(-2.02f, 0.13f, 4.23f));
-	sp3->setMaterial(STONE);
-
-	Sphere *sp4 = new Sphere(1.f, glm::vec3(-2.32f, -2.f, 4.23f));
-	sp4->setMaterial(MARBLE);
-	
-	Sphere *spLight = new Sphere(0.1f, glm::vec3(0.0f,-4.0f, 5.0f));
-	spLight->setMaterial(LIGHT);
-	
-	Triangle *tri = new Triangle(
-			glm::vec3(10.f, 10.f, 30.f),
-			glm::vec3(-10.f, -10.f, 30.f),
-			glm::vec3(10.f, -10.f, 30.f));
-//	tree->addObject(tri);
-
-
-	PointLight *ptLgt = new PointLight(glm::vec3(0.0f, 1.f, -2.0f), 1, glm::vec3(0.3f));
-// 	tree->addPointLight(ptLgt);
 	PointLight *l2 = new PointLight(glm::vec3(5.0f, 1.4f, -0.4f), 1, glm::vec3(0.3f));
 	tree->addPointLight(l2);
-// 	Quadrilateral *quad = new Quadrilateral(
-// 				  glm::vec3( 1., 1., 5.),
-//                   glm::vec3( 1., -1., 5.),
-//                   glm::vec3(-1., -1., 5.),
-// 				  glm::vec3( -1., 1., 5.));
-// 	quad->setMaterial(CORNELL_LEFT);
-
 
 	std::vector<Renderable *> scene = SceneBuilder::createCornellBox();
-
 	tree->addObject(scene);
-/*	tree->addObject(sphere);
-	tree->addObject(sp2);
-	tree->addObject(sp3);
-	tree->addObject(sp4);*/
 
-// 	tree->addObject(spLight);
-	
-//	tree->addObject(quad);
 	tree->print();
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
@@ -121,11 +82,6 @@ int main(int argc, char **argv) {
 	glfwTerminate();
 #endif
 
-
-	delete sphere;
-	delete sp2;
-	delete sp3;
-	delete sp4;
 	delete tree;
 	delete pixels;
 

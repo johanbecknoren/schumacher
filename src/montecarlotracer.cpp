@@ -19,13 +19,14 @@ void MonteCarloRayTracer::addToMeanDepth(int d) {
 	_depthMutex.unlock();
 }
 
-glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth, bool kill) {
+glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int depth, bool kill) {
 	IntersectionPoint ip;
 	glm::vec3 color(0.0f);
 	glm::vec3 rad(0.0f);
 	if(tree.intersect(ray, ip)) {
 		
 		if (ip.getMaterial().getMaterialType() == LIGHT) {
+			addToMeanDepth(depth);
 			return ip.getMaterial().getDiffuseColor();
 		} else if(ip.getMaterial().getMaterialType() == GLASS) {
 		//	return glm::vec3(0.0f,0.0f,1.0f);
@@ -51,39 +52,33 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 					std::cout<<"BOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOM\n";
 //					n2overn1 = 0.99f;
 				}
-				if(n2overn1 < -1.0f) {
-//					n2overn1 = -0.99f;
-				}
 //				float critical_angle = asin(n2overn1);
 				float critical_angle = acos(snell);
 				float angle_in = acos(glm::dot(ip.getNormal(), ray.getDirection() * -1.0f));
+
+				Ray refl_ray = calculateReflection(ray, ip);		
 				
 				if(angle_in > critical_angle) { // Total internal reflection, no refraction
 					//std::cout << "Inside, Total internal reflection!\n";					
-					Ray new_ray = calculateReflection(ray, ip);
-					rad += ip.getMaterial().getDiffuseColor() * iterateRay(new_ray, tree, ++depth, kill);
-				} else { // Calc and spawn refracted and reflected rays
+					} else { // Calc and spawn refracted and reflected rays
 					//std::cout << "Inside, Both internal refl and refraction\n";
+					
 					ip.getMaterial().setRefractionIndex(REFRACTION_AIR);
 //					std::cout<<"Inside, before";
-					//Ray refr_ray = calculateRefraction(ray, ip);
-					//glm::vec3 refr_dir = glm::refract(ray.getDirection(), ip.getNormal(), n2overn1);
-					//Ray refr_ray = Ray(ip.getPoint() + 0.01f*refr_dir, refr_dir, REFRACTION_AIR);
+					Ray refr_ray = calculateRefraction(ray, ip);
+					
 //					Ray refr_ray = Ray(ip.getPoint() + 0.001f*ray.getDirection(), ray.getDirection(), ip.getMaterial().getRefractionIndex());
-					float thedot = glm::dot(ip.getNormal(), ray.getDirection());
-					float factor = (snell*thedot - sqrt(1.0f - snell*snell *(1.0f - thedot*thedot)));
-					glm::vec3 refr_dir = glm::normalize(ray.getDirection()*-snell+ip.getNormal()*factor);
-					Ray refr_ray = Ray(ip.getPoint() + 0.01f*refr_dir, refr_dir, REFRACTION_AIR);
-					rad += (1.0f-ip.getMaterial().getOpacity()) *
-						ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
+					
+					//rad += (1.0f-ip.getMaterial().getOpacity()) *
+						//ip.getMaterial().getDiffuseColor()*iterateRay(refr_ray, tree, ++depth, kill);
+
 //					std::cout<<"Inside, after";
-					return rad;
-					Ray refl_ray = calculateReflection(ray, ip);
+					/*Ray new_ray2 = calculateReflection(ray, ip);
 					rad += ip.getMaterial().getOpacity() *
-						ip.getMaterial().getDiffuseColor()*iterateRay(refl_ray, tree, ++depth, kill);
-
+						ip.getMaterial().getDiffuseColor()*iterateRay(new_ray2, tree, ++depth, kill);*/
 				}
-
+				rad += ip.getMaterial().getOpacity() * 
+					ip.getMaterial().getDiffuseColor() * iterateRay(refl_ray, tree, ++depth, kill);
 			}
 			else { // Check for opacity (-> refraction + reflection), otherwise just reflect
 				glm::vec3 origin = ip.getPoint();
@@ -113,15 +108,10 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 					float snell = n2overn1;
 						
 //					std::cout<<"Ray origin before: "<<glm::to_string(ray.getOrigin())<<"Ray dir: "<<glm::to_string(ray.getDirection())<<std::endl;
-//					Ray refr_ray = calculateRefraction(ray, ip);
+					Ray refr_ray = calculateRefraction(ray, ip);
 					//glm::vec3 refr_dir = glm::refract(ray.getDirection(), ip.getNormal(), n2overn1);
 					//Ray refr_ray = Ray(ip.getPoint() + 0.01f*refr_dir, refr_dir, ip.getMaterial().getRefractionIndex());
 //					Ray refr_ray = Ray(ip.getPoint() - 0.001f*ray.getDirection(), ray.getDirection(), ip.getMaterial().getRefractionIndex());
-
-					float thedot = glm::dot(ip.getNormal(), ray.getDirection());
-					float factor = (snell * thedot - sqrt(1.0f - snell*snell *(1.0f - thedot*thedot)));
-					glm::vec3 refr_dir = glm::normalize(ray.getDirection()-snell+ip.getNormal()*factor);
-					Ray refr_ray = Ray(ip.getPoint() + 0.01f*refr_dir, refr_dir, ip.getMaterial().getRefractionIndex());
 //					std::cout<<"Ray origin after: "<<glm::to_string(refr_ray.getOrigin())<<"Ray dir: "<<glm::to_string(refr_ray.getDirection())<<std::endl;
 
 					rad += (1.0f-ip.getMaterial().getOpacity()) * 
@@ -150,7 +140,6 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray ray, const Octree &tree, int depth
 #define UNIFORM_DIST 0
 
 void MonteCarloRayTracer::threadRender(int tId, float *pixels, const Octree &tree, const Camera &cam, int row, const int NUM_THREADS) {
-
 
 	int *tex = new int[_W * _H * 3];
 	for (int u = 0; u < _W / NUM_THREADS; ++u) {
@@ -206,7 +195,7 @@ void MonteCarloRayTracer::glRender(float *pixels) {
  
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam) {
 
-	const int NUM_THREADS = std::thread::hardware_concurrency();
+	const int NUM_THREADS = 1;//std::thread::hardware_concurrency();
 
 	_rgen = Rng();
 

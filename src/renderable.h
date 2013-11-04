@@ -27,7 +27,7 @@ class Renderable {
 			_material.setRefractionIndex(REFRACTION_GLASS);
 			_material.setOpacity(0.05f);
 			_material.setSpecular(1.0f);
-			_material.setAbsorbtion(1.0f);
+			_material.setAbsorbtion(1.f);
 		} else if (m == MARBLE) {
 			_material.setDiffuseColor(glm::vec3(1.0f, 1.0f,0.0f));
 			_material.setSpecular(0.8f);
@@ -36,9 +36,9 @@ class Renderable {
 			_material.setDiffuseColor(glm::vec3(1.0f));
 			_material.setEmission(glm::vec3(1.0f));
 		} else if (m == MIRROR) {
-			_material.setDiffuseColor(glm::vec3(0.2f, 0.2f, 1.f));
+			_material.setDiffuseColor(glm::vec3(1.f));
 			_material.setAbsorbtion(0.1f);
-			_material.setSpecular(0.8f);
+			_material.setSpecular(1.0f);
 		} else if (m == STONE) {	
 			_material.setDiffuseColor(glm::vec3(0.8f,0.8f,0.8f)); // gray
 		} else if (m == CORNELL_CEIL) {

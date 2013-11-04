@@ -16,26 +16,23 @@ class Tracer {
 
 		Ray calculateReflection(const Ray &inRay, const IntersectionPoint &ip) {
 			glm::vec3 reflection = inRay.getDirection() - 2.0f * glm::dot(inRay.getDirection(), ip.getNormal()) * ip.getNormal();			
-			Ray r = Ray(ip.getPoint() + 0.001f * reflection, reflection, inRay.getRefractionIndex());
+			Ray r = Ray(ip.getPoint() + 0.01f * reflection, reflection, inRay.getRefractionIndex());
 			return r;
 		}
 
 		Ray calculateRefraction(const Ray &inRay, const IntersectionPoint &ip) {
 			// Snell's Law
-//			std::cout<<"1";
 			float cosIn = glm::dot(ip.getNormal(), glm::normalize(inRay.getDirection()) );
 			float n1overn2 = inRay.getRefractionIndex()/ip.getMaterial().getRefractionIndex();
 			float cosOut = sqrtf(1.0f - (n1overn2*n1overn2)*(1.0f - cosIn*cosIn));
-//			std::cout<<"2";
 
 			glm::vec3 refr_dir;
 			if(cosIn > 0.0f)
 				refr_dir = (n1overn2) * inRay.getDirection() + (n1overn2*cosIn - cosOut)*ip.getNormal();
 			else		
 				refr_dir = (n1overn2) * inRay.getDirection() + (n1overn2*cosIn + cosOut)*ip.getNormal();
-//			std::cout<<"3";
 
-			return Ray(ip.getPoint()+0.0001f*glm::normalize(refr_dir), refr_dir, ip.getMaterial().getRefractionIndex());
+			return Ray(ip.getPoint()+0.01f*glm::normalize(refr_dir), refr_dir, ip.getMaterial().getRefractionIndex());
 		}
 
 		inline int calculateId(const int u, const int v) const {
