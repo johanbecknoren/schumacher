@@ -10,7 +10,7 @@ class Triangle : public Renderable {
 		bool getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const;
 		void createAABB();
 		void translate(const glm::vec3 &t);
-		void scale(float s);
+		void scale(const float s);
 	private:
 		glm::vec3 x1;
 		glm::vec3 x2;

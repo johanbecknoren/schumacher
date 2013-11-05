@@ -29,7 +29,6 @@ int main(int argc, char **argv) {
             renderDuring = false;
         }
 	}
-
 	
 	Camera *cam = new Camera();
 
@@ -38,7 +37,6 @@ int main(int argc, char **argv) {
 	Octree *tree = new Octree(&bb);
 
 	MaterialManager mm = MaterialManager();
-
 
 	PointLight *l2 = new PointLight(glm::vec3(5.0f, 1.4f, -0.4f), 1, glm::vec3(0.3f));
 	tree->addPointLight(l2);
@@ -69,12 +67,10 @@ int main(int argc, char **argv) {
     mTracer.render(pixels, tree, cam, singleThread, renderDuring);
 //	wTracer.render(pixels, tree, cam);
 
-	// caster.render(pixels, tree, cam);
-// 	int iters = 1;	
-	
+	// caster.render(pixels, tree, cam);	
 
-	for(int i=0; i<3*WIDTH*HEIGHT; ++i)
-		pixelsInt[i] = int(pixels[i]*255.0f);
+	for(int i = 0; i < 3 * WIDTH * HEIGHT; ++i)
+		pixelsInt[i] = int(pixels[i] * 255.0f);
 
 	if (exportImage)
 		ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);

@@ -24,47 +24,7 @@ class Renderable {
 		_material = MaterialManager::get(m);
 		return;
 	}
-	/*void setMaterial(const material_t& m) {
-		_material = Material();
-		_material.setMaterialType(m);
-		if (m == GLASS) {
-			_material.setDiffuseColor(glm::vec3(1.0f));
-			_material.setRefractionIndex(REFRACTION_GLASS);
-			_material.setOpacity(0.5f);
-			_material.setSpecular(1.0f);
-			_material.setAbsorbtion(1.f);
-		} else if (m == MARBLE) {
-			_material.setDiffuseColor(glm::vec3(1.0f, 1.0f,0.0f));
-			_material.setSpecular(0.8f);
-			_material.setAbsorbtion(0.75f);
-		} else if(m == LIGHT) {
-			_material.setDiffuseColor(glm::vec3(1.0f));
-			_material.setEmission(glm::vec3(1.0f));
-		} else if (m == MIRROR) {
-			_material.setDiffuseColor(glm::vec3(1.f));
-			_material.setAbsorbtion(0.1f);
-			_material.setSpecular(1.0f);
-		} else if (m == STONE) {	
-			_material.setDiffuseColor(glm::vec3(0.8f,0.8f,0.8f)); // gray
-		} else if (m == CORNELL_CEIL) {
-			_material.setDiffuseColor(glm::vec3(1.0f));
-			_material.setAbsorbtion(1.f);
-		} else if (m == CORNELL_FLOOR) {
-			_material.setDiffuseColor(glm::vec3(1.0f));
-			_material.setAbsorbtion(0.9f);
-		} else if (m == CORNELL_BACK) {
-			_material.setDiffuseColor(glm::vec3(1.0f));
-			_material.setAbsorbtion(0.9f);
-		} else if (m == CORNELL_RIGHT) {
-			_material.setDiffuseColor(glm::vec3(0.0f, 1.0f, 0.0f));
-			_material.setAbsorbtion(0.9f);
-		} else if (m == CORNELL_LEFT) {
-			_material.setDiffuseColor(glm::vec3(1.0f, 0.0f, 0.0f));
-			_material.setAbsorbtion(0.9f);
-		}
-		
-		return;		
-	}*/
+
 	Material* getMaterial() const { return _material; }
 	void updateAABB() { createAABB(); }
  protected:

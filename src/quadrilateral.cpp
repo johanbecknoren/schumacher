@@ -18,7 +18,7 @@ std::string Quadrilateral::asString() const {
 	return ss.str();
 }
 
-void Quadrilateral::scale(float v) {
+void Quadrilateral::scale(const float v) {
 	_v00 *= v;
 	_v01 *= v;
 	_v10 *= v;

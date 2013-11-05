@@ -15,7 +15,7 @@ public:
 
 	virtual void createAABB();
 
-	void scale(float v);
+	void scale(const float v);
 	void translate(const glm::vec3&);
 private:
 	glm::vec3 _v00;

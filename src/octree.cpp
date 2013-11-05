@@ -204,13 +204,11 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 		float min = FLT_MAX;
 		int id = 0;
 		for (size_t i = 0; i < pts.size(); ++i) {
-// 			std::cout << glm::to_string(pts[i].getPoint()) << glm::to_string(ray.getOrigin()) << std::flush;
-			glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
+			// glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
 
-			float len = glm::length((vec));
+			float len = glm::distance(pts[i].getPoint(), ray.getOrigin());
 
 			if(len < min) {
-				
 				min = len;
 				id = i;
 			}
