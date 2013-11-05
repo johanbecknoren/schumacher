@@ -51,7 +51,8 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 //				float critical_angle = asin(n2overn1);
 				float critical_angle = acos(snell);
 				float angle_in = glm::dot(ip.getNormal(), ray.getDirection() * -1.0f);
-//TODO: correct reflecance acc. to Fresnel eq.	float reflectance_s = ray.get
+//TODO: correct reflecance acc. to Fresnel eq.
+				float reflectance_s = ip.getMaterial()->getOpacity();
 				Ray refl_ray = calculateReflection(ray, ip);		
 				
 				if(acos(angle_in) > critical_angle) {// Calc and spawn refracted and reflected rays
@@ -59,11 +60,16 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				} else {
 					ip.getMaterial()->setRefractionIndex(REFRACTION_AIR);
 					Ray refr_ray = calculateRefraction(ray, ip);
-					rad += (1.0f-ip.getMaterial()->getOpacity()) *
+					
+					float reflectance_s_nom = (ray.getRefractionIndex()*angle_in) -
+		 				(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), ip.getNormal()));
+					float reflectance_s_denom = (ray.getRefractionIndex()*angle_in) +
+						(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), ip.getNormal()));
+					reflectance_s = (reflectance_s_nom/reflectance_s_denom) * (reflectance_s_nom/reflectance_s_denom);
+					rad += (1.0f-reflectance_s) *
 						ip.getMaterial()->getDiffuseColor()*iterateRay(refr_ray, tree, depth + 1, kill);
 				} 
-				rad += ip.getMaterial()->getOpacity() * 
-					ip.getMaterial()->getDiffuseColor() * iterateRay(refl_ray, tree, depth + 1, kill);
+				rad += reflectance_s * ip.getMaterial()->getDiffuseColor() * iterateRay(refl_ray, tree, depth + 1, kill);
 
 			}
 			else { // Ray coming from air
@@ -86,13 +92,23 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				glm::vec3 dir = glm::normalize(diffuse_dir*(1.0f-t) + refl_ray.getDirection()*t);
 				
 				refl_ray = Ray(origin + dir * 0.0001f, dir);
-
+				float reflectance_s = ip.getMaterial()->getOpacity();
 				if(ip.getMaterial()->getOpacity() < 1.f-0.0001f) { // Do refraction + reflection						
 					Ray refr_ray = calculateRefraction(ray, ip);
-					rad += (1.0f-ip.getMaterial()->getOpacity()) * 
+					float angle_in = glm::dot(ip.getNormal(), ray.getDirection()*-1.0f);
+					//std::cout<<"angle_in = "<<angle_in<<std::endl;
+
+					float reflectance_s_nom = (ray.getRefractionIndex()*angle_in) -
+		 				(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), -ip.getNormal()));
+					float reflectance_s_denom = (ray.getRefractionIndex()*angle_in) +
+						(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), -ip.getNormal()));
+					//reflectance_s = (reflectance_s_nom/reflectance_s_denom) * (reflectance_s_nom/reflectance_s_denom);
+
+//					std::cout<<"reflectance_s = "<<reflectance_s<<std::endl;
+					rad += (1.0f-reflectance_s) * 
 						ip.getMaterial()->getDiffuseColor()*iterateRay(refr_ray, tree, depth + 1, kill);
 				}
-				rad += ip.getMaterial()->getOpacity()*ip.getMaterial()->getDiffuseColor() * 
+				rad += reflectance_s*ip.getMaterial()->getDiffuseColor() * 
 					iterateRay(refl_ray, tree, depth + 1, kill);
 			}
 
