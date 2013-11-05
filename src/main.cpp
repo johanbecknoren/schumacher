@@ -12,6 +12,7 @@
 #include "triangle.h"
 #include "montecarlotracer.h"
 #include "scenebuilder.h"
+#include "materialmanager.h"
 
 int main(int argc, char **argv) {
 	bool exportImage = true;
@@ -29,11 +30,15 @@ int main(int argc, char **argv) {
         }
 	}
 
+	
 	Camera *cam = new Camera();
 
 	AABB bb(glm::vec3(-10.0f), glm::vec3(10.0f));
 
 	Octree *tree = new Octree(&bb);
+
+	MaterialManager mm = MaterialManager();
+
 
 	PointLight *l2 = new PointLight(glm::vec3(5.0f, 1.4f, -0.4f), 1, glm::vec3(0.3f));
 	tree->addPointLight(l2);

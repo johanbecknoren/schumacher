@@ -89,7 +89,7 @@ std::vector<const Renderable*> Octree::getLightList() const {
 	std::vector<const Renderable*> lightList;
 	for (size_t i = 0; i < _leafs.size(); ++i) {
 		const Renderable *r = _leafs[i].getRenderable();
-		if (r->getMaterial().getMaterialType() == LIGHT) {
+		if (r->getMaterial()->getMaterialType() == LIGHT) {
 			lightList.push_back(r);
 		}
 	}

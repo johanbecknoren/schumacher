@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include "utils.h"
+#include "glm/glm.hpp"
 
 class Material {
 public:

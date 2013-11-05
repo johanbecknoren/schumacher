@@ -4,6 +4,7 @@
 #include "AABB.h"
 #include "intersectionpoint.h"
 #include "utils.h"
+#include "materialmanager.h"
 
 class Renderable {
  public:
@@ -20,6 +21,10 @@ class Renderable {
 
 	}
 	void setMaterial(const material_t& m) {
+		_material = MaterialManager::get(m);
+		return;
+	}
+	/*void setMaterial(const material_t& m) {
 		_material = Material();
 		_material.setMaterialType(m);
 		if (m == GLASS) {
@@ -59,13 +64,13 @@ class Renderable {
 		}
 		
 		return;		
-	}
-	Material getMaterial() const { return _material; }
+	}*/
+	Material* getMaterial() const { return _material; }
 	void updateAABB() { createAABB(); }
  protected:
 	std::string _name;
     AABB *_boundingBox;
-	Material _material;
+	Material *_material;
     virtual void createAABB() = 0;
 };
 

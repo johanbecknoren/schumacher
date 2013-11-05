@@ -23,7 +23,7 @@ class Tracer {
 		Ray calculateRefraction(const Ray &inRay, const IntersectionPoint &ip) {
 			// Snell's Law
 			float cosIn = glm::dot(ip.getNormal(), glm::normalize(inRay.getDirection()) );
-			float n1overn2 = inRay.getRefractionIndex()/ip.getMaterial().getRefractionIndex();
+			float n1overn2 = inRay.getRefractionIndex()/ip.getMaterial()->getRefractionIndex();
 			float cosOut = sqrtf(1.0f - (n1overn2*n1overn2)*(1.0f - cosIn*cosIn));
 
 			glm::vec3 refr_dir;
@@ -32,7 +32,7 @@ class Tracer {
 			else		
 				refr_dir = (n1overn2) * inRay.getDirection() + (n1overn2*cosIn + cosOut)*ip.getNormal();
 
-			return Ray(ip.getPoint()+0.0001f*glm::normalize(refr_dir), refr_dir, ip.getMaterial().getRefractionIndex());
+			return Ray(ip.getPoint()+0.0001f*glm::normalize(refr_dir), refr_dir, ip.getMaterial()->getRefractionIndex());
 		}
 
 		inline int calculateId(const int u, const int v) const {
