@@ -1,9 +1,8 @@
 #include "materialmanager.h"
 
 MaterialManager::MaterialManager() {
-if(_materials.empty()) {
-	MaterialManager::_materials.reserve(NUM_MATERIALS);
-
+	MaterialManager::_materials.resize(int(NUM_MATERIALS));
+	std::cout<<"Material manager size = "<<MaterialManager::_materials.size();
 	MaterialManager::_materials.at(GLASS) = new Material();
 	MaterialManager::_materials.at(GLASS)->setMaterialType(GLASS);
 	MaterialManager::_materials.at(GLASS)->setDiffuseColor(glm::vec3(1.0f));
@@ -58,4 +57,6 @@ if(_materials.empty()) {
 	MaterialManager::_materials.at(CORNELL_LEFT)->setDiffuseColor(glm::vec3(1.0f,0.0f,0.0f));
 	MaterialManager::_materials.at(CORNELL_LEFT)->setAbsorbtion(1.f);
 }
-}
+
+
+std::vector<Material*> MaterialManager::_materials = std::vector<Material*>();

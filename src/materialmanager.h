@@ -3,12 +3,14 @@
 #include "material.h"
 #include "utils.h"
 #include <vector>
+#include <iostream>
 
 class MaterialManager {
 public:
 	MaterialManager();
 	static Material* get(const material_t &m) { return MaterialManager::_materials.at(m); }
-
+private:
 	static std::vector<Material*> _materials;
 };
+
 #endif
