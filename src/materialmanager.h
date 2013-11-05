@@ -3,7 +3,6 @@
 #include "material.h"
 #include "utils.h"
 #include <vector>
-#include <iostream>
 
 class MaterialManager {
 public:

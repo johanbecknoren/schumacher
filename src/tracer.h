@@ -22,7 +22,7 @@ class Tracer {
 
 		Ray calculateRefraction(const Ray &inRay, const IntersectionPoint &ip) {
 			// Snell's Law
-			float cosIn = glm::dot(ip.getNormal(), glm::normalize(inRay.getDirection()) );
+			float cosIn = glm::dot(ip.getNormal(), glm::normalize(inRay.getDirection()*-1.0f) );
 			float n1overn2 = inRay.getRefractionIndex()/ip.getMaterial()->getRefractionIndex();
 			float cosOut = sqrtf(1.0f - (n1overn2*n1overn2)*(1.0f - cosIn*cosIn));
 

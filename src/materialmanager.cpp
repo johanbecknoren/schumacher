@@ -1,13 +1,13 @@
 #include "materialmanager.h"
 
 MaterialManager::MaterialManager() {
+	if(MaterialManager::_materials.empty()) {
 	MaterialManager::_materials.resize(int(NUM_MATERIALS));
-	std::cout<<"Material manager size = "<<MaterialManager::_materials.size();
 	MaterialManager::_materials.at(GLASS) = new Material();
 	MaterialManager::_materials.at(GLASS)->setMaterialType(GLASS);
 	MaterialManager::_materials.at(GLASS)->setDiffuseColor(glm::vec3(1.0f));
-	MaterialManager::_materials.at(GLASS)->setRefractionIndex(REFRACTION_GLASS);
-	MaterialManager::_materials.at(GLASS)->setOpacity(0.5f);
+	MaterialManager::_materials.at(GLASS)->setRefractionIndex(1.52f);
+	MaterialManager::_materials.at(GLASS)->setOpacity(0.05f);
 	MaterialManager::_materials.at(GLASS)->setSpecular(1.0f);
 	MaterialManager::_materials.at(GLASS)->setAbsorbtion(1.f);
 
@@ -56,6 +56,7 @@ MaterialManager::MaterialManager() {
 	MaterialManager::_materials.at(CORNELL_LEFT)->setMaterialType(CORNELL_LEFT);
 	MaterialManager::_materials.at(CORNELL_LEFT)->setDiffuseColor(glm::vec3(1.0f,0.0f,0.0f));
 	MaterialManager::_materials.at(CORNELL_LEFT)->setAbsorbtion(1.f);
+	}
 }
 
 
