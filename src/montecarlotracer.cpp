@@ -103,7 +103,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 					ip.getMaterial()->setRefractionIndex(1.52f); // TODO Assumes GLASS. Should not be hard coded, but doesnt work right now.
 					//std::cout<<"ip mat type:"<<ip.getMaterial()->getMaterialType()<<"ip refr idx:"<<ip.getMaterial()->getRefractionIndex();
 					Ray refr_ray = calculateRefraction(ray, ip);
-					std::cout<<"orig dir: "<<glm::to_string(ray.getDirection())<<"refr dir: "<<glm::to_string(refr_ray.getDirection())<<std::endl;
+					//std::cout<<"orig dir: "<<glm::to_string(ray.getDirection())<<"refr dir: "<<glm::to_string(refr_ray.getDirection())<<std::endl;
 //					float angle_in = glm::dot(ip.getNormal(), ray.getDirection()*-1.0f);
 					//std::cout<<"angle_in = "<<angle_in<<std::endl;
 
