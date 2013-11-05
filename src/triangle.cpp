@@ -47,7 +47,7 @@ void Triangle::translate(const glm::vec3 &t) {
 	x0 + t;
 }
 
-void Triangle::scale(float s) {
+void Triangle::scale(const float s) {
 	x1 *= s;
 	x2 *= s;
 	x0 *= s;

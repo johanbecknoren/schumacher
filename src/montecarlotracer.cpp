@@ -111,22 +111,23 @@ void MonteCarloRayTracer::threadRender(float *pixels, const Octree &tree, const 
 
 		float randU, randV;
 		for(int rpp=1; rpp<=_raysPerPixel; ++rpp) {
-
-			randU = _rgen.nextFloat() / 1.f;
-			randV = _rgen.nextFloat() / 1.f;
-				
-			float u2 = u * thd.NUM_THREADS + thd.tId + randU;
-			float v2 = thd.row + randV;
-				
 			float x;
 			float y;
-			calculateXnY(u2, v2, x, y);
+			{
+				randU = _rgen.nextFloat() / 1.f;
+				randV = _rgen.nextFloat() / 1.f;
+				
+				float u2 = u * thd.NUM_THREADS + thd.tId + randU;
+				float v2 = thd.row + randV;
+				
+				calculateXnY(u2, v2, x, y);
+			}
 			Ray r = cam.createRay(x, y);
 			IntersectionPoint ip;
 				
 			if (tree.intersect(r, ip)) {
-				Ray ray(ip.getPoint() + r.getDirection() * 0.00001f, r.getDirection());
-				glm::vec3 color = iterateRay(ray, tree, 0, false);
+				r.setOrigin(ip.getPoint() + r.getDirection() * 0.00001f);
+				glm::vec3 color = iterateRay(r, tree, 0, false);
 				accumDiffColor += color;
 			}
 			addToCount();
