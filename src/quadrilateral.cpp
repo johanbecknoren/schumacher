@@ -6,6 +6,7 @@ Quadrilateral::Quadrilateral( const glm::vec3& v00, const glm::vec3& v10, const 
 	_v01 = v01;
 	_v10 = v10;
 	_v11 = v11;
+	_boundingBox = NULL;
 	createAABB();
 }
 
@@ -22,7 +23,7 @@ void Quadrilateral::scale(const float v) {
 	_v01 *= v;
 	_v10 *= v;
 	_v11 *= v;
-//	createAABB();
+	createAABB();
 }
 
 void Quadrilateral::translate(const glm::vec3& t){
@@ -30,7 +31,7 @@ void Quadrilateral::translate(const glm::vec3& t){
 	_v01 += t;
 	_v10 += t;
 	_v11 += t;
-//	createAABB();
+	createAABB();
 }
 
 //typedef float real;
@@ -169,7 +170,7 @@ void Quadrilateral::createAABB(){
 	if ( (lLB.z - uRF.z) < eps)
 		uRF.z += 0.0001f;
 
-	if(!(_boundingBox = NULL))
+	if((_boundingBox == NULL))
 		this->_boundingBox = new AABB(lLB, uRF);
 	else {
 		_boundingBox->setLowerLeftBack(lLB);
