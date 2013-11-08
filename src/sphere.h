@@ -11,6 +11,7 @@ public:
 	virtual void createAABB();
     virtual bool getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const;
 	virtual std::string asString() const;
+	virtual std::string getName() const { return "Sphere"; };
 	glm::vec3 getPosition() const { return _position; }
 private:
 	float _radius;

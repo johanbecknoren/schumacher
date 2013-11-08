@@ -13,7 +13,7 @@ public:
 	~AABB(){};
 	bool isInside(const glm::vec3&) const;
 	int getQuadrant(const glm::vec3&) const;
-	//IntersectionPoint* getIntersection(Ray&, bool = false) const;
+
 	bool getIntersection(Ray&, IntersectionPoint&, bool = false) const;
 	bool IntersectT(Ray *r, float *tmin, float *tmax) const;
 	glm::vec3 getOrigin() const { return _origin; };

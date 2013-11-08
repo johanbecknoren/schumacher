@@ -11,7 +11,7 @@ class Renderable {
     virtual ~Renderable() { delete _boundingBox; };
     AABB *getBoundingBox() { return _boundingBox; };
     virtual bool getIntersectionPoint(Ray &ray,  IntersectionPoint &ip) const = 0;
-	std::string getName() const { return _name; };
+	virtual std::string getName() const { return "No name"; };
 	virtual std::string asString() const { return "asString() not implemented for " + getName(); };
 	virtual void scale(const float s) {
 		std::cout << "Using unimplemented scale in " << getName() << std::endl;
@@ -28,7 +28,6 @@ class Renderable {
 	Material* getMaterial() const { return _material; }
 	void updateAABB() { createAABB(); }
  protected:
-	std::string _name;
     AABB *_boundingBox;
 	Material *_material;
     virtual void createAABB() = 0;
