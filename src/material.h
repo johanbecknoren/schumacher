@@ -32,7 +32,7 @@ public:
 	float getAbsorbtion() const { return _absorbtion; }
 
 	void setDiffuseColor(const glm::vec3& d) { _diffuseColor = d; }
-	void setRefractionIndex(const float& rI) { _refractionIndex = rI; }
+	void setRefractionIndex(const float& ri) { _refractionIndex = ri; }
 	void setSpecular(const float& s) { _specular = s; }
 	void setOpacity(const float& o) { _opacity = o; }
 	void setEmission(const glm::vec3 e) { _emission = e; }

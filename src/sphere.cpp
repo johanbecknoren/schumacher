@@ -24,11 +24,10 @@ bool Sphere::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 	/*Algorithm from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection*/
 
 	float A,B,C,t;
-	Ray ray_cp = Ray(ray);
-	IntersectionPoint* d = _boundingBox->getIntersection(ray_cp);
 	glm::vec3 dir = glm::normalize(ray.getDirection());
 
-	if(d != NULL) {// Intersection with AABB exists
+	//if(d != NULL) {// Intersection with AABB exists
+	if(_boundingBox->getIntersection(ray, ip)) {
 		A = glm::dot(dir, dir);
 		B = 2 * glm::dot((ray.getOrigin() - _position), dir);
 		C = glm::dot((ray.getOrigin() - _position),

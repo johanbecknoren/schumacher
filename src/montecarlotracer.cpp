@@ -53,14 +53,16 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				//TODO: correct reflectance acc. to Fresnel eq.
 				float reflectance_s = ip.getMaterial()->getOpacity();
 				Ray refl_ray = calculateReflection(ray, ip);
-//				std::cout<<"ray refract="<<ray.getRefractionIndex()<<",angle_in="<<angle_in<<",critical_angle="<<critical_angle<<std::endl;
+				//std::cout<<"ray refract="<<ray.getRefractionIndex()<<",angle_in="<<angle_in<<",critical_angle="<<critical_angle<<std::endl;
 				if(angle_in > critical_angle) {// Calc and spawn refracted and reflected rays
 					// Only internal reflection
 					//std::cout<<"HERRRKKKA\n";
 				} else {
+					float old_refr_idx = float(ip.getMaterial()->getRefractionIndex());
 					ip.getMaterial()->setRefractionIndex(REFRACTION_AIR);
-					
 					Ray refr_ray = calculateRefraction(ray, ip);
+					ip.getMaterial()->setRefractionIndex(REFRACTION_GLASS); // TODO should not be hardcoded, but old_refr_idx always returns REFRACTION_AIR and never glass.
+					//std::cout<<"ip mat type:"<<ip.getMaterial()->getMaterialType()<<"old ip refr idx"<<old_refr_idx<<"ip refr idx:"<<ip.getMaterial()->getRefractionIndex();
 //					std::cout<<"derrp";
 /*					float reflectance_s_nom = (ray.getRefractionIndex()*angle_in) -
 		 				(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), ip.getNormal()));
@@ -100,7 +102,6 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 
 				if(ip.getMaterial()->getOpacity() < 1.f-0.0001f) { // Do refraction + reflection
 
-					ip.getMaterial()->setRefractionIndex(1.52f); // TODO Assumes GLASS. Should not be hard coded, but doesnt work right now.
 					//std::cout<<"ip mat type:"<<ip.getMaterial()->getMaterialType()<<"ip refr idx:"<<ip.getMaterial()->getRefractionIndex();
 					Ray refr_ray = calculateRefraction(ray, ip);
 					//std::cout<<"orig dir: "<<glm::to_string(ray.getDirection())<<"refr dir: "<<glm::to_string(refr_ray.getDirection())<<std::endl;

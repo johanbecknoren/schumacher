@@ -83,9 +83,9 @@ public:
 		sp_glass->setMaterial(GLASS);
 		scene.push_back(sp_glass);
 
-/*		Sphere* sp_mirror = new Sphere(1.5f, glm::vec3(-3.f,0.f,22.0f) );
+		Sphere* sp_mirror = new Sphere(1.5f, glm::vec3(-3.f,0.f,22.0f) );
 		sp_mirror->setMaterial(MIRROR);
-		scene.push_back(sp_mirror);*/
+		scene.push_back(sp_mirror);
 
 		createTallBox(scene, LIGHT);
 		createShortBox(scene, CORNELL_CEIL);
