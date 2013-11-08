@@ -29,9 +29,9 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, Camera *cam){
 			if (tree->intersect(r, ip)) {
 				float intensity = glm::dot(r.getDirection(), - ip.getNormal());
 				int id = calculateId(u, v);
-				pixels[id + 0] = intensity*ip.getMaterial().getDiffuseColor().x;
-				pixels[id + 1] = intensity*ip.getMaterial().getDiffuseColor().y;
-				pixels[id + 2] = intensity*ip.getMaterial().getDiffuseColor().z;
+				pixels[id + 0] = intensity*ip.getMaterial()->getDiffuseColor().x;
+				pixels[id + 1] = intensity*ip.getMaterial()->getDiffuseColor().y;
+				pixels[id + 2] = intensity*ip.getMaterial()->getDiffuseColor().z;
 			}
 			ProgressBar::printProgBar(rayCounter, total);	
 		}

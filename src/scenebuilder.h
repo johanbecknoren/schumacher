@@ -9,7 +9,7 @@ class SceneBuilder {
 private:
 	static void createShortBox(std::vector<Renderable *> &scene, material_t m) {
 		Quadrilateral *shortBlock1 = new Quadrilateral(CornellBoxFactory::createShortBlock1());
-		shortBlock1->setMaterial(LIGHT);//m);
+		shortBlock1->setMaterial(m);
 		scene.push_back(shortBlock1);
 
 		Quadrilateral *shortBlock2 = new Quadrilateral(CornellBoxFactory::createShortBlock2());
@@ -78,15 +78,24 @@ public:
 		Quadrilateral *boxFront = new Quadrilateral(CornellBoxFactory::createFront());
 		boxFront->setMaterial(CORNELL_CEIL);
 		scene.push_back(boxFront);
-		
-		createTallBox(scene, CORNELL_LEFT);
-		createShortBox(scene, LIGHT);
+
+		Sphere* sp_glass = new Sphere(1.5f, glm::vec3(3.f,-5.5f,17.5f) );
+		sp_glass->setMaterial(GLASS);
+		scene.push_back(sp_glass);
+
+/*		Sphere* sp_mirror = new Sphere(1.5f, glm::vec3(-3.f,0.f,22.0f) );
+		sp_mirror->setMaterial(MIRROR);
+		scene.push_back(sp_mirror);*/
+
+		createTallBox(scene, LIGHT);
+		createShortBox(scene, CORNELL_CEIL);
 
 		return scene;
 	}
 	static void destructCornellBox(std::vector<Renderable *> r) {
 		for (size_t i = 0; i < r.size(); ++i) {
-			delete r[i];
+            if (r[i] != NULL)
+                delete r[i];
 		}
 		
 	}

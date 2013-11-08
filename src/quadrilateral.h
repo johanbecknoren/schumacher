@@ -9,13 +9,13 @@ public:
 	Quadrilateral() {};
 	~Quadrilateral() {};
 
-	bool getIntersectionPoint(Ray *ray, IntersectionPoint &ip) const;
+	bool getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const;
 
 	virtual std::string asString() const;
 
 	virtual void createAABB();
 
-	void scale(float v);
+	void scale(const float v);
 	void translate(const glm::vec3&);
 private:
 	glm::vec3 _v00;

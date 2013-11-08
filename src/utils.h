@@ -10,10 +10,14 @@
 
 
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)
+#ifndef REFRACTION_AIR
 #define REFRACTION_AIR 1.000293f
+#endif
+#ifndef REFRACTION_GLASS
 #define REFRACTION_GLASS 1.52f
+#endif
 
 // Materials enums
-enum material_t { STONE, GLASS, MARBLE, LIGHT, MIRROR, CORNELL_CEIL, CORNELL_BACK, CORNELL_RIGHT, CORNELL_LEFT, CORNELL_FLOOR };
+enum material_t { STONE, GLASS, MARBLE, LIGHT, MIRROR, CORNELL_CEIL, CORNELL_BACK, CORNELL_RIGHT, CORNELL_LEFT, CORNELL_FLOOR, NUM_MATERIALS/*Leave in last slot*/ };
 
 #endif

@@ -38,10 +38,10 @@ glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
 	if (tree->intersect(ray, ip)) {
 		if (depth < maxDepth) {
 			color = phongShader(ray, ip, tree);
-			color *= ip.getMaterial().getAbsorbtion();
+			color *= ip.getMaterial()->getAbsorbtion();
 
 			Ray reflection = calculateReflection(ray, ip);
-			float absor = 1.0f - ip.getMaterial().getAbsorbtion();
+			float absor = 1.0f - ip.getMaterial()->getAbsorbtion();
 // 			if (color.x < 1.f && color.y < 1.f && color.y < 1.f) 
 			{
 				glm::vec3 rayColor = iterateRay(reflection, tree, depth + 1);
@@ -50,7 +50,7 @@ glm::vec3 WhittedTracer::iterateRay(Ray &ray, Octree *tree, int depth) {
 			
 		}
 		else {
-			color = ip.getMaterial().getAbsorbtion() * phongShader(ray, ip, tree);
+			color = ip.getMaterial()->getAbsorbtion() * phongShader(ray, ip, tree);
 		}
 	}
 	return color;
@@ -82,8 +82,8 @@ glm::vec3 WhittedTracer::phongShader(Ray &incoming, IntersectionPoint &ip, Octre
 			glm::vec3 R = 2 * a * surfaceNormal - L;
 			float vDotR =0 * pow(glm::max(glm::dot(R, V), 0.0f), 4);
 			
-			color += ip.getMaterial().getDiffuseColor() * nDotL; // Diffuse component
-			color += vDotR * ip.getMaterial().getDiffuseColor(); // Specular component
+			color += ip.getMaterial()->getDiffuseColor() * nDotL; // Diffuse component
+			color += vDotR * ip.getMaterial()->getDiffuseColor(); // Specular component
 			
 		}
 

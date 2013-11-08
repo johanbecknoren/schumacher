@@ -89,7 +89,7 @@ std::vector<const Renderable*> Octree::getLightList() const {
 	std::vector<const Renderable*> lightList;
 	for (size_t i = 0; i < _leafs.size(); ++i) {
 		const Renderable *r = _leafs[i].getRenderable();
-		if (r->getMaterial().getMaterialType() == LIGHT) {
+		if (r->getMaterial()->getMaterialType() == LIGHT) {
 			lightList.push_back(r);
 		}
 	}
@@ -104,11 +104,10 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
 bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
 	float lMin = FLT_MAX;
 	bool found = false;
-	std::vector<IntersectionPoint> ipvec;
 	
 	for (size_t i = 0; i < _leafs.size(); ++i) {
 		IntersectionPoint ip;
-		if (_leafs[i].getRenderable()->getIntersectionPoint(&ray, ip)) {
+		if (_leafs[i].getRenderable()->getIntersectionPoint(ray, ip)) {
 			glm::vec3 vec = ip.getPoint() - ray.getOrigin();
 			float len = glm::length((vec));
 			if(len < lMin && len < ray.getTMax()) {
@@ -145,7 +144,7 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 
 		while(leaf != NULL) {
 			IntersectionPoint i;
-			if (leaf->getRenderable()->getIntersectionPoint(&ray, i)) {
+			if (leaf->getRenderable()->getIntersectionPoint(ray, i)) {
 				pts.push_back(i);
 				hit = true;
 			}
@@ -205,13 +204,11 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 		float min = FLT_MAX;
 		int id = 0;
 		for (size_t i = 0; i < pts.size(); ++i) {
-// 			std::cout << glm::to_string(pts[i].getPoint()) << glm::to_string(ray.getOrigin()) << std::flush;
-			glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
+			// glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
 
-			float len = glm::length((vec));
+			float len = glm::distance(pts[i].getPoint(), ray.getOrigin());
 
 			if(len < min) {
-				
 				min = len;
 				id = i;
 			}
