@@ -75,7 +75,7 @@ bool AABB::IntersectT(Ray *ray, float *tmin, float *tmax) const {
 	return true;
 }
 
-IntersectionPoint* AABB::getIntersection(Ray& ray, bool getIntersectionNormal)  const {
+ bool AABB::getIntersection(Ray& ray, IntersectionPoint &ip, bool getIntersectionNormal)  const {
 	/* Algorithm from http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms */
 	glm::vec3 direction = glm::normalize(ray.getDirection());
 	glm::vec3 dirfrac;
@@ -98,13 +98,13 @@ IntersectionPoint* AABB::getIntersection(Ray& ray, bool getIntersectionNormal)  
 	if(tmax < 0.0f) { // Ray intersection, but whole AABB is behind us
 		t = tmax;
 		//std::cout<<"AABB.cpp - Intersection, but AABB behind us\n";
-		return NULL;
+		return false;
 	}
 
 	if(tmin > tmax) { // No intersection
 		t = tmax;
 		//std::cout<<"AABB.cpp - No intersection\n";
-		return NULL;
+		return false;
 	}
 
 	t = tmin; // Store length of ray until intersection in t
@@ -146,7 +146,8 @@ IntersectionPoint* AABB::getIntersection(Ray& ray, bool getIntersectionNormal)  
 		}
 	}
 	//return t;
-	return new IntersectionPoint(intP, surfNormal);
+    ip = IntersectionPoint(intP, surfNormal);
+	return true;
 }
 void AABB::print() const {
 	std::cout << _lowerLeftBack.x << " " 
