@@ -4,7 +4,6 @@ Sphere::Sphere(const float &radius, const glm::vec3 &position) {
 	_radius = radius;
 	_position = position;
 	createAABB();
-	_name = "Sphere";
 }
 
 void Sphere::createAABB() {
@@ -15,7 +14,7 @@ void Sphere::createAABB() {
 
 std::string Sphere::asString() const {
 	std::stringstream s;
-	s << _name << " p:[" << _position.x << " " << _position.y << " "
+	s << getName() << " p:[" << _position.x << " " << _position.y << " "
       << _position.z << "] r:" << _radius;
 	return s.str();
 }

@@ -5,16 +5,16 @@
 
 class Quadrilateral : public Renderable {
 public:
+	
 	Quadrilateral( const glm::vec3& v00, const glm::vec3& v10, const glm::vec3& v11, const glm::vec3& v01);
-	Quadrilateral() {};
 	~Quadrilateral() {};
 
 	bool getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const;
 
 	virtual std::string asString() const;
-
+	virtual std::string getName() const { return "Quadrilateral"; };
 	virtual void createAABB();
-
+	
 	void scale(const float v);
 	void translate(const glm::vec3&);
 private:

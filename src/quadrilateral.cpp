@@ -7,7 +7,6 @@ Quadrilateral::Quadrilateral( const glm::vec3& v00, const glm::vec3& v10, const 
 	_v10 = v10;
 	_v11 = v11;
 	createAABB();
-	_name = "Quadrilateral";
 }
 
 std::string Quadrilateral::asString() const {

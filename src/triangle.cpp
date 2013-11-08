@@ -2,7 +2,7 @@
 
 Triangle::Triangle(glm::vec3 ix0, glm::vec3 ix1, glm::vec3 ix2) : x1(ix1), x2(ix2), x0(ix0) {
 	normal = -glm::cross(x1 - x0, x2 - x0);
-	_name = "Triangle";
+
 	createAABB();
 }
 

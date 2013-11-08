@@ -7,7 +7,7 @@
 class IntersectionPoint {
 public:
 	IntersectionPoint() {};
-	IntersectionPoint(const glm::vec3& p, const glm::vec3& n, Material *m = new Material()) {
+	IntersectionPoint(const glm::vec3& p, const glm::vec3& n, Material *m = NULL) {
 		_point = p;
 		_surfaceNormal = n;
 		_material = m;
