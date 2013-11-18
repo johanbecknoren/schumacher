@@ -51,10 +51,12 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				float angle_in = acos(glm::dot( glm::normalize(ip.getNormal()), glm::normalize(ray.getDirection() * -1.0f) ));
 				float critical_angle = asin(snell);
 
+				ray.setRefractionIndex(REFRACTION_GLASS);
+
 				//TODO: correct reflectance acc. to Fresnel eq.
 				float reflectance_s = ip.getMaterial()->getOpacity();
 				Ray refl_ray = calculateReflection(ray, ip);
-				std::cout<<"ray refract="<<ray.getRefractionIndex()<<",angle_in="<<angle_in<<",critical_angle="<<critical_angle<<std::endl;
+//				std::cout<<"ray refract="<<ray.getRefractionIndex()<<",angle_in="<<angle_in<<",critical_angle="<<critical_angle<<std::endl;
 				if(angle_in > critical_angle) {// Calc and spawn refracted and reflected rays
 					// Only internal reflection
 					//std::cout<<"HERRRKKKA\n";
