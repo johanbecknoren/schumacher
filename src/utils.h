@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define EPSILON float(1e06)
+#define EPSILON 0.00001f//float(1e06)
 #define PI 3.1415926535897932384626433832795f
 
 // Viewport dimensions

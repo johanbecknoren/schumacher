@@ -41,20 +41,20 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 		if( (depth < _minDepth || !kill) && depth < _maxDepth) {
 			
 			rad = ip.getMaterial()->getEmission();
-			bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
+			bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) >= 0.0f) ? true : false;
 
 			if(isInsideObj && ip.getMaterial()->getMaterialType() == GLASS) { // If coming from inside obj going out into air (refraction needed)
 				float n2overn1 = REFRACTION_AIR / REFRACTION_GLASS;//ip.getMaterial()->getRefractionIndex(); // Should always be < 1
 				float n1overn2 = ip.getMaterial()->getRefractionIndex() / REFRACTION_AIR;
 				float snell = n2overn1;
 				ip.setNormal(-1.0f*ip.getNormal());
-				float angle_in = acos(glm::dot(ip.getNormal(), ray.getDirection() * -1.0f));
-				float critical_angle = acos(snell);
+				float angle_in = acos(glm::dot( glm::normalize(ip.getNormal()), glm::normalize(ray.getDirection() * -1.0f) ));
+				float critical_angle = asin(snell);
 
 				//TODO: correct reflectance acc. to Fresnel eq.
 				float reflectance_s = ip.getMaterial()->getOpacity();
 				Ray refl_ray = calculateReflection(ray, ip);
-				//std::cout<<"ray refract="<<ray.getRefractionIndex()<<",angle_in="<<angle_in<<",critical_angle="<<critical_angle<<std::endl;
+				std::cout<<"ray refract="<<ray.getRefractionIndex()<<",angle_in="<<angle_in<<",critical_angle="<<critical_angle<<std::endl;
 				if(angle_in > critical_angle) {// Calc and spawn refracted and reflected rays
 					// Only internal reflection
 					//std::cout<<"HERRRKKKA\n";
@@ -101,7 +101,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 				refl_ray = Ray(origin + dir * 0.0001f, dir);
 				float reflectance_s = ip.getMaterial()->getOpacity();
 
-				if(ip.getMaterial()->getOpacity() < 1.f-0.0001f) { // Do refraction + reflection
+				if(ip.getMaterial()->getOpacity() < 1.f-EPSILON) { // Do refraction + reflection
 
 					//std::cout<<"ip mat type:"<<ip.getMaterial()->getMaterialType()<<"ip refr idx:"<<ip.getMaterial()->getRefractionIndex();
 					Ray refr_ray = calculateRefraction(ray, ip);
