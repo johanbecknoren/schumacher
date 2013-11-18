@@ -12,8 +12,9 @@ public:
 													working(true),
 													_rayCounter(0),
 													_meanRayDepth(0),
-													_maxDepth(4),
-													_raysPerPixel(25)
+													_maxDepth(10),
+													_minDepth(4),
+													_raysPerPixel(20)
 	{};
 	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 
@@ -61,9 +62,9 @@ private:
 	Rng _rgen;
 	int _meanRayDepth;
 	int _maxDepth;
+	int _minDepth;
 	int _raysPerPixel;
-
-};
+	};
 
 
 #endif

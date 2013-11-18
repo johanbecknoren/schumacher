@@ -51,6 +51,12 @@ private:
 		scene.push_back(tallBlock5);
 	}
 	
+	static void createLightSourceQuad(std::vector<Renderable *> &scene, material_t m) {
+		Quadrilateral *lightQuad = new Quadrilateral(CornellBoxFactory::createLightSourceQuad());
+		lightQuad->setMaterial(m);
+		scene.push_back(lightQuad);
+	}
+	
 public:	
 	
 	static std::vector<Renderable *> createCornellBox() {
@@ -89,6 +95,7 @@ public:
 
 		createTallBox(scene, LIGHT);
 		createShortBox(scene, CORNELL_CEIL);
+		createLightSourceQuad(scene, LIGHT);
 
 		return scene;
 	}

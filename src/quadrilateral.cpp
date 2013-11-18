@@ -143,7 +143,7 @@ bool Quadrilateral::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const 
 		v = beta / ((u * (beta_11 - float(1.0))) + float(1.0)); 
 	}
 
-	glm::vec3 iPoint = ray.getOrigin() + t * ray.getDirection();
+	glm::vec3 iPoint = ray.getOrigin() + t * ray.getDirection();// - 0.0001f*ray.getDirection();
 	glm::vec3 sN = glm::normalize( glm::cross(_v00-_v10, _v00-_v11) );
 
 /*	if(glm::dot(ray.getDirection(), sN) > 0.0f) // Draw the quad from both directions

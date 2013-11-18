@@ -23,7 +23,13 @@ public:
 		_material = ip.getMaterial();
 	}
 
-	~IntersectionPoint() {};
+	~IntersectionPoint() { 
+/*		if(_material == NULL) {
+			std::cout << "Material null\n";
+			delete _material;
+		} else
+			std::cout << "Material not null\n";*/
+	};
 	std::string asString() const { 
 		std::stringstream s;
 		s << _point.x << " " << _point.y << " " << _point.z; 
@@ -35,7 +41,8 @@ public:
 
 	void setPoint(const glm::vec3 &p) { _point = p; }
 	void setNormal(const glm::vec3 &n) { _surfaceNormal = n; }
-	void setMaterial(const Material &m) { _material = new Material(m); }
+	//void setMaterial(const Material &m) { _material = new Material(m); }
+	void setMaterial(const material_t& m) { _material = MaterialManager::get(m); }
 
 private:
 	glm::vec3 _point;

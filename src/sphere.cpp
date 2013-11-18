@@ -67,7 +67,7 @@ bool Sphere::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 			t = t0;
 
 		//ray.print();
-		glm::vec3 intP = ray.getOrigin() + glm::normalize(ray.getDirection())*t;
+		glm::vec3 intP = ray.getOrigin() + glm::normalize(ray.getDirection())*t + 0.0001f*ray.getDirection();
 		glm::vec3 surfNormal = glm::normalize(intP - _position);
 		ip = IntersectionPoint(intP, surfNormal, getMaterial());
 

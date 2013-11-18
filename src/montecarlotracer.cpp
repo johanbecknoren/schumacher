@@ -35,21 +35,22 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 		// Do russian roulette to terminate rays.
 		float russianRandom = _rgen.nextFloat();
 
-		float killRange = 0.7f;
+		float killRange = 0.9f;
 		if (killRange < russianRandom) kill = true;
 		
-		if(depth < _maxDepth || !kill) {
+		if( (depth < _minDepth || !kill) && depth < _maxDepth) {
 			
 			rad = ip.getMaterial()->getEmission();
 			bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) > 0.0f) ? true : false;
 
 			if(isInsideObj && ip.getMaterial()->getMaterialType() == GLASS) { // If coming from inside obj going out into air (refraction needed)
-				float n2overn1 = REFRACTION_AIR / ip.getMaterial()->getRefractionIndex(); // Should always be < 1
+				float n2overn1 = REFRACTION_AIR / REFRACTION_GLASS;//ip.getMaterial()->getRefractionIndex(); // Should always be < 1
 				float n1overn2 = ip.getMaterial()->getRefractionIndex() / REFRACTION_AIR;
 				float snell = n2overn1;
 				ip.setNormal(-1.0f*ip.getNormal());
-				float critical_angle = asin(snell);
 				float angle_in = acos(glm::dot(ip.getNormal(), ray.getDirection() * -1.0f));
+				float critical_angle = acos(snell);
+
 				//TODO: correct reflectance acc. to Fresnel eq.
 				float reflectance_s = ip.getMaterial()->getOpacity();
 				Ray refl_ray = calculateReflection(ray, ip);
@@ -64,11 +65,11 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 					ip.getMaterial()->setRefractionIndex(REFRACTION_GLASS); // TODO should not be hardcoded, but old_refr_idx always returns REFRACTION_AIR and never glass.
 					//std::cout<<"ip mat type:"<<ip.getMaterial()->getMaterialType()<<"old ip refr idx"<<old_refr_idx<<"ip refr idx:"<<ip.getMaterial()->getRefractionIndex();
 //					std::cout<<"derrp";
-/*					float reflectance_s_nom = (ray.getRefractionIndex()*angle_in) -
+					float reflectance_s_nom = (ray.getRefractionIndex()*angle_in) -
 		 				(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), ip.getNormal()));
 					float reflectance_s_denom = (ray.getRefractionIndex()*angle_in) +
-						(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), ip.getNormal()));*/
-				//	reflectance_s = (reflectance_s_nom/reflectance_s_denom) * (reflectance_s_nom/reflectance_s_denom);
+						(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), ip.getNormal()));
+//					reflectance_s = (reflectance_s_nom/reflectance_s_denom) * (reflectance_s_nom/reflectance_s_denom);
 //					rad += (1.0f-reflectance_s) *
 					rad += (1.0f - ip.getMaterial()->getOpacity()) * 
 						ip.getMaterial()->getDiffuseColor()*iterateRay(refr_ray, tree, depth + 1, kill);
@@ -105,14 +106,14 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 					//std::cout<<"ip mat type:"<<ip.getMaterial()->getMaterialType()<<"ip refr idx:"<<ip.getMaterial()->getRefractionIndex();
 					Ray refr_ray = calculateRefraction(ray, ip);
 					//std::cout<<"orig dir: "<<glm::to_string(ray.getDirection())<<"refr dir: "<<glm::to_string(refr_ray.getDirection())<<std::endl;
-//					float angle_in = glm::dot(ip.getNormal(), ray.getDirection()*-1.0f);
+					float angle_in = glm::dot(ip.getNormal(), ray.getDirection()*-1.0f);
 					//std::cout<<"angle_in = "<<angle_in<<std::endl;
 
-/*					float reflectance_s_nom = (ray.getRefractionIndex()*angle_in) -
+					float reflectance_s_nom = (ray.getRefractionIndex()*angle_in) -
 		 				(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), -ip.getNormal()));
 					float reflectance_s_denom = (ray.getRefractionIndex()*angle_in) +
-						(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), -ip.getNormal()));*/
-					//reflectance_s = (reflectance_s_nom/reflectance_s_denom) * (reflectance_s_nom/reflectance_s_denom);
+						(ip.getMaterial()->getRefractionIndex() * glm::dot(refr_ray.getDirection(), -ip.getNormal()));
+//					reflectance_s = (reflectance_s_nom/reflectance_s_denom) * (reflectance_s_nom/reflectance_s_denom);
 
 //					std::cout<<"reflectance_s = "<<reflectance_s<<std::endl;
 //					rad += (1.0f-reflectance_s) * 
