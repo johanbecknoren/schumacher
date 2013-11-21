@@ -1,5 +1,5 @@
 #include "triangle.h"
-
+#include "glmprint.h"
 
 Triangle::Triangle(glm::vec3 ix0, glm::vec3 ix1, glm::vec3 ix2) : x1(glm::vec3(ix1)),
 																  x2(glm::vec3(ix2)),
@@ -25,10 +25,11 @@ bool Triangle::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 	if (T < 0.f) return false;
 	glm::vec3 newPos = ray.getOrigin() + T * ray.getDirection();
 
-	float v = 1.f;
+	float v = -1.f;
 	if(glm::dot(ray.getDirection(), normal) > 0.0f) // Draw the quad from both directions
-		v = -1.0f;
-	ip = IntersectionPoint(newPos, normal * v, getMaterial()); 
+		v = 1.0f;
+
+	ip = IntersectionPoint(newPos, normal * v, this->getMaterial()); 
 	
 	return true;
 }
