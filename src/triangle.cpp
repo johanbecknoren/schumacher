@@ -1,6 +1,5 @@
 #include "triangle.h"
 
-#include "glmprint.h"
 
 Triangle::Triangle(glm::vec3 ix0, glm::vec3 ix1, glm::vec3 ix2) : x1(glm::vec3(ix1)),
 																  x2(glm::vec3(ix2)),
@@ -41,7 +40,6 @@ void Triangle::createAABB() {
 	if (upper.x == lower.x) upper.x += 0.1f;
 	if (upper.y == lower.y) upper.y += 0.1f;
 	if (upper.z == lower.z) upper.z += 0.1f;
-	std::cout << __FILE__ << upper << lower << std::endl;
 
 	this->_boundingBox.reset( new AABB(lower, upper));
 } 

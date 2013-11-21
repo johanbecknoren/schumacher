@@ -221,6 +221,6 @@ private:
 };
 
 
-	float CornellBoxFactory::_scaleFactor = 0.025f;
-	glm::vec3 CornellBoxFactory::_t = glm::vec3(-7.f,-6.8f,15.6f);//glm::vec3(-278.f,-273.f,800.f);
+float CornellBoxFactory::_scaleFactor = 0.025f;
+glm::vec3 CornellBoxFactory::_t = glm::vec3(-7.f,-6.8f,15.6f);//glm::vec3(-278.f,-273.f,800.f);
 #endif

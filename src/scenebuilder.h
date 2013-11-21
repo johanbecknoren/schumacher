@@ -50,6 +50,7 @@ private:
 
 		Quadrilateral *tallBlock5 = new Quadrilateral(CornellBoxFactory::createTallBlock5());
 		tallBlock5->setMaterial(m);
+		std::cout << tallBlock5->asString() << std::endl;
 		scene.push_back(tallBlock5);
 	}
 	
@@ -61,7 +62,13 @@ private:
 
 	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
 		Mesh *mesh = new Mesh();
-		std::vector<Triangle> triangles = mesh->createTriangles("../models/box.obj");
+		std::vector<Triangle *> *triangles = mesh->createTriangles("../models/box.obj");
+		std::cout << triangles->at(0)->asString() << std::endl;
+		for (unsigned int s = 0; s < triangles->size(); ++s) {
+			triangles->at(s)->setMaterial(m);
+			triangles->at(s)->translate(glm::vec3(0, -40, 0));
+			scene.push_back(triangles->at(s));
+		}
 	}
 	
 public:	
