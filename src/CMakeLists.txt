@@ -17,6 +17,7 @@ list(APPEND schumacher_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/externals/glm
 	${CMAKE_SOURCE_DIR}/externals/assimp
  	${CMAKE_SOURCE_DIR}/externals/FreeImage  
+    ${CMAKE_SOURCE_DIR}/externals/tinyobjloader
 )
 
 if (USE_OPENGL)
@@ -35,9 +36,13 @@ list(APPEND schumacher_INCLUDE_DIRS
 FILE(GLOB_RECURSE SFMT_H ${CMAKE_SOURCE_DIR}/sfmt/*.h*)
 FILE(GLOB_RECURSE SFMT_CPP ${CMAKE_SOURCE_DIR}/sfmt/*.c)
 
-list(APPEND HEADERS ${SFMT_H})
+FILE(GLOB_RECURSE TNYOBJ_H ${CMAKE_SOURCE_DIR}/externals/tinyobjloader/*.h*)
+FILE(GLOB_RECURSE TNYOBJ_CPP ${CMAKE_SOURCE_DIR}/externals/tinyobjloader/*.cc)
 
-list(APPEND SRCS ${SFMT_CPP})
+
+list(APPEND HEADERS ${SFMT_H} ${TNYOBJ_H})
+
+list(APPEND SRCS ${SFMT_CPP} ${TNYOBJ_CPP})
 
 add_definitions(-DSFMT_MEXP=19937)
 
@@ -62,7 +67,7 @@ endif()
 add_executable(schumacher ${HEADERS} ${SRCS} )
 
 if(WIN32)
-	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib glew32.lib)
+	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib assimp.lib)
 endif(WIN32)
 
 if(UNIX)
