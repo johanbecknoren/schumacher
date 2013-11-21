@@ -5,11 +5,12 @@
 #include "intersectionpoint.h"
 #include "utils.h"
 #include "materialmanager.h"
+#include <memory>
 
 class Renderable {
  public:
-    virtual ~Renderable() { if (_boundingBox != NULL) delete _boundingBox; };
-    AABB *getBoundingBox() { return _boundingBox; };
+    virtual ~Renderable() { };
+    AABB *getBoundingBox() { return _boundingBox.get(); };
     virtual bool getIntersectionPoint(Ray &ray,  IntersectionPoint &ip) const = 0;
 	virtual std::string getName() const { return "No name"; };
 	virtual std::string asString() const { return "asString() not implemented for " + getName(); };
@@ -28,7 +29,7 @@ class Renderable {
 	Material* getMaterial() const { return _material; }
 	void updateAABB() { createAABB(); }
  protected:
-    AABB *_boundingBox;
+	std::shared_ptr<AABB> _boundingBox;
 	Material *_material;
     virtual void createAABB() = 0;
 };

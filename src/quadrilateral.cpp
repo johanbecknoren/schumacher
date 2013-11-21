@@ -171,7 +171,7 @@ void Quadrilateral::createAABB(){
 		uRF.z += 0.0001f;
 
 	if((_boundingBox == NULL))
-		this->_boundingBox = new AABB(lLB, uRF);
+		this->_boundingBox.reset( new AABB(lLB, uRF));
 	else {
 		_boundingBox->setLowerLeftBack(lLB);
 		_boundingBox->setUpperRightFront(uRF);

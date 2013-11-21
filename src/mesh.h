@@ -11,6 +11,7 @@ public:
 	~Mesh();
 private:
 	std::vector<glm::vec3> verts;
+	std::vector<Triangle> triangles;
 };
 
 #endif

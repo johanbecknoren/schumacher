@@ -11,17 +11,8 @@ Mesh::Mesh() {
 }
 
 std::vector<Triangle> Mesh::createTriangles(std::string objName) {
-	std::vector<Triangle> triangles = std::vector<Triangle>();
+	triangles = std::vector<Triangle>();
 	verts = std::vector<glm::vec3>();
-
-	std::ifstream fin(objName.c_str());
-	if (!fin.fail()) {
-		fin.close();
-	}
-	else {
-		std::cout << "Couldn\'t find file " << objName << std::endl;
-		return triangles;
-	}
 
     std::vector<tinyobj::shape_t> shapes;
     std::string err = tinyobj::LoadObj(shapes, objName.c_str());
@@ -45,23 +36,24 @@ std::vector<Triangle> Mesh::createTriangles(std::string objName) {
 		std::cout << verts.size() << " verts loaded.\n";
 
         for (unsigned int i = 0; i < numFaces; ++i) {
-			//std::cout << "Creating face " << i << std::endl;
-			//
-			//std::vector<unsigned int> val = std::vector<unsigned int>(3);
-			//for (unsigned int u = 0; u < 3; ++u) {
-   //             val[u] = shapes[n].mesh.indices[i * 3 + u + vertOffset];
-			//}
+			std::cout << "Creating face " << i << std::endl;
+			
+			std::vector<unsigned int> val = std::vector<unsigned int>(3);
+			for (unsigned int u = 0; u < 3; ++u) {
+               val[u] = shapes[n].mesh.indices[i * 3 + u + vertOffset];
+			}
 
-			//std::cout  <<" " << val[0] <<" " << val[1] << " " << val[2] <<" " <<
-			//	  " created\n";
-			//
-			//glm::vec3 v0 = verts[val[0]];
-			//glm::vec3 v1 = verts[val[1]];
-			//glm::vec3 v2 = verts[val[2]];
-			//
-			//std::cout << v0 << v1 << v2;
-			//triangles.push_back(Triangle(v0, v1, v2));
-			//std::cout << "dune\n";
+			std::cout  <<" " << val[0] <<" " << val[1] << " " << val[2] <<" " <<
+				  " created\n";
+			
+			glm::vec3 v0 = verts[val[0]];
+			glm::vec3 v1 = verts[val[1]];
+			glm::vec3 v2 = verts[val[2]];
+			
+			std::cout << v0 << v1 << v2;
+			Triangle t = Triangle(v0, v1, v2);
+			triangles.push_back(t);
+			std::cout << "dune\n";
 		}
 		std::cout << "Mesh " << n << " loaded\n";
 		vertOffset += numVerts;

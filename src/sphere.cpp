@@ -9,7 +9,7 @@ Sphere::Sphere(const float &radius, const glm::vec3 &position) {
 void Sphere::createAABB() {
 	glm::vec3 lLB(_position.x-_radius, _position.y-_radius, _position.z-_radius);
 	glm::vec3 uRF(_position.x+_radius, _position.y+_radius, _position.z+_radius);
-	this->_boundingBox = new AABB(lLB, uRF, _position);
+	this->_boundingBox.reset(new AABB(lLB, uRF, _position));
 }
 
 std::string Sphere::asString() const {

@@ -2,14 +2,9 @@
 
 #include "glmprint.h"
 
-Triangle::Triangle(glm::vec3 ix0, glm::vec3 ix1, glm::vec3 ix2) : x1(new glm::vec3(ix1)),
-																  x2(new glm::vec3(ix2)),
-																  x0(new glm::vec3(ix0)) {
-	normal = -glm::cross((x1) - (x0), (x2) - (x0));
-	createAABB();
-}
-
-Triangle::Triangle(glm::vec3 *ix0, glm::vec3 *ix1, glm::vec3 *ix2) : x1(ix0), x2(ix1), x0(ix0) {
+Triangle::Triangle(glm::vec3 ix0, glm::vec3 ix1, glm::vec3 ix2) : x1(glm::vec3(ix1)),
+																  x2(glm::vec3(ix2)),
+																  x0(glm::vec3(ix0)) {
 	normal = -glm::cross((x1) - (x0), (x2) - (x0));
 	createAABB();
 }
@@ -48,7 +43,7 @@ void Triangle::createAABB() {
 	if (upper.z == lower.z) upper.z += 0.1f;
 	std::cout << __FILE__ << upper << lower << std::endl;
 
-	this->_boundingBox = new AABB(lower, upper);
+	this->_boundingBox.reset( new AABB(lower, upper));
 } 
 
 void Triangle::translate(const glm::vec3 &t) {
