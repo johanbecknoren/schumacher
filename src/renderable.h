@@ -8,7 +8,7 @@
 
 class Renderable {
  public:
-    virtual ~Renderable() { delete _boundingBox;delete _material; };
+    virtual ~Renderable() { if (_boundingBox != NULL) delete _boundingBox; };
     AABB *getBoundingBox() { return _boundingBox; };
     virtual bool getIntersectionPoint(Ray &ray,  IntersectionPoint &ip) const = 0;
 	virtual std::string getName() const { return "No name"; };

@@ -4,6 +4,8 @@
 #include <vector>
 #include "cornellboxfactory.h"
 #include "quadrilateral.h"
+#include "mesh.h"
+
 class SceneBuilder {
 
 private:
@@ -56,6 +58,11 @@ private:
 		lightQuad->setMaterial(m);
 		scene.push_back(lightQuad);
 	}
+
+	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
+		Mesh *mesh = new Mesh();
+		std::vector<Triangle> triangles = mesh->createTriangles("../models/box.obj");
+	}
 	
 public:	
 	
@@ -96,9 +103,12 @@ public:
 		createTallBox(scene, LIGHT);
 		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
-
+		createBunny(scene, CORNELL_CEIL);
 		return scene;
 	}
+
+	
+	
 	static void destructCornellBox(std::vector<Renderable *> r) {
 		for (size_t i = 0; i < r.size(); ++i) {
             if (r[i] != NULL)

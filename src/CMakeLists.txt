@@ -66,7 +66,7 @@ if(WIN32)
 endif(WIN32)
 
 if(UNIX)
-	target_link_libraries(schumacher freeimage ${EXTRA_LIBS})
+	target_link_libraries(schumacher freeimage assimp ${EXTRA_LIBS})
 endif(UNIX)
 
 
