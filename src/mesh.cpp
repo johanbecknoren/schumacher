@@ -3,16 +3,16 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <fstream>
-
+#include <assimp/cimport.h>
 #include "glmprint.h"
 
 Mesh::Mesh() {
 	
 }
 
-std::vector<Triangle> Mesh::createTriangles(std::string objName) const {
+std::vector<Triangle> Mesh::createTriangles(std::string objName) {
 	std::vector<Triangle> triangles = std::vector<Triangle>();
-	std::vector<glm::vec3> verts = std::vector<glm::vec3>();
+	verts = std::vector<glm::vec3>();
 	Assimp::Importer importer = Assimp::Importer();
 	std::ifstream fin(objName.c_str());
 	if (!fin.fail()) {
@@ -43,7 +43,7 @@ std::vector<Triangle> Mesh::createTriangles(std::string objName) const {
 		}
 		std::cout << verts.size() << " verts loaded.\n";
 
-		for (unsigned int i = 0; i < numFaces; ++i) {
+		for (unsigned int i = 0; i < 8; ++i) {
 			std::cout << "Creating face " << i << std::endl;
 			const struct aiFace *face = &mesh->mFaces[i];
 			std::vector<unsigned int> val = std::vector<unsigned int>(3);
@@ -78,6 +78,6 @@ std::vector<Triangle> Mesh::createTriangles(std::string objName) const {
 		std::cout << "Mesh " << n << " loaded\n";
 		vertOffset += numVerts;
 	}
-	
+	aiReleaseImport(scene);
 	return triangles;
 }

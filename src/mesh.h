@@ -7,9 +7,10 @@ class Mesh{
 public:
 	
 	Mesh();
-	std::vector<Triangle> createTriangles(std::string objName) const;
+	std::vector<Triangle> createTriangles(std::string objName);
 	~Mesh();
-	
+private:
+	std::vector<glm::vec3> verts;
 };
 
 #endif

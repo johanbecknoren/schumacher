@@ -47,7 +47,9 @@ void Triangle::createAABB() {
 	if (upper.y == lower.y) upper.y += 0.1f;
 	if (upper.z == lower.z) upper.z += 0.1f;
 	std::cout << __FILE__ << upper << lower << std::endl;
-	this->_boundingBox = new AABB(lower, upper);
+	AABB *bb;
+	bb = new AABB(lower, upper);
+	this->_boundingBox = bb;
 } 
 
 void Triangle::translate(const glm::vec3 &t) {
