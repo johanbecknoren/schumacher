@@ -50,7 +50,6 @@ private:
 
 		Quadrilateral *tallBlock5 = new Quadrilateral(CornellBoxFactory::createTallBlock5());
 		tallBlock5->setMaterial(m);
-		std::cout << tallBlock5->asString() << std::endl;
 		scene.push_back(tallBlock5);
 	}
 	
@@ -62,11 +61,14 @@ private:
 
 	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
 		Mesh *mesh = new Mesh();
-		std::vector<Triangle *> *triangles = mesh->createTriangles("../models/box.obj");
-		std::cout << triangles->at(0)->asString() << std::endl;
+		std::vector<Triangle *> *triangles = mesh->createTriangles("../models/bunny_small.obj");
+		
 		for (unsigned int s = 0; s < triangles->size(); ++s) {
 			triangles->at(s)->setMaterial(m);
-			triangles->at(s)->translate(glm::vec3(0, -40, 0));
+			triangles->at(s)->translate(glm::vec3(0, -45, 0));
+			
+			// triangles->at(s)->scale(0.2);
+			// std::cout << triangles->at(s)->asString() << std::endl;
 			scene.push_back(triangles->at(s));
 		}
 	}
@@ -97,7 +99,7 @@ public:
 
 		Quadrilateral *boxFront = new Quadrilateral(CornellBoxFactory::createFront());
 		boxFront->setMaterial(CORNELL_CEIL);
-		scene.push_back(boxFront);
+		// scene.push_back(boxFront);
 
 		Sphere* sp_glass = new Sphere(1.5f, glm::vec3(3.f,-5.5f,17.5f) );
 		sp_glass->setMaterial(GLASS);
@@ -110,7 +112,7 @@ public:
 		createTallBox(scene, LIGHT);
 		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
-		createBunny(scene, CORNELL_CEIL);
+		createBunny(scene, CORNELL_LEFT);
 		return scene;
 	}
 

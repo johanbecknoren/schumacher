@@ -97,8 +97,8 @@ std::vector<const Renderable*> Octree::getLightList() const {
 }
 
 bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
-	return intersectSimple(ray, isect);
-	// return intersectHard(ray, isect);
+	// return intersectSimple(ray, isect);
+	return intersectHard(ray, isect);
 }
 
 bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {

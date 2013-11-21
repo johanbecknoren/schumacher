@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 	std::vector<Renderable *> scene = SceneBuilder::createCornellBox();
 	tree->addObject(scene);
 
-	tree->print();
+	// tree->print();
 	float* pixels = new float[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
 #ifdef USE_OPENGL
@@ -59,15 +59,15 @@ int main(int argc, char **argv) {
     glfwSwapInterval(0);
 #endif
 	
-//	SimpleRaycaster caster(WIDTH, HEIGHT);
+	SimpleRaycaster caster(WIDTH, HEIGHT);
 //	WhittedTracer wTracer(WIDTH, HEIGHT);
 
-	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
+	// MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
 
-    mTracer.render(pixels, tree, cam, singleThread, renderDuring);
+    // mTracer.render(pixels, tree, cam, singleThread, renderDuring);
 //	wTracer.render(pixels, tree, cam);
 
-	// caster.render(pixels, tree, cam);	
+	caster.render(pixels, tree, cam);	
 
 	for(int i = 0; i < 3 * WIDTH * HEIGHT; ++i)
 		pixelsInt[i] = int(pixels[i] * 255.0f);
