@@ -163,12 +163,18 @@ void Quadrilateral::createAABB(){
 		glm::max( glm::max(_v00.y,_v01.y), glm::max(_v10.y,_v11.y) ),
 		glm::max( glm::max(_v00.z,_v01.z), glm::max(_v10.z,_v11.z) ));
 
-	if ( (lLB.x - uRF.x) < eps)
+	if ( (lLB.x - uRF.x) < eps){
 		uRF.x += 0.0001f;
-	if ( (lLB.y - uRF.y) < eps)
+		lLB.x -= 0.0001f;
+	}
+	if ( (lLB.y - uRF.y) < eps) {
 		uRF.y += 0.0001f;
-	if ( (lLB.z - uRF.z) < eps)
+		lLB.x -= 0.0001f;
+	}
+	if ( (lLB.z - uRF.z) < eps) {
 		uRF.z += 0.0001f;
+		lLB.x -= 0.0001f;
+	}
 
 	if((_boundingBox == NULL))
 		this->_boundingBox.reset( new AABB(lLB, uRF));
