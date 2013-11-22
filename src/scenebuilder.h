@@ -5,7 +5,7 @@
 #include "cornellboxfactory.h"
 #include "quadrilateral.h"
 #include "mesh.h"
-
+#include "imageexporter.h"
 class SceneBuilder {
 
 private:
@@ -61,8 +61,10 @@ private:
 
 static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3 t, float scale, std::string name) {
 	Mesh *mesh = new Mesh();
+
+	#pragma GCC diagnostic ignored "-Wwrite-strings"
 	std::vector<Triangle *> *triangles =
-		mesh->createTriangles(name.c_str());
+		mesh->createTriangles(merge(CMAKE_SOURCE_DIR,(char*) name.c_str()));
 	
 	for (unsigned int s = 0; s < triangles->size(); ++s) {
 		Triangle *tri = (*triangles)[s];
@@ -80,16 +82,17 @@ static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3
 		Triangle *tri = (*triangles)[s];
 		std::cout << tri->asString() << std::endl;
 	}
-	mesh->updateBbox();
-	mesh->printBbox();
+	// mesh->updateBbox();
+	// mesh->printBbox();
 }
 	
 	static void createSmallObj(std::vector<Renderable *> &scene, material_t m) {
-		createMesh(scene, m, glm::vec3(-3, 1, 15), .07f, "../models/box.obj");
+		
+		createMesh(scene, m, glm::vec3(-3, 1, 15), .07f, "/models/box.obj");
 	}
 	
 	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
-		createMesh(scene, m, glm::vec3(-1, -3, 20.), 10.f, "../models/bunny_small.obj");	
+		createMesh(scene, m, glm::vec3(-1, -3, 20.), 10.f, "/models/bunny_small.obj");	
 	}
 	
 public:	
