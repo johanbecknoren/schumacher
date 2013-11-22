@@ -201,7 +201,7 @@ void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam, bool 
 	std::vector<std::thread> threads;
 	// Start threads
 	
-	for (int row = 0; row < _H; ++row) {
+	for (int row = _H - 1; row >= 0 ; --row) {
 		for (int i = 0; i < NUM_THREADS; ++i) {
 			ThreadData thd(i, row, NUM_THREADS);
 			threads.push_back(std::thread(&MonteCarloRayTracer::threadRender, this,

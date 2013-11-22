@@ -65,11 +65,11 @@ private:
 			mesh->createTriangles("../models/bunny_small.obj");
 		
 		for (unsigned int s = 0; s < triangles->size(); ++s) {
-			triangles->at(s)->setMaterial(m);
-			
 			Triangle *tri = (*triangles)[s];
-			tri->scale(0.2);
-			// tri->translate(glm::vec3(.0, 0.01, 10));
+			tri->setMaterial(m);
+			
+			// tri->scale(0.2);
+			tri->translate(glm::vec3(.0, 0.01, 1));
 
 			// triangles->at(s)->scale(0.2);
 
@@ -104,8 +104,8 @@ public:
 		scene.push_back(boxLeft);
 
 		Quadrilateral *boxFront = new Quadrilateral(CornellBoxFactory::createFront());
-		boxFront->setMaterial(CORNELL_CEIL);
-		// scene.push_back(boxFront);
+		boxFront->setMaterial(CORNELL_BACK);
+		scene.push_back(boxFront);
 
 		Sphere* sp_glass = new Sphere(1.5f, glm::vec3(3.f,-5.5f,17.5f) );
 		sp_glass->setMaterial(GLASS);
@@ -118,7 +118,7 @@ public:
 		createTallBox(scene, LIGHT);
 		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
-		createBunny(scene, CORNELL_LEFT);
+		// createBunny(scene, CORNELL_LEFT);
 		// Triangle * t = new Triangle(glm::vec3(-1, -1, 2), glm::vec3(-1, 1, 1),
 									// glm::vec3(1, 1, 1));
 		// t->setMaterial(CORNELL_LEFT);

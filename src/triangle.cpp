@@ -23,7 +23,11 @@ bool Triangle::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
     if (V < 0.f || U + V > 1.f) return false;
     float T = glm::dot(edge2, qvec) * invDet;
 	if (T < 0.f) return false;
-	glm::vec3 newPos = ray.getOrigin() + T * ray.getDirection();
+
+	float dt = glm::dot(x1 - ray.getOrigin(), normal) /
+		glm::dot(ray.getDirection(), normal);
+	
+	glm::vec3 newPos = ray.getOrigin() + dt * ray.getDirection();
 
 	float v = 1.f;
 	if(glm::dot(ray.getDirection(), normal) > 0.0f) // Draw the quad from both directions
