@@ -63,6 +63,8 @@ if(CMAKE_CURRENT_BINARY_DIR)
 else()
 	add_definitions(-DCMAKE_BINARY_DIR=\"\")
 endif()
+get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} PATH)
+add_definitions(-DCMAKE_SOURCE_DIR=\"${PARENT_DIR}\")
 
 add_executable(schumacher ${HEADERS} ${SRCS} )
 

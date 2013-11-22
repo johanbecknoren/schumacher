@@ -1,7 +1,7 @@
 #include "octree.h"
-#include "sphere.h"
+// #include "sphere.h"
 #include <climits>
-
+#include "glmprint.h"
 #define USE_OCTREE
 
 Node::Node(int nodeDepth, AABB nodeBoundingBox) {
@@ -162,7 +162,8 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 				float max, tplane;
 				// If colliding with octree child boxes
 				if (node->getChild(i)->getBoundingBox()->IntersectT(&ray, &tplane, &max)) {
-					if(tplane < mint && tplane > 0) {
+					if(tplane < mint && tplane > 0)
+					{
 						if (id != -1) {
 							todo[todoPos].node = node->getChild(i);
 							todo[todoPos].tmin = mint;
@@ -173,7 +174,8 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 						mint = tplane;
 						maxt = max;
 					}
-					else {
+					else
+					{
 						todo[todoPos].node = node->getChild(i);
 						todo[todoPos].tmin = tplane;
 						todo[todoPos].tmax = max;
@@ -209,7 +211,7 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 		for (size_t i = 0; i < pts.size(); ++i) {
 			// glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
 
-			float len = glm::distance(pts[i].getPoint(), ray.getOrigin());
+			float len = glm::distance(ray.getOrigin(), pts[i].getPoint());
 
 			if(len < min && len > 0) {
 				min = len;

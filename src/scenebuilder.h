@@ -5,7 +5,7 @@
 #include "cornellboxfactory.h"
 #include "quadrilateral.h"
 #include "mesh.h"
-
+#include "imageexporter.h"
 class SceneBuilder {
 
 private:
@@ -59,24 +59,40 @@ private:
 		scene.push_back(lightQuad);
 	}
 
-	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
-		Mesh *mesh = new Mesh();
-		std::vector<Triangle *> *triangles =
-			mesh->createTriangles("../models/bunny_small.obj");
+static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3 t, float scale, std::string name) {
+	Mesh *mesh = new Mesh();
+
+	#pragma GCC diagnostic ignored "-Wwrite-strings"
+	std::vector<Triangle *> *triangles =
+		mesh->createTriangles(merge(CMAKE_SOURCE_DIR,(char*) name.c_str()));
+	
+	for (unsigned int s = 0; s < triangles->size(); ++s) {
+		Triangle *tri = (*triangles)[s];
+		tri->setMaterial(m);
+		glm::vec3 center = mesh->getCenter();
+		tri->translate(-center);
+		tri->scale(scale);
+		tri->translate(center);
+		tri->translate(t);
 		
-		for (unsigned int s = 0; s < triangles->size(); ++s) {
-			Triangle *tri = (*triangles)[s];
-			tri->setMaterial(m);
-			
-			// tri->scale(0.2);
-			tri->translate(glm::vec3(.0, 0.01, 1));
-
-			// triangles->at(s)->scale(0.2);
-
-			scene.push_back(tri);
-		}
-		mesh->updateBbox();
-		mesh->printBbox();
+		scene.push_back(tri);
+	}
+	unsigned r = (4 < triangles->size()) ? 4 : triangles->size();
+	for (unsigned int s = 0; s < r; ++s) {
+		Triangle *tri = (*triangles)[s];
+		std::cout << tri->asString() << std::endl;
+	}
+	// mesh->updateBbox();
+	// mesh->printBbox();
+}
+	
+	static void createSmallObj(std::vector<Renderable *> &scene, material_t m) {
+		
+		createMesh(scene, m, glm::vec3(-3, 1, 15), .07f, "/models/box.obj");
+	}
+	
+	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
+		createMesh(scene, m, glm::vec3(-1, -3, 20.), 10.f, "/models/bunny_small.obj");	
 	}
 	
 public:	
@@ -102,6 +118,7 @@ public:
 		Quadrilateral *boxLeft = new Quadrilateral(CornellBoxFactory::createLeft());
 		boxLeft->setMaterial(CORNELL_LEFT);
 		scene.push_back(boxLeft);
+		std::cout << boxLeft->asString() << std::endl;
 
 		Quadrilateral *boxFront = new Quadrilateral(CornellBoxFactory::createFront());
 		boxFront->setMaterial(CORNELL_BACK);
@@ -118,11 +135,8 @@ public:
 		createTallBox(scene, LIGHT);
 		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
-		// createBunny(scene, CORNELL_LEFT);
-		// Triangle * t = new Triangle(glm::vec3(-1, -1, 2), glm::vec3(-1, 1, 1),
-									// glm::vec3(1, 1, 1));
-		// t->setMaterial(CORNELL_LEFT);
-		// scene.push_back(t);
+		createBunny(scene, MARBLE);
+
 		return scene;
 	}
 

@@ -57,9 +57,9 @@ public:
 	void print(bool printLeaf) const;
 	std::vector<const Renderable*> getLightList() const;
 	bool intersect(Ray &ray, IntersectionPoint &isect) const;
+	bool intersectSimple(Ray &ray, IntersectionPoint &isect) const;
 
 private:
-	bool intersectSimple(Ray &ray, IntersectionPoint &isect) const;
 	bool intersectHard(Ray &ray, IntersectionPoint &isect) const;
 	void addChild(Node *parent, int octant);
 	void addLeaf(Renderable *renderable);

@@ -6,6 +6,7 @@
 #include <chrono>
 #include "SFMT.h"
 #include <glm/gtx/random.hpp>
+#include "glmprint.h"
 
 void MonteCarloRayTracer::addToCount() {
 	_mutex.lock();
@@ -158,7 +159,9 @@ void MonteCarloRayTracer::threadRender(float *pixels, const Octree &tree, const 
 			IntersectionPoint ip;
 				
 			if (tree.intersect(r, ip)) {
+
 				r.setOrigin(ip.getPoint() + r.getDirection() * 0.00001f);
+
 				glm::vec3 color = iterateRay(r, tree, 0, false);
 				accumDiffColor += color;
 			}

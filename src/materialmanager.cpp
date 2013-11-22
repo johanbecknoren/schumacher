@@ -59,5 +59,42 @@ MaterialManager::MaterialManager() {
 	}
 }
 
+std::string MaterialManager::asString(const Material &m) {
+	switch(m.getMaterialType()) {
+	case STONE:
+		return "Stone";
+
+	case GLASS:
+		return "Glass";
+
+	case MARBLE:
+		return "Marble";
+
+	case LIGHT:
+		return "Light";
+
+	case MIRROR:
+		return "Mirror";
+
+	case CORNELL_CEIL:
+		return "CORNELL_CEIL";
+
+	case CORNELL_BACK:
+		return "CORNELL_BACK";
+
+	case CORNELL_RIGHT:
+		return "CORNELL_RIGHT";
+		
+	case CORNELL_LEFT:
+		return "CORNELL_LEFT";
+
+	case CORNELL_FLOOR:
+		return "CORNELL_FLOOR";
+
+	default:
+		return "NoStr";
+		
+	}
+}
 
 std::vector<Material*> MaterialManager::_materials = std::vector<Material*>();

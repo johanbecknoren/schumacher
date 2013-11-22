@@ -7,18 +7,11 @@
 #include <string>
 #include <ctime>
 
+#include "utils.h"
 #include "imageexporter.h"
 
 int BitsPerPixel = 24;
 
-char* ImageExporter::merge(char* folder, char* filename)
-{
-	char *newArray = new char[std::strlen(folder)+std::strlen(filename)+1];
-	std::strcpy(newArray,folder);
-    std::strcat(newArray,filename);
-
-	return newArray;
-}
 
 
 FIBITMAP* ImageExporter::convertArrayToBitmap(int image[], int width, int height) 

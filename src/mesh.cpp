@@ -10,6 +10,10 @@ Mesh::Mesh() {
 	
 }
 
+glm::vec3 Mesh::getCenter() {
+	return _bbox.getOrigin();
+}
+
 void Mesh::updateBbox() {
 	glm::vec3 minv = verts[0];
 	glm::vec3 maxv = verts[0];

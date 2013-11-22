@@ -28,13 +28,14 @@ bool Triangle::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 		glm::dot(ray.getDirection(), normal);
 	
 	glm::vec3 newPos = ray.getOrigin() + dt * ray.getDirection();
-
+	// std::cout << newPos << " " << ray.getOrigin() << std::endl;
+	
 	float v = 1.f;
 	if(glm::dot(ray.getDirection(), normal) > 0.0f) // Draw the quad from both directions
 		v = -1.0f;
 
 	ip = IntersectionPoint(newPos, normal * v, this->getMaterial()); 
-	
+
 	return true;
 }
 

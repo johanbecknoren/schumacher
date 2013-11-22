@@ -11,7 +11,7 @@ public:
 	~Mesh();
 	void printBbox();
 	void updateBbox();
-	
+	glm::vec3 getCenter();
 private:
 	std::vector<glm::vec3> verts;
 	std::vector<Triangle *> *triangles;
