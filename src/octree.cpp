@@ -38,14 +38,14 @@ Octree::~Octree() {
 	// TODO: Fix destructor
 }
 
-void Octree::print() const {
+void Octree::print(bool printLeaf) const {
 	std::cout << "Printing octree \n";
 
-	print(_root);
+	print(_root, printLeaf);
 	std::cout << std::endl;
 }
 
-void Octree::print(Node *node) const {
+void Octree::print(Node *node, bool printLeaf) const {
 	std::cout << "====== D" << node->getDepth() << " ";
 	std::string s;
 	for(size_t i = 0; i < 8; ++i) {
@@ -58,20 +58,22 @@ void Octree::print(Node *node) const {
 		}
 	}
 	std::cout << s;
-	Leaf *leaf = node->getFirstLeaf();
-	if (leaf != NULL) {
-		std::cout << " L:";
-		do {
+	if (printLeaf) {
+		Leaf *leaf = node->getFirstLeaf();
+		if (leaf != NULL) {
+			std::cout << " L:";
+			do {
 				const Renderable *r = leaf->getRenderable();
 				std::cout << r->getName() << " ";
 				leaf = leaf->getNextSibling();
-		} while(leaf != NULL);
+			} while(leaf != NULL);
+		}
 	}
 	std::cout << std::endl;
 	for(int i = 0; i < 8; ++i) {
 		Node *n = node->getChild(i);
 		if (n != NULL) {
-			print(n);
+			print(n, printLeaf);
 		}
 	}
 }
@@ -97,8 +99,8 @@ std::vector<const Renderable*> Octree::getLightList() const {
 }
 
 bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
-	return intersectSimple(ray, isect);
-	// return intersectHard(ray, isect);
+	// return intersectSimple(ray, isect);
+	return intersectHard(ray, isect);
 }
 
 bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
@@ -118,7 +120,7 @@ bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
 			}
 		}
 	}
-	
+
 	return found;
 }
 
@@ -158,6 +160,7 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 			if (node->getChild(i) != NULL) {
 
 				float max, tplane;
+				// If colliding with octree child boxes
 				if (node->getChild(i)->getBoundingBox()->IntersectT(&ray, &tplane, &max)) {
 					if(tplane < mint && tplane > 0) {
 						if (id != -1) {
@@ -201,14 +204,14 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 	}
 	// Find closest intersection
 	if (pts.size() > 0) {
-		float min = FLT_MAX;
+		float min = glm::distance(pts[0].getPoint(), ray.getOrigin());
 		int id = 0;
 		for (size_t i = 0; i < pts.size(); ++i) {
 			// glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
 
 			float len = glm::distance(pts[i].getPoint(), ray.getOrigin());
 
-			if(len < min) {
+			if(len < min && len > 0) {
 				min = len;
 				id = i;
 			}

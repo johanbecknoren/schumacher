@@ -186,45 +186,39 @@ void MonteCarloRayTracer::glRender(float *pixels) {
 }
  
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
-    Timer::getInstance()->start("Carlo");
-    int NUM_THREADS = std::thread::hardware_concurrency();
-    if (singleThread || NUM_THREADS == 1) {
-        std::cout << "Starting carlo tracer with " << 1 << " thread.\n";
-        for (int row = 0; row < _H; ++row) {
-            ThreadData td(0, row, 1);
-            threadRender(pixels, *tree, *cam, td);
-#ifdef USE_OPENGL
-            if (renderDuring) {
-                glRender(pixels);
-            }
-#endif
-        }
-    }
-    else {
-        std::cout << "Starting carlo tracer with " << NUM_THREADS << " threads.\n";
-	    _rgen = Rng();
-	    std::vector<std::thread> threads;
-	    // Start threads
-	    
-	    for (int row = 0; row < _H; ++row) {
-		    for (int i = 0; i < NUM_THREADS; ++i) {
-                MonteCarloRayTracer::ThreadData thd(i, row, NUM_THREADS);
-			    threads.push_back(std::thread(&MonteCarloRayTracer::threadRender, this,
-                    pixels, *tree, *cam, thd));
-		    }
-		    for (auto &thread : threads) {
-			    thread.join();
-		    }
-		    threads.clear();
-#ifdef USE_OPENGL
-            if (renderDuring) {
-                glRender(pixels);
-            }
-#endif
-	    }
-    }
-	// Join threads
+	Timer::getInstance()->start("Carlo");
+	int NUM_THREADS = std::thread::hardware_concurrency();
+	std::cout << "Starting carlo tracer with ";
+	if (singleThread) {
+		NUM_THREADS = 1;
+		std::cout << NUM_THREADS << " thread\n";
+	}
+	else {
+		std::cout << NUM_THREADS << " threads\n";
+	}
+
+	_rgen = Rng();
+	std::vector<std::thread> threads;
+	// Start threads
 	
+	for (int row = _H - 1; row >= 0 ; --row) {
+		for (int i = 0; i < NUM_THREADS; ++i) {
+			ThreadData thd(i, row, NUM_THREADS);
+			threads.push_back(std::thread(&MonteCarloRayTracer::threadRender, this,
+										  pixels, *tree, *cam, thd));
+		}
+		for (auto &thread : threads) {
+			thread.join();
+		}
+		threads.clear();
+#ifdef USE_OPENGL
+		if (renderDuring) {
+			glRender(pixels);
+		}
+#endif
+	}
+    
+	// Join threads
 	std::cout << std::endl;
 	Timer::getInstance()->stop("Carlo");
 	Timer::getInstance()->printRealTime("Carlo");

@@ -1,12 +1,13 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <iostream>
 #define EPSILON 0.00001f//float(1e06)
 #define PI 3.1415926535897932384626433832795f
 
 // Viewport dimensions
-#define WIDTH 400
-#define HEIGHT 400
+#define WIDTH 200
+#define HEIGHT 200
 
 
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)

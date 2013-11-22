@@ -23,11 +23,10 @@ class CornellBoxFactory {
 	}
 
 	static Quadrilateral createFront() {
-		Quadrilateral f = Quadrilateral(
+		Quadrilateral f = Quadrilateral(glm::vec3(0.f, 548.8f, 0.f),
 										glm::vec3(0.f, 0.f, 0.f),
-										glm::vec3(0.f, 548.8f, 0.f),
-										glm::vec3(556.f, 548.8f, 0.f),
-										glm::vec3(552.8, 0.f, 0.f));
+										glm::vec3(552.8, 0.f, 0.f),
+										glm::vec3(556.f, 548.8f, 0.f));
 		f.scale(_scaleFactor);
 		f.translate(_t);
 		f.updateAABB();
@@ -221,6 +220,6 @@ private:
 };
 
 
-	float CornellBoxFactory::_scaleFactor = 0.025f;
-	glm::vec3 CornellBoxFactory::_t = glm::vec3(-7.f,-6.8f,15.6f);//glm::vec3(-278.f,-273.f,800.f);
+float CornellBoxFactory::_scaleFactor = 0.025f;
+glm::vec3 CornellBoxFactory::_t = glm::vec3(-7.f,-6.8f,15.6f);//glm::vec3(-278.f,-273.f,800.f);
 #endif

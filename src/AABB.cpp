@@ -6,11 +6,9 @@ AABB::AABB() {
 	this->_upperRightFront = glm::vec3(1.0f);
 }
 
-AABB::AABB(const glm::vec3& lLB, const glm::vec3& uRF, const glm::vec3& trash)//,
-//          const glm::vec3 o)
+AABB::AABB(const glm::vec3& lLB, const glm::vec3& uRF, const glm::vec3& trash) : _lowerLeftBack(lLB),
+																				 _upperRightFront(uRF)
 {
-	this->_lowerLeftBack = lLB;
-	this->_upperRightFront = uRF;
 	this->_origin = (_lowerLeftBack + _upperRightFront)/2.0f;
 }
 

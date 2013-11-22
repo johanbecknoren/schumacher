@@ -54,7 +54,7 @@ public:
 	void addObject(std::vector<Renderable *> &scene) { for (auto r : scene) addObject(r); }
 	void addPointLight(PointLight *pointLight) { _pointLights.push_back(pointLight); }
 	const std::vector<PointLight *> &getPointLights() { return _pointLights; }
-	void print() const;
+	void print(bool printLeaf) const;
 	std::vector<const Renderable*> getLightList() const;
 	bool intersect(Ray &ray, IntersectionPoint &isect) const;
 
@@ -65,7 +65,7 @@ private:
 	void addLeaf(Renderable *renderable);
 	AABB *createBoundingBox(const Node *node, const int octant);
 	void subdivideBoundingBox(Node *parent, Renderable *object);
-	void print(Node *node) const ;
+	void print(Node *node, bool printLeaf) const ;
 	Node *_root;
 	std::vector<Node> _nodes;
 	std::vector<Leaf> _leafs;
