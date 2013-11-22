@@ -158,13 +158,10 @@ void MonteCarloRayTracer::threadRender(float *pixels, const Octree &tree, const 
 			Ray r = cam.createRay(x, y);
 			IntersectionPoint ip;
 				
-			if (tree.intersectSimple(r, ip)) {
-				if (ip.getMaterial()->getMaterialType() != MARBLE) {
-					r.setOrigin(ip.getPoint() + r.getDirection() * 0.00001f);
-				}
-				else {
-					std::cout << r.getOrigin() << " " << ip.getPoint() << std::endl;
-				}
+			if (tree.intersect(r, ip)) {
+
+				r.setOrigin(ip.getPoint() + r.getDirection() * 0.00001f);
+
 				glm::vec3 color = iterateRay(r, tree, 0, false);
 				accumDiffColor += color;
 			}

@@ -72,20 +72,24 @@ static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3
 		tri->scale(scale);
 		tri->translate(center);
 		tri->translate(t);
-		std::cout << tri->asString() << std::endl;
 		
 		scene.push_back(tri);
+	}
+	unsigned r = (4 < triangles->size()) ? 4 : triangles->size();
+	for (unsigned int s = 0; s < r; ++s) {
+		Triangle *tri = (*triangles)[s];
+		std::cout << tri->asString() << std::endl;
 	}
 	mesh->updateBbox();
 	mesh->printBbox();
 }
 	
 	static void createSmallObj(std::vector<Renderable *> &scene, material_t m) {
-		createMesh(scene, m, glm::vec3(4, -5, 18), .07f, "../models/box.obj");
+		createMesh(scene, m, glm::vec3(-3, 1, 15), .07f, "../models/box.obj");
 	}
 	
 	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
-		createMesh(scene, m, glm::vec3(0, 0, 0.), 10.f, "../models/bunny_small.obj");	
+		createMesh(scene, m, glm::vec3(-1, -3, 20.), 10.f, "../models/bunny_small.obj");	
 	}
 	
 public:	
@@ -128,12 +132,8 @@ public:
 		createTallBox(scene, LIGHT);
 		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
-		// createBunny(scene, MIRROR);
-		createSmallObj(scene, MARBLE);
-		// Triangle * t = new Triangle(glm::vec3(-1, -1, 2), glm::vec3(-1, 1, 1),
-									// glm::vec3(1, 1, 1));
-		// t->setMaterial(CORNELL_LEFT);
-		// scene.push_back(t);
+		createBunny(scene, MARBLE);
+
 		return scene;
 	}
 
