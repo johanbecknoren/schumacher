@@ -10,15 +10,34 @@ Mesh::Mesh() {
 	
 }
 
+void Mesh::updateBbox() {
+	glm::vec3 minv = verts[0];
+	glm::vec3 maxv = verts[0];
+	for (unsigned int i = 0; i < verts.size(); ++i) {
+		minv.x = glm::min(verts[i].x, minv.x);
+		minv.y = glm::min(verts[i].y, minv.y);
+		minv.z = glm::min(verts[i].z, minv.z);
+
+		maxv.x = glm::max(verts[i].x, maxv.x);
+		maxv.y = glm::max(verts[i].y, maxv.y);
+		maxv.z = glm::max(verts[i].z, maxv.z);
+	}
+	_bbox = AABB(minv, maxv);
+}
+
+void Mesh::printBbox() {
+	_bbox.print();
+}
+
 std::vector<Triangle*> *Mesh::createTriangles(std::string objName) {
-	std::vector<Triangle*> *tri = new std::vector<Triangle*>();
+	triangles = new std::vector<Triangle*>();
 	verts = std::vector<glm::vec3>();
 
     std::vector<tinyobj::shape_t> shapes;
     std::string err = tinyobj::LoadObj(shapes, objName.c_str());
     if (!err.empty()) {
         std::cerr << err << std::endl;
-        return tri;
+        return triangles;
     }
 
     for (unsigned int n = 0, vertOffset = 0; n < shapes.size(); ++n) {
@@ -46,9 +65,12 @@ std::vector<Triangle*> *Mesh::createTriangles(std::string objName) {
 			glm::vec3 v2 = verts[val[2]];
 			
 			Triangle *t = new Triangle(v0, v1, v2);
-			tri->push_back(t);
+			triangles->push_back(t);
 		}
 		vertOffset += numVerts;
 	}
-	return tri;
+
+
+	
+	return triangles;
 }

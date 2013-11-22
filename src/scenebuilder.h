@@ -61,16 +61,22 @@ private:
 
 	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
 		Mesh *mesh = new Mesh();
-		std::vector<Triangle *> *triangles = mesh->createTriangles("../models/bunny_small.obj");
+		std::vector<Triangle *> *triangles =
+			mesh->createTriangles("../models/bunny_small.obj");
 		
 		for (unsigned int s = 0; s < triangles->size(); ++s) {
 			triangles->at(s)->setMaterial(m);
-			triangles->at(s)->translate(glm::vec3(0, -45, 0));
 			
+			Triangle *tri = (*triangles)[s];
+			tri->scale(0.2);
+			// tri->translate(glm::vec3(.0, 0.01, 10));
+
 			// triangles->at(s)->scale(0.2);
-			// std::cout << triangles->at(s)->asString() << std::endl;
-			scene.push_back(triangles->at(s));
+
+			scene.push_back(tri);
 		}
+		mesh->updateBbox();
+		mesh->printBbox();
 	}
 	
 public:	
@@ -113,6 +119,10 @@ public:
 		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
 		createBunny(scene, CORNELL_LEFT);
+		// Triangle * t = new Triangle(glm::vec3(-1, -1, 2), glm::vec3(-1, 1, 1),
+									// glm::vec3(1, 1, 1));
+		// t->setMaterial(CORNELL_LEFT);
+		// scene.push_back(t);
 		return scene;
 	}
 

@@ -38,14 +38,14 @@ Octree::~Octree() {
 	// TODO: Fix destructor
 }
 
-void Octree::print() const {
+void Octree::print(bool printLeaf) const {
 	std::cout << "Printing octree \n";
 
-	print(_root);
+	print(_root, printLeaf);
 	std::cout << std::endl;
 }
 
-void Octree::print(Node *node) const {
+void Octree::print(Node *node, bool printLeaf) const {
 	std::cout << "====== D" << node->getDepth() << " ";
 	std::string s;
 	for(size_t i = 0; i < 8; ++i) {
@@ -58,20 +58,22 @@ void Octree::print(Node *node) const {
 		}
 	}
 	std::cout << s;
-	Leaf *leaf = node->getFirstLeaf();
-	if (leaf != NULL) {
-		std::cout << " L:";
-		do {
+	if (printLeaf) {
+		Leaf *leaf = node->getFirstLeaf();
+		if (leaf != NULL) {
+			std::cout << " L:";
+			do {
 				const Renderable *r = leaf->getRenderable();
 				std::cout << r->getName() << " ";
 				leaf = leaf->getNextSibling();
-		} while(leaf != NULL);
+			} while(leaf != NULL);
+		}
 	}
 	std::cout << std::endl;
 	for(int i = 0; i < 8; ++i) {
 		Node *n = node->getChild(i);
 		if (n != NULL) {
-			print(n);
+			print(n, printLeaf);
 		}
 	}
 }

@@ -9,9 +9,14 @@ public:
 	Mesh();
 	std::vector<Triangle*> *createTriangles(std::string objName);
 	~Mesh();
+	void printBbox();
+	void updateBbox();
+	
 private:
 	std::vector<glm::vec3> verts;
-	std::vector<Triangle> triangles;
+	std::vector<Triangle *> *triangles;
+	AABB _bbox;
+	
 };
 
 #endif

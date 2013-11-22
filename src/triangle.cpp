@@ -4,7 +4,7 @@
 Triangle::Triangle(glm::vec3 ix0, glm::vec3 ix1, glm::vec3 ix2) : x1(glm::vec3(ix1)),
 																  x2(glm::vec3(ix2)),
 																  x0(glm::vec3(ix0)) {
-	normal = glm::cross((x1) - (x0), (x2) - (x0));
+	normal = glm::normalize(glm::cross((x1) - (x0), (x2) - (x0)));
 	createAABB();
 }
 
@@ -25,9 +25,9 @@ bool Triangle::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 	if (T < 0.f) return false;
 	glm::vec3 newPos = ray.getOrigin() + T * ray.getDirection();
 
-	float v = -1.f;
+	float v = 1.f;
 	if(glm::dot(ray.getDirection(), normal) > 0.0f) // Draw the quad from both directions
-		v = 1.0f;
+		v = -1.0f;
 
 	ip = IntersectionPoint(newPos, normal * v, this->getMaterial()); 
 	
@@ -50,13 +50,15 @@ void Triangle::createAABB() {
 } 
 
 void Triangle::translate(const glm::vec3 &t) {
-	(x1) + t;
-	(x2) + t;
-	(x0) + t;
+	x1 += t;
+	x2 += t;
+	x0 += t;
+	createAABB();
 }
 
 void Triangle::scale(const float s) {
-	(x1) *= s;
-	(x2) *= s;
-	(x0) *= s;
+	x1 *= s;
+	x2 *= s;
+	x0 *= s;
+	createAABB();
 }
