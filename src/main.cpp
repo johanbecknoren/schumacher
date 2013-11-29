@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 
 	PointLight *l2 = new PointLight(glm::vec3(5.0f, 1.4f, -0.4f), 1, glm::vec3(0.3f));
 	tree->addPointLight(l2);
-
+	
 	std::vector<Renderable *> scene = SceneBuilder::createCornellBox();
 	tree->addObject(scene);
 
@@ -60,8 +60,8 @@ int main(int argc, char **argv) {
 #endif
 	
 
-	// WhittedTracer wTracer(WIDTH, HEIGHT);
-	// wTracer.render(pixels, tree, cam);
+//	 WhittedTracer wTracer(WIDTH, HEIGHT);
+//	 wTracer.render(pixels, tree, cam);
 	
 	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
     mTracer.render(pixels, tree, cam, singleThread, renderDuring);

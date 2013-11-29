@@ -213,13 +213,74 @@ class CornellBoxFactory {
 		return ls;
 	}
 
+	// Top of box
+	static Quadrilateral createLightBlock1() {
+		Quadrilateral lb1 = Quadrilateral(
+			glm::vec3(0.0f,		0.0f,	0.0f),
+			glm::vec3(4.0f,		0.0f,	0.0f),
+			glm::vec3(4.0f,		0.0f,	4.0f),
+			glm::vec3(0.0f,		0.0f,	4.0f));
+		lb1.scale(_scaleFactor);
+		lb1.translate(_t + _lightboxTranslate);
+//		lb1.translate(
+		lb1.updateAABB();
+		return lb1;
+	}
+	static Quadrilateral createLightBlock2() {
+		Quadrilateral lb2 = Quadrilateral(
+			glm::vec3(0.0f,		0.0f,	0.0f),
+			glm::vec3(4.0f,		0.0f,	0.0f),
+			glm::vec3(0.0f,		1.0f,	0.0f),
+			glm::vec3(4.0f,		1.0f,	0.0f));
+		lb2.scale(_scaleFactor);
+		lb2.translate(_t + _lightboxTranslate);
+		lb2.updateAABB();
+		return lb2;
+	}
+	static Quadrilateral createLightBlock3() {
+		Quadrilateral lb3 = Quadrilateral(
+			glm::vec3(130.0f,	0.0f,	65.0f),
+			glm::vec3(130.0f,	165.0f,	65.0f),
+			glm::vec3(290.0f,	165.0f,	114.0f),
+			glm::vec3(290.0f,	0.0f,	114.0f));
+		lb3.scale(_scaleFactor);
+		lb3.translate(_t + _lightboxTranslate);
+		lb3.updateAABB();
+		return lb3;
+	}
+	static Quadrilateral createLightBlock4() {
+		Quadrilateral lb4 = Quadrilateral(
+			glm::vec3(82.0f,	0.0f,	225.0f),
+			glm::vec3(82.0f,	165.0f,	225.0f),
+			glm::vec3(130.0f,	165.0f,	65.0f),
+			glm::vec3(130.0f,	0.0f,	65.0f));
+		lb4.scale(_scaleFactor);
+		lb4.translate(_t + _lightboxTranslate);
+		lb4.updateAABB();
+		return lb4;
+	}
+	static Quadrilateral createLightBlock5() {
+		Quadrilateral lb5 = Quadrilateral(
+			glm::vec3(240.0f,	0.0f,	272.0f),
+			glm::vec3(240.0f,	165.0f,	272.0f),
+			glm::vec3(82.0f,	165.0f,	225.0f),
+			glm::vec3(82.0f,	0.0f,	225.0f));
+		lb5.scale(_scaleFactor);
+		lb5.translate(_t + _lightboxTranslate);
+		lb5.updateAABB();
+		return lb5;
+	}
+
+
 
 private:
 		static float _scaleFactor;
 		static glm::vec3 _t;
+		static glm::vec3 _lightboxTranslate;
 };
 
 
 float CornellBoxFactory::_scaleFactor = 0.025f;
+glm::vec3 CornellBoxFactory::_lightboxTranslate = glm::vec3(0.0f,-5.0f,20.0f);
 glm::vec3 CornellBoxFactory::_t = glm::vec3(-7.f,-6.8f,15.6f);//glm::vec3(-278.f,-273.f,800.f);
 #endif
