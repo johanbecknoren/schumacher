@@ -1,0 +1,86 @@
+\documentclass[]{report}   % list options between brackets
+\usepackage{graphicx, url, placeins, algorithm, algorithmic, lipsum}
+\graphicspath{{figures/}}
+
+\begin{document}
+
+\title{Monte Carlo-based ray tracer\\ Project Report}   % type title between braces
+\author{
+	Johan Beck Norén, johbe559@student.liu.se
+	\\Andreas Valter , andva287@student.liu.se
+	}
+\date{\today}    % type date between braces
+\maketitle
+
+\setcounter{page}{2}
+\chapter{Abstract}
+\emph{ A brief and concise summary of the article. It should be limited to 1000 characters.}
+\chapter{Introduction}
+\emph{You should describe here global lighting models and talk about Whitted ray tracing, radiosity, Monte Carlo ray-tracing, two-pass rendering, photon mapping and ray-tracing of isosurfaces, explaining how they work and what they do. 
+This description should be done mainly in words and not so much with maths. 
+Also do not go too much into detail. 
+The explanations should be done with the help of the papers above that were presented during the seminar. 
+You should reference these papers in the introduction. 
+The introduction is concluded by a paragraph, that describes the structure of the paper like: "The first section is the introduction. 
+In section 2, we discuss in more detail the techniques regarding (raytracing, Monte Carlo raytracing, depending on what you have implemented), which we have implemented. 
+Section 3 shows some results that we have obtained with our implementation and benchmarks. 
+The discussion and the outlook is the section 4." 
+Length: about 3 pages.}
+\section{Global lightning}
+Global lightning models uses contributions from the whole scene when calculating the light for each part of the screen.
+
+\section{Whitted ray tracing}
+
+\section{Radiosity}
+
+\section{Monte Carlo ray-tracing}
+
+\section{Two-pass rendering}
+
+\chapter{Background}
+\emph{Here you describe the techniques you use in your code. 
+Describe how you do ray-surface intersections, how you launch reflected and refracted rays, how you compute the intensities, what are shadow rays, etc. No C++ code. 
+You may use pseudocode, but it is better do discuss the techniques only from a theoretical point of view. 
+These descriptions should be accompanied by figures. 
+The figures are numbered consecutively in order of appearance. 
+Each figure must have a caption with a brief description of what you see in it. 
+The figures must be referred to from the text and described and interpreted in more detail in the text.
+Length: about 5-6 pages.}
+
+\section{Scene storage}
+\subsection{Bounding box}
+\subsection{Octree}
+
+\section{Intersection}
+\subsection{Implicit sphere}
+\subsection{Quadrilateral}
+\subsection{Triangle}
+\subsection{Octree}
+
+\section{Ray tracing}
+\subsection{Reflection}
+\subsection{Refraction}
+\subsection{Intensity calculations}
+\subsection{Shadow rays}
+
+\chapter{Results and benchmarks}
+\emph{Here you show results obtained with your code. You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. You can compare in detail images computed from the same scene with different resolutions. You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. Here you can be creative and look at things you like. 
+Length: about 5-6 pages .}
+
+
+\chapter{Discussion}
+\emph{Here you should repeat the key findings of your article and discuss how you could improve them. 
+Do not go into details, but just give a general description. 
+Do not use bullet points. 
+You can also give an outlook on how your renderer could be improved etc. 
+Length: about 1 page .}
+\begingroup
+\let\clearpage\relax % Removes blankpage before include
+\chapter{Results}
+
+\endgroup
+
+\bibliographystyle{abbrv}
+\bibliography{bibl}
+
+\end{document}
