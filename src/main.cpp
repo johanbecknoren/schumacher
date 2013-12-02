@@ -13,6 +13,7 @@
 #include "montecarlotracer.h"
 #include "scenebuilder.h"
 #include "materialmanager.h"
+#include "montecarlotracer2.h"
 
 int main(int argc, char **argv) {
 	bool exportImage = true;
@@ -63,8 +64,12 @@ int main(int argc, char **argv) {
 //	 WhittedTracer wTracer(WIDTH, HEIGHT);
 //	 wTracer.render(pixels, tree, cam);
 	
-	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
-    mTracer.render(pixels, tree, cam, singleThread, renderDuring);
+/*	MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
+    mTracer.render(pixels, tree, cam, singleThread, renderDuring);*/
+
+	MonteCarloRayTracer2 mTracer2(WIDTH, HEIGHT, *SceneBuilder::getLightSourceQuad());
+	mTracer2.render(pixels, tree, cam, singleThread, renderDuring);
+
 
 	// SimpleRaycaster caster(WIDTH, HEIGHT);
 	// caster.render(pixels, tree, cam);	

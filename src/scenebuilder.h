@@ -81,6 +81,7 @@ private:
 		Quadrilateral *lightQuad = new Quadrilateral(CornellBoxFactory::createLightSourceQuad());
 		lightQuad->setMaterial(m);
 		scene.push_back(lightQuad);
+		SceneBuilder::lightSourceQuad = lightQuad;
 	}
 
 static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3 t, float scale, std::string name) {
@@ -161,11 +162,15 @@ public:
 //		createLightBox(scene, CORNELL_CEIL);
 		createTallBox(scene, CORNELL_CEIL);
 		createShortBox(scene, CORNELL_CEIL);
-//		createLightSourceQuad(scene, LIGHT);
+		createLightSourceQuad(scene, LIGHT);
 //		createBunny(scene, MARBLE);
-		createSmallObj(scene, LIGHT);
+//		createSmallObj(scene, LIGHT);
 
 		return scene;
+	}
+
+	static Quadrilateral* getLightSourceQuad() {
+		return lightSourceQuad;
 	}
 
 	
@@ -179,11 +184,12 @@ public:
 	}
 
 	static std::vector<Mesh*> meshVec;
-
+	static Quadrilateral *lightSourceQuad;
 };
 
 
+Quadrilateral* SceneBuilder::lightSourceQuad;
+std::vector<Mesh *> SceneBuilder::meshVec = std::vector<Mesh *>();
 #endif
 
 
-std::vector<Mesh *> SceneBuilder::meshVec = std::vector<Mesh *>();

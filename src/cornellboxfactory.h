@@ -202,10 +202,10 @@ class CornellBoxFactory {
 
 	static Quadrilateral createLightSourceQuad() {
 		Quadrilateral ls = Quadrilateral(
-			glm::vec3(343.0f, 548.8f, 227.0f),
-			glm::vec3(343.0f, 548.8f, 332.0f),
-			glm::vec3(213.0f, 548.8f, 332.0f),
-			glm::vec3(213.0f, 548.8f, 227.0f));
+			glm::vec3(343.0f, 548.8f, 213.0f),
+			glm::vec3(343.0f, 548.8f, 343.0f),
+			glm::vec3(213.0f, 548.8f, 343.0f),
+			glm::vec3(213.0f, 548.8f, 213.0f));
 		ls.scale(_scaleFactor);
 		ls.translate(_t);
 		ls.translate(glm::vec3(0.0f,-0.01f,0.0f));
