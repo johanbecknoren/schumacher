@@ -36,6 +36,15 @@ A=B
 Global lightning models uses contributions from the whole scene when calculating the light for each part of the screen.
 
 \section{Whitted ray tracing}
+The Whitted ray tracing method described by Turner Whitted in \cite{} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
+In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuser or the Phong model.
+Reflections were calculated using environment mapping to emulate the surrounding scene.
+Whitted extended the previous techniques and allowed for rays to bounce in the scene and thus creating the basis for global illumination.
+The solution he presented allowed for true reflections, shadows and refractions.
+
+
+
+
 
 \section{Radiosity}
 
@@ -71,10 +80,15 @@ The bounding box wont be the smallest box that can encapsulate the primitive but
 \subsection{Bounding volume hierarchy}
 Bounding volume hierarchy (BVH) uses a tree structure with bounding volumes like axis aligned bounding boxes. 
 Small sets of primitives is divided into different bounding volumes.
-When 
+These small volumes are then divided in to larger bounding volumes recursively until there is only one bounding volume left surrounding the whole scene.
+By using this technique, it is known that if the ray does not intersect the large bounding box, the smaller child boxes can be ignored as well.
 
 \subsection{Octree}
-
+The octree method uses the bounding boxes in a slightly different way.
+The scene is encapsulated into a large bounding box.
+When each primitive is added, the scene bounding box is subdivided into eight sub-volumes recursively until the current level of bounding boxes are to small to fit the primitive.
+The primitive is then added to the level above that as a leaf.
+Using this structure, it is possible to traverse the ray trough the volume and just as when using the BVH tree, large parts of the tree can be ignored by checking parent nodes.
 
 \section{Intersection}
 \subsection{Implicit sphere}
