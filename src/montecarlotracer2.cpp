@@ -29,7 +29,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 	glm::vec3 rad(0.0f);
 
-	int countd = 10, counts = 2, countl = 20;
+	int countd = 1, counts = 1, countl = 20;
 
 	if(tree.intersect(ray, ip)) {
 		
@@ -47,50 +47,87 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 		if( (depth < _minDepth || !kill) && depth < _maxDepth) {
 			
 			rad = ip.getMaterial()->getEmission();
-			//bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) >= 0.0f) ? true : false;
+			bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) >= 0.0f) ? true : false;
 
 			glm::vec3 diffuse_dir;
 			IntersectionPoint ip_temp;
 
 			// diffuse indirect light
+			glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / (2*PI);
+			float pdf = 1 / PI;
+
 			/*for(int i=0; i<countd; ++i) {
 				diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f,
 												  2.f * _rgen.nextFloat() - 1.f,
 												  2.f * _rgen.nextFloat() - 1.f);
 				diffuse_dir = glm::normalize(diffuse_dir);
-				
 				if (glm::dot(diffuse_dir, ip.getNormal()) < 0) {
 					diffuse_dir = -diffuse_dir;
 				}
 
 				Ray diffuse_ray(ip.getPoint() + 0.0001f*diffuse_dir, diffuse_dir);
-				float cosA = glm::dot(ip.getNormal(), diffuse_dir);
+				float cosA = glm::dot( glm::normalize(ip.getNormal()), diffuse_dir);
 
-				if(tree.intersect(diffuse_ray, ip_temp)) {
+								if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
-						Lrd += 2.f * ip.getMaterial()->getDiffuseColor()
-							* (1.f-ip.getMaterial()->getSpecular()) * cosA * iterateRay(diffuse_ray, tree, depth+1, kill);
+						Lrd += iterateRay(diffuse_ray, tree, depth+1, kill);// * brdf / pdf;
+						//Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
+						//	* (1.f-ip.getMaterial()->getSpecular()) * iterateRay(diffuse_ray, tree, depth+1, kill)) * cosA;
 	
 					}
 				}
 			}
+			Lrd = Lrd * PI * brdf;
 			Lrd /= float(countd);*/
 
-			// perfect speuclar reflections
-			/*for(int i=0; i<counts; ++i) {
+			// perfect specular reflections (även refraktion här)
+			for(int i=0; i<counts; ++i) {
+				// Refraction
+				if(ip.getMaterial()->getMaterialType() == GLASS) {
+					if(isInsideObj) { // coming from inside object
+						ip.setNormal(-ip.getNormal());
+						float n2overn1 = REFRACTION_AIR / REFRACTION_GLASS;
+						float snell = n2overn1;
+						float angle_in = acos(glm::dot( ip.getNormal(), -ray.getDirection()));
+						float critical_angle = asin(snell);
+						
+						ray.setRefractionIndex(REFRACTION_GLASS);
+						Ray refl_ray = calculateReflection(ray, ip);
+
+						if(angle_in > critical_angle) {	// Total internal reflection
+						} else {
+							ip.getMaterial()->setRefractionIndex(REFRACTION_AIR);
+							Ray refr_ray = calculateRefraction(ray, ip);
+							ip.getMaterial()->setRefractionIndex(REFRACTION_GLASS);
+							Ls += (1.0f-ip.getMaterial()->getOpacity())
+								* ip.getMaterial()->getDiffuseColor()
+								* iterateRay(refr_ray, tree,depth+1,kill);
+						}
+						Ls += (ip.getMaterial()->getOpacity()) *
+						ip.getMaterial()->getDiffuseColor() * iterateRay(refl_ray, tree, depth+1, kill);
+					} else {	// Coming from outside (air)
+						Ray refr_ray = calculateRefraction(ray, ip);
+						Ls += (1.0f-ip.getMaterial()->getOpacity())
+								* ip.getMaterial()->getDiffuseColor()
+								* iterateRay(refr_ray, tree,depth+1,kill);
+					}
+				}
+				// Reflection
 				Ray refl_ray = calculateReflection(ray, ip);
 				float cosA = glm::dot(ip.getNormal(), refl_ray.getDirection());
 				
 				if(tree.intersect(refl_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) { // Indirect
 						Ls += ip.getMaterial()->getDiffuseColor() 
-							* ip.getMaterial()->getSpecular() * iterateRay(refl_ray, tree, depth+1, kill) * cosA/1.f;
+							* ip.getMaterial()->getSpecular() * iterateRay(refl_ray, tree, depth+1, kill) * cosA/1.f
+							* ip.getMaterial()->getOpacity();
+
 					} else { // Direct
-						Ls += ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getSpecular() * cosA/1.f;
+						Ls += ip_temp.getMaterial()->getEmission() * ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getSpecular() * cosA/1.f;
 					}
 				}
 			}
-			Ls /= float(counts);*/
+			Ls /= float(counts);
 
 			// direct diffuse light (shadow rays)
 			for(int i=0; i<countl; ++i) {
@@ -113,7 +150,9 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 						cosThetaPrim = glm::max(0.0f, cosThetaPrim);
 						cosTheta = glm::max(0.0f, cosTheta);
 
-						Ldl += (ip.getMaterial()->getDiffuseColor()*_lightQuad.getArea() * ip_temp.getMaterial()->getEmission()* /*egentl. emission här också*/ cosTheta * cosThetaPrim) / (lightDist*lightDist*lightDist*lightDist);
+						Ldl += (ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular())
+							* _lightQuad.getArea() * ip_temp.getMaterial()->getEmission()
+							* cosTheta * cosThetaPrim) / (lightDist*lightDist*lightDist*lightDist);
 					//} 
 					//else {
 					//	std::cout<<"MissedLightSås!";

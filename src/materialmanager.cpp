@@ -20,7 +20,7 @@ MaterialManager::MaterialManager() {
 	MaterialManager::_materials.at(LIGHT) = new Material();
 	MaterialManager::_materials.at(LIGHT)->setMaterialType(LIGHT);
 	MaterialManager::_materials.at(LIGHT)->setDiffuseColor(glm::vec3(1.0f));
-	MaterialManager::_materials.at(LIGHT)->setEmission(glm::vec3(1.0f));
+	MaterialManager::_materials.at(LIGHT)->setEmission(glm::vec3(8.0f));
 
 	MaterialManager::_materials.at(MIRROR) = new Material();
 	MaterialManager::_materials.at(MIRROR)->setMaterialType(MIRROR);
@@ -49,12 +49,12 @@ MaterialManager::MaterialManager() {
 
 	MaterialManager::_materials.at(CORNELL_RIGHT) = new Material();
 	MaterialManager::_materials.at(CORNELL_RIGHT)->setMaterialType(CORNELL_RIGHT);
-	MaterialManager::_materials.at(CORNELL_RIGHT)->setDiffuseColor(glm::vec3(0.0f,1.0f,0.0f));
+	MaterialManager::_materials.at(CORNELL_RIGHT)->setDiffuseColor(glm::vec3(192.f/255.f,216.f/255.f,144.f/255.f));
 	MaterialManager::_materials.at(CORNELL_RIGHT)->setAbsorbtion(1.f);
 
 	MaterialManager::_materials.at(CORNELL_LEFT) = new Material();
 	MaterialManager::_materials.at(CORNELL_LEFT)->setMaterialType(CORNELL_LEFT);
-	MaterialManager::_materials.at(CORNELL_LEFT)->setDiffuseColor(glm::vec3(1.0f,0.0f,0.0f));
+	MaterialManager::_materials.at(CORNELL_LEFT)->setDiffuseColor(glm::vec3(237.f/255.f,67.f/255.f,55.f/255.f));
 	MaterialManager::_materials.at(CORNELL_LEFT)->setAbsorbtion(1.f);
 	}
 }
