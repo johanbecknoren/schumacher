@@ -29,7 +29,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 	glm::vec3 rad(0.0f);
 
-	int countd = 10, counts = 2, countl = 20;
+	int countd = 1, counts = 2, countl = 20;
 
 	if(tree.intersect(ray, ip)) {
 		
@@ -53,28 +53,30 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			IntersectionPoint ip_temp;
 
 			// diffuse indirect light
-			/*for(int i=0; i<countd; ++i) {
+			for(int i=0; i<countd; ++i) {
 				diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f,
 												  2.f * _rgen.nextFloat() - 1.f,
 												  2.f * _rgen.nextFloat() - 1.f);
 				diffuse_dir = glm::normalize(diffuse_dir);
-				
 				if (glm::dot(diffuse_dir, ip.getNormal()) < 0) {
 					diffuse_dir = -diffuse_dir;
 				}
 
 				Ray diffuse_ray(ip.getPoint() + 0.0001f*diffuse_dir, diffuse_dir);
-				float cosA = glm::dot(ip.getNormal(), diffuse_dir);
+				float cosA = glm::dot( glm::normalize(ip.getNormal()), diffuse_dir);
 
+				glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;
+				float pdf = cosA / PI;
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
-						Lrd += 2.f * ip.getMaterial()->getDiffuseColor()
-							* (1.f-ip.getMaterial()->getSpecular()) * cosA * iterateRay(diffuse_ray, tree, depth+1, kill);
+						Lrd += iterateRay(diffuse_ray, tree, depth+1, kill) * brdf * cosA / pdf;
+						//Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
+						//	* (1.f-ip.getMaterial()->getSpecular()) * iterateRay(diffuse_ray, tree, depth+1, kill)) * cosA;
 	
 					}
 				}
 			}
-			Lrd /= float(countd);*/
+			Lrd /= float(countd);
 
 			// perfect speuclar reflections
 			/*for(int i=0; i<counts; ++i) {
@@ -113,7 +115,9 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 						cosThetaPrim = glm::max(0.0f, cosThetaPrim);
 						cosTheta = glm::max(0.0f, cosTheta);
 
-						Ldl += (ip.getMaterial()->getDiffuseColor()*_lightQuad.getArea() * ip_temp.getMaterial()->getEmission()* /*egentl. emission här också*/ cosTheta * cosThetaPrim) / (lightDist*lightDist*lightDist*lightDist);
+						Ldl += (ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular())
+							* _lightQuad.getArea() * ip_temp.getMaterial()->getEmission()
+							* cosTheta * cosThetaPrim) / (lightDist*lightDist*lightDist*lightDist);
 					//} 
 					//else {
 					//	std::cout<<"MissedLightSås!";
