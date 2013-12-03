@@ -6,6 +6,7 @@
 #include "quadrilateral.h"
 #include "mesh.h"
 #include "imageexporter.h"
+
 class SceneBuilder {
 
 private:
@@ -52,11 +53,35 @@ private:
 		tallBlock5->setMaterial(m);
 		scene.push_back(tallBlock5);
 	}
+
+	static void createLightBox(std::vector<Renderable *> &scene, material_t m) {
+		Quadrilateral *lightBlock1 = new Quadrilateral(CornellBoxFactory::createLightBlock1());
+		lightBlock1->setMaterial(m);
+		scene.push_back(lightBlock1);
+
+		Quadrilateral *lightBlock2 = new Quadrilateral(CornellBoxFactory::createLightBlock2());
+		lightBlock2->setMaterial(m);
+		scene.push_back(lightBlock2);
+
+		Quadrilateral *lightBlock3 = new Quadrilateral(CornellBoxFactory::createLightBlock3());
+		lightBlock3->setMaterial(m);
+		scene.push_back(lightBlock3);
+
+		Quadrilateral *lightBlock4 = new Quadrilateral(CornellBoxFactory::createLightBlock4());
+		lightBlock4->setMaterial(m);
+		scene.push_back(lightBlock4);
+
+		Quadrilateral *lightBlock5 = new Quadrilateral(CornellBoxFactory::createLightBlock5());
+		lightBlock5->setMaterial(m);
+		scene.push_back(lightBlock1);
+
+	}
 	
 	static void createLightSourceQuad(std::vector<Renderable *> &scene, material_t m) {
 		Quadrilateral *lightQuad = new Quadrilateral(CornellBoxFactory::createLightSourceQuad());
 		lightQuad->setMaterial(m);
 		scene.push_back(lightQuad);
+		SceneBuilder::lightSourceQuad = lightQuad;
 	}
 
 static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3 t, float scale, std::string name) {
@@ -65,7 +90,7 @@ static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3
 	#pragma GCC diagnostic ignored "-Wwrite-strings"
 	std::vector<Triangle *> *triangles =
 		mesh->createTriangles(merge(CMAKE_SOURCE_DIR,(char*) name.c_str()));
-	
+	meshVec.push_back(mesh);
 	for (unsigned int s = 0; s < triangles->size(); ++s) {
 		Triangle *tri = (*triangles)[s];
 		tri->setMaterial(m);
@@ -88,15 +113,17 @@ static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3
 	
 	static void createSmallObj(std::vector<Renderable *> &scene, material_t m) {
 		
-		createMesh(scene, m, glm::vec3(-3, 1, 15), .07f, "/models/box.obj");
+		createMesh(scene, m, glm::vec3(0.5f, 0.f, 20.f), 0.15f, "/models/box.obj");
 	}
-	
+
 	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
-		createMesh(scene, m, glm::vec3(-1, -3, 20.), 10.f, "/models/bunny_small.obj");	
+		createMesh(scene, m, glm::vec3(-1, -3.5, 20.), 20.f, "/models/bunny_small.obj");	
 	}
 	
 public:	
-	
+	static std::vector<Mesh *> getMeshVector() {
+		return meshVec;
+	}
 	static std::vector<Renderable *> createCornellBox() {
 		std::vector<Renderable *> scene;
 		Quadrilateral *boxCeiling = new Quadrilateral(CornellBoxFactory::createCeil());
@@ -132,12 +159,18 @@ public:
 		sp_mirror->setMaterial(MIRROR);
 		scene.push_back(sp_mirror);
 
-		createTallBox(scene, LIGHT);
+//		createLightBox(scene, CORNELL_CEIL);
+		createTallBox(scene, CORNELL_CEIL);
 		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
-		createBunny(scene, MARBLE);
+//		createBunny(scene, MARBLE);
+//		createSmallObj(scene, LIGHT);
 
 		return scene;
+	}
+
+	static Quadrilateral* getLightSourceQuad() {
+		return lightSourceQuad;
 	}
 
 	
@@ -150,6 +183,13 @@ public:
 		
 	}
 
+	static std::vector<Mesh*> meshVec;
+	static Quadrilateral *lightSourceQuad;
 };
 
+
+Quadrilateral* SceneBuilder::lightSourceQuad;
+std::vector<Mesh *> SceneBuilder::meshVec = std::vector<Mesh *>();
 #endif
+
+

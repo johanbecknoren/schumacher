@@ -34,8 +34,17 @@ void Quadrilateral::translate(const glm::vec3& t){
 	createAABB();
 }
 
-//typedef float real;
-//typedef glm::vec3 vector;
+glm::vec3 Quadrilateral::getRandomPoint(const float &s, const float &t, const float &randomFloat) {
+	glm::vec3 randS = s*_v00 + (1.f-s)*_v10;
+	glm::vec3 randT = t*_v11 + (1.f-t)*_v01;
+
+	return randomFloat*randS + (1.f-randomFloat)*randT;
+}
+
+float Quadrilateral::getArea() {
+	return glm::length(_v11 - _v01) * glm::length(_v00 - _v01);
+}
+
 
 bool Quadrilateral::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 	// Algorithm from http://graphics.cs.kuleuven.be/publications/LD05ERQIT/LD05ERQIT_code.cpp

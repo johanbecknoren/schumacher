@@ -13,6 +13,10 @@ public:
 
 	virtual std::string asString() const;
 	virtual std::string getName() const { return "Quadrilateral"; };
+
+	glm::vec3 getRandomPoint(const float &s, const float &t, const float &randomFloat);
+	float getArea();
+
 	virtual void createAABB();
 	
 	void scale(const float v);
