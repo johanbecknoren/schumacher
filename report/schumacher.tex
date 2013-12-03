@@ -1,5 +1,5 @@
 \documentclass[]{report}   % list options between brackets
-\usepackage{graphicx, url, placeins, algorithm, algorithmic, lipsum}
+\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, lipsum}
 \graphicspath{{figures/}}
 
 \begin{document}
@@ -26,6 +26,12 @@ In section 2, we discuss in more detail the techniques regarding (raytracing, Mo
 Section 3 shows some results that we have obtained with our implementation and benchmarks. 
 The discussion and the outlook is the section 4." 
 Length: about 3 pages.}
+
+\begin{equation} \label{eq:light}
+A=B
+\end{equation}
+\section{Local lightning}
+
 \section{Global lightning}
 Global lightning models uses contributions from the whole scene when calculating the light for each part of the screen.
 
@@ -36,6 +42,7 @@ Global lightning models uses contributions from the whole scene when calculating
 \section{Monte Carlo ray-tracing}
 
 \section{Two-pass rendering}
+
 
 \chapter{Background}
 \emph{Here you describe the techniques you use in your code. 
@@ -48,8 +55,26 @@ The figures must be referred to from the text and described and interpreted in m
 Length: about 5-6 pages.}
 
 \section{Scene storage}
+When calculating global lightning for the scene, all other objects needs to be taken into consideration when calculating the light in one part of the scene due to \autoref{eq:light}.
+For ray tracing solutions, this means that as rays bounce inside the scene, the first intersecting object needs to be located.
+A novice solution would be to store the whole scene without any information about where in the scene they are.
+When doing the ray tracing in the scene, the algorithm would have to check against all other objects, even if almost all of the checks would be misses.
+For a simple scene with only few implicit objects, this is the best solution, the overhead when dealing with an more complex storage method would make it slower.
+But when using a real scene consisting of models with hundreds of thousands of elements, it is possible to take advantage of the spatial information of each element to subtract a small subset and only do collision tests against those.
+There are several methods for storing the scene using different techniques.
+
 \subsection{Bounding box}
+An axis aligned bounding box is a crucial part of most scene storage methods.
+This is the smallest box with axes aligned to the Cartesian coordinates axes that can encapsulate the primitive that owns the bounding box.
+The bounding box wont be the smallest box that can encapsulate the primitive but the intersection tests is much simpler then doing collision tests against arbitrary rotated primitives.
+
+\subsection{Bounding volume hierarchy}
+Bounding volume hierarchy (BVH) uses a tree structure with bounding volumes like axis aligned bounding boxes. 
+Small sets of primitives is divided into different bounding volumes.
+When 
+
 \subsection{Octree}
+
 
 \section{Intersection}
 \subsection{Implicit sphere}
@@ -74,11 +99,6 @@ Do not go into details, but just give a general description.
 Do not use bullet points. 
 You can also give an outlook on how your renderer could be improved etc. 
 Length: about 1 page .}
-\begingroup
-\let\clearpage\relax % Removes blankpage before include
-\chapter{Results}
-
-\endgroup
 
 \bibliographystyle{abbrv}
 \bibliography{bibl}
