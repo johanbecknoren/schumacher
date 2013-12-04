@@ -55,32 +55,46 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			IntersectionPoint ip_temp;
 
 			// diffuse indirect light
-			glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / (2.f);
-			float pdf = 1.f / PI;
-
 			for(int i=0; i<countd; ++i) {
-				diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f,
+				float cosTheta = glm::dot(ip.getNormal(), ray.getDirection());
+				float pdf = cosTheta / PI;//1.f/(2.f*PI);
+
+				// Use PDF when picking sample direction here
+				float thetaPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
+				float phiPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
+
+				/*diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f, // [-1, 1]
 												  2.f * _rgen.nextFloat() - 1.f,
-												  2.f * _rgen.nextFloat() - 1.f);
+												  2.f * _rgen.nextFloat() - 1.f);*/
+				diffuse_dir = glm::vec3 (
+					sin(thetaPrim)*cos(phiPrim),
+					sin(thetaPrim)*sin(phiPrim),
+					cos(thetaPrim)
+					);
 				diffuse_dir = glm::normalize(diffuse_dir);
-				if (glm::dot(diffuse_dir, ip.getNormal()) < 0) {
+				if (glm::dot(diffuse_dir, ip.getNormal()) < 0.f) {
 					diffuse_dir = -diffuse_dir;
 				}
 
 				Ray diffuse_ray(ip.getPoint() + 0.0001f*diffuse_dir, diffuse_dir);
-				float cosA = glm::dot( glm::normalize(ip.getNormal()), diffuse_dir);
+
+				float cosA = glm::max(0.f, glm::dot( glm::normalize(ip.getNormal()), diffuse_dir));
+				glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;// * cosA;
 
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
-						Lrd += iterateRay(diffuse_ray, tree, depth+1, kill) ;// * brdf / pdf;
+						glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
+						if(glm::dot(glm::vec3(1,1,1), val)<0.0f) val *= -1.f;
+						Lrd += val;//iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
 						//Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
 						//	* (1.f-ip.getMaterial()->getSpecular()) * iterateRay(diffuse_ray, tree, depth+1, kill)) * cosA;
 	
 					}
 				}
 			}
-			Lrd = Lrd * brdf;
-			Lrd /= float(countd);
+			//Lrd = Lrd * PI;
+			Lrd /= float(countd)*PI;
+			//Lrd = glm::clamp(Lrd, 0.0f,1.0f);
 
 			// perfect specular reflections (även refraktion här)
 			/*for(int i=0; i<counts; ++i) {
@@ -227,7 +241,7 @@ void MonteCarloRayTracer2::glRender(float *pixels) {
  
 void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
 	Timer::getInstance()->start("Carlo");
-	int NUM_THREADS = 1;//std::thread::hardware_concurrency();
+	int NUM_THREADS = std::thread::hardware_concurrency();
 	std::cout << "Starting carlo tracer with ";
 	if (singleThread) {
 		NUM_THREADS = 1;
