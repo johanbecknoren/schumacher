@@ -48,7 +48,7 @@ It assumes that each light source $\emph{L}_j$ is located at a point with infini
 The total reflected intensity $\emph{I}$ is calculated using the reflection due to ambient light $\emph{I}_{a}$ together with two terms, one term for diffuse light and one specular term.
 The two constants $\emph{k}_{d}$ and $\emph{k}_{s}$ is reflection constants that regulates their contributions.
 The diffuse term uses the Lamberts cosine law to describe the color using a dot product between the normal and the light direction to calculate if that part of the surface is directed towards the light source.
-The specular term uses the direction that a perfect reflection from the light source would take on the surface $\emph{}$ together with a ray towards the viewer $$.
+The specular term uses the direction that a perfect reflection from the light source would take on the surface $\emph{herp}$ together with a ray towards the viewer $derp$.
 \\
 Reflections were calculated using environment mapping to emulate the surrounding scene.
 Whitted extended the previous techniques and allowed for rays to bounce in the scene and thus creating the basis for global illumination.
@@ -56,10 +56,8 @@ The solution he presented allowed for true reflections, shadows and refractions.
 
 
 
-
-
 \section{Radiosity}
-By splitting the scene geometry into a number of finite elements called patches, illumination in a scene can be calculated as the exchange of energy between these patches.
+Radiosity is an algorithm for global illumination which only handles diffusely reflected light, and is therefore not dependent on any camera position or direction. This means that the solution converges toward a steady state, and can for example be pre-computed for use in static scenes. The algorithm works by splitting the scene geometry into a number of finite area elements called patches, and solves the rendering equation for surfaces that diffusely reflects light. A visibility factor, called \emph{form factor}, is used to describe a patch's visibility toward all other patches in the scene. The size of a view factor is dependent on the distance between any two patches, their orientation in relation with each other, partial or total occlusion etc. and describes the amount of radiance leaving a patch $j$ arriving at patch $i$ for all patches $j \in N$ for a scene consisting of $N$ number of patches. The form factors make up a system of linear equations, which when solved produces the radiosity for each patch. The process can be iterated to perform several passes and allowing for multiple bounces to be computed.
 \section{Monte Carlo ray-tracing}
 
 \section{Two-pass rendering}
@@ -67,6 +65,8 @@ By splitting the scene geometry into a number of finite elements called patches,
 \section{Photon mapping}
 
 \section{Iso surface ray tracing}
+An iso surface is a surface described implicitly by a mathematical expression or equation. An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. Different data structures can be used to greatly increase the performace of intersection tests, such as storing surfaces in an \emph{octree} structure or using a \emph{bounding volume hierarchy} (BVH).
+
 
 \chapter{Background}
 \emph{Here you describe the techniques you use in your code. 
@@ -107,6 +107,7 @@ Using this structure, it is possible to traverse the ray trough the volume and j
 
 \section{Intersection}
 \subsection{Implicit sphere}
+A sphere is defined by a position vector and a radius scalar.
 \subsection{Quadrilateral}
 \subsection{Triangle}
 \subsection{Octree}
