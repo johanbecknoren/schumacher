@@ -31,14 +31,25 @@ Length: about 3 pages.}
 \begin{equation} \label{eq:light}
 A=B
 \end{equation}
-\section{Local lightning}
 
 \section{Global lightning}
 Global lightning models uses contributions from the whole scene when calculating the light for each part of the screen.
 
 \section{Whitted ray tracing}
 The Whitted ray tracing method described by Turner Whitted in \cite{} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
-In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuser or the Phong model.
+In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuser or the Phong model. \\
+
+\begin{equation} \label{eq:phong}
+\emph{I} = \emph{I}_{a} + \emph{k}_{d} \sum_{j=1}^{j=ls} (  \bar{N} .  \bar{L}_j) + \emph{k}_{s} \sum_{j=1}^{j=ls} (  \bar{N} .  \bar{L}_j')^n
+\end{equation}
+
+The Phong model given by \autoref{eq:phong} is a local light model.
+It assumes that each light source $\emph{L}_j$ is located at a point with infinite distance to the objects in the scene. 
+The total reflected intensity $\emph{I}$ is calculated using the reflection due to ambient light $\emph{I}_{a}$ together with two terms, one term for diffuse light and one specular term.
+The two constants $\emph{k}_{d}$ and $\emph{k}_{s}$ is reflection constants that regulates their contributions.
+The diffuse term uses the Lamberts cosine law to describe the color using a dot product between the normal and the light direction to calculate if that part of the surface is directed towards the light source.
+The specular term uses the direction that a perfect reflection from the light source would take on the surface $\emph{}$ together with a ray towards the viewer $$.
+\\
 Reflections were calculated using environment mapping to emulate the surrounding scene.
 Whitted extended the previous techniques and allowed for rays to bounce in the scene and thus creating the basis for global illumination.
 The solution he presented allowed for true reflections, shadows and refractions.
@@ -53,6 +64,9 @@ By splitting the scene geometry into a number of finite elements called patches,
 
 \section{Two-pass rendering}
 
+\section{Photon mapping}
+
+\section{Iso surface ray tracing}
 
 \chapter{Background}
 \emph{Here you describe the techniques you use in your code. 
