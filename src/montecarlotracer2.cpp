@@ -55,23 +55,27 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			IntersectionPoint ip_temp;
 
 			// diffuse indirect light
+#if 1
 			for(int i=0; i<countd; ++i) {
-				float cosTheta = glm::dot(ip.getNormal(), ray.getDirection());
+				float cosTheta = glm::max(0.0f,glm::dot(ip.getNormal(), -ray.getDirection()));
 				float pdf = cosTheta / PI;//1.f/(2.f*PI);
 
 				// Use PDF when picking sample direction here
-				float thetaPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
-				float phiPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
+				//float thetaPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
+				float thetaPrim = (2.f*PI*_rgen.nextFloat()) / pdf;
+				//float phiPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
+				float phiPrim = (2.f*PI*_rgen.nextFloat()) / pdf;
 
 				/*diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f, // [-1, 1]
-												  2.f * _rgen.nextFloat() - 1.f,
-												  2.f * _rgen.nextFloat() - 1.f);*/
+										2.f * _rgen.nextFloat() - 1.f,
+										2.f * _rgen.nextFloat() - 1.f);*/
 				diffuse_dir = glm::vec3 (
 					sin(thetaPrim)*cos(phiPrim),
 					sin(thetaPrim)*sin(phiPrim),
 					cos(thetaPrim)
 					);
 				diffuse_dir = glm::normalize(diffuse_dir);
+				
 				if (glm::dot(diffuse_dir, ip.getNormal()) < 0.f) {
 					diffuse_dir = -diffuse_dir;
 				}
@@ -79,25 +83,26 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 				Ray diffuse_ray(ip.getPoint() + 0.0001f*diffuse_dir, diffuse_dir);
 
 				float cosA = glm::max(0.f, glm::dot( glm::normalize(ip.getNormal()), diffuse_dir));
-				glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;// * cosA;
+				glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;
 
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
 						glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
-						if(glm::dot(glm::vec3(1,1,1), val)<0.0f) val *= -1.f;
-						Lrd += val;//iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
-						//Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
-						//	* (1.f-ip.getMaterial()->getSpecular()) * iterateRay(diffuse_ray, tree, depth+1, kill)) * cosA;
+						//if(glm::dot(glm::vec3(1,1,1), val)<0.0f) val *= -1.f;
+						//Lrd += val;//iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
+						Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
+							* (1.f-ip.getMaterial()->getSpecular()) * iterateRay(diffuse_ray, tree, depth+1, kill)) * cosA;
 	
 					}
 				}
 			}
 			//Lrd = Lrd * PI;
-			Lrd /= float(countd)*PI;
+			Lrd /= float(countd);
 			//Lrd = glm::clamp(Lrd, 0.0f,1.0f);
-
+#endif
+#if 0
 			// perfect specular reflections (även refraktion här)
-			/*for(int i=0; i<counts; ++i) {
+			for(int i=0; i<counts; ++i) {
 				// Refraction
 				if(ip.getMaterial()->getMaterialType() == GLASS) {
 					if(isInsideObj) { // coming from inside object
@@ -130,20 +135,20 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 				}
 				// Reflection
 				Ray refl_ray = calculateReflection(ray, ip);
-				float cosA = glm::dot(ip.getNormal(), refl_ray.getDirection());
+				//float cosA = glm::dot(ip.getNormal(), refl_ray.getDirection());
 				if(tree.intersect(refl_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) { // Indirect
 						Ls += ip.getMaterial()->getDiffuseColor() 
-							* ip.getMaterial()->getSpecular() * iterateRay(refl_ray, tree, depth+1, kill) * cosA/1.f
+							* ip.getMaterial()->getSpecular() * iterateRay(refl_ray, tree, depth+1, kill)// * cosA/1.f
 							* ip.getMaterial()->getOpacity();
 
 					} else { // Direct
-						Ls += ip_temp.getMaterial()->getEmission() * ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getSpecular() * cosA/1.f;
+						Ls += ip_temp.getMaterial()->getEmission() * ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getSpecular();// * cosA/1.f;
 					}
 				}
 			}
-			Ls /= float(counts);*/
-
+			Ls /= float(counts);
+#endif
 			// direct diffuse light (shadow rays)
 			for(int i=0; i<countl; ++i) {
 				// Slumpad rikning mot ljuskälla
