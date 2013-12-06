@@ -29,7 +29,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 	glm::vec3 rad(0.0f);
 
-	int countd = 4, counts = 1, countl = 20;
+	int countd = 1, counts = 1, countl = 30;
 
 	if(tree.intersect(ray, ip)) {
 		
@@ -55,7 +55,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			IntersectionPoint ip_temp;
 
 			// diffuse indirect light
-#if 1
+#if 0
 			for(int i=0; i<countd; ++i) {
 				float n = 0.1;
 				float r1 = _rgen.nextFloat();
@@ -124,7 +124,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			Lrd /= float(countd);
 			//Lrd = glm::clamp(Lrd, 0.f,1.f);
 #endif
-#if 0
+#if 1
 			// perfect specular reflections (även refraktion här)
 			int num_refr_rays = 0;
 			for(int i=0; i<counts; ++i) {
