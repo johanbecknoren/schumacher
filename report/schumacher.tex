@@ -1,5 +1,5 @@
 \documentclass[]{report}   % list options between brackets
-\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, amsmath, lipsum, cite}
+\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, amsmath, lipsum, cite, caption, subcaption}
 \graphicspath{{figures/}}
 
 \begin{document}
@@ -98,36 +98,38 @@ The figures must be referred to from the text and described and interpreted in m
 Length: about 5-6 pages.}
 
 \section{Scene storage}
-When calculating global lightning for the scene, all other objects needs to be taken into consideration when calculating the light in one part of the scene due to \autoref{eq:light}.
+When calculating global lightning for the scene, all objects need to be taken into consideration when calculating the illumination for one part of the scene due to the recursive nature of \autoref{eq:rendering_eq}.
+
 For ray tracing solutions, this means that as rays bounce inside the scene, the first intersecting object needs to be located.
-A novice solution would be to store the whole scene without any information about where in the scene they are.
-When doing the ray tracing in the scene, the algorithm would have to check against all other objects, even if almost all of the checks would be misses.
-For a simple scene with only few implicit objects, this is the best solution, the overhead when dealing with an more complex storage method would make it slower.
-But when using a real scene consisting of models with hundreds of thousands of elements, it is possible to take advantage of the spatial information of each element to subtract a small subset and only do collision tests against those.
+A na\"{\i}ve solution would be to store all objects without any information about where in the scene they are located.
+When traversing a ray through the scene, the algorithm would have to check against all objects, even if almost all of the checks would be misses.
+For a simple scene with only a few implicit objects this is a good solution. The overhead when dealing with an more complex storage method would make it slower.
+But when using a more complex scene consisting of models with hundreds of thousands of elements, it is possible to take advantage of the spatial information of each element to subtract a small subset and only do collision tests against those.
+
 There are several methods for storing the scene using different techniques.
 
 \subsection{Bounding box}
 An axis aligned bounding box is a crucial part of most scene storage methods.
 This is the smallest box with axes aligned to the Cartesian coordinates axes that can encapsulate the primitive that owns the bounding box.
-The bounding box wont be the smallest box that can encapsulate the primitive but the intersection tests is much simpler then doing collision tests against arbitrary rotated primitives.
+The bounding box will not be the smallest box that can encapsulate the primitive but the intersection tests is much simpler compared to doing collision tests against arbitrarily rotated primitives.
 
 \subsection{Bounding volume hierarchy}
 Bounding volume hierarchy (BVH) uses a tree structure with bounding volumes like axis aligned bounding boxes. 
-Small sets of primitives is divided into different bounding volumes.
-These small volumes are then divided in to larger bounding volumes recursively until there is only one bounding volume left surrounding the whole scene.
-By using this technique, it is known that if the ray does not intersect the large bounding box, the smaller child boxes can be ignored as well.
+Small sets of primitives are divided into different bounding volumes.
+These small volumes are then combined to larger bounding volumes recursively until there is only one bounding volume left surrounding the entire scene.
+By using this technique, it is known that if the ray does not intersect a larger bounding box, the child boxes within that larger box can be ignored as well.
 
 \subsection{Octree}
-The octree method uses the bounding boxes in a slightly different way.
+The octree method uses the bounding boxes in a slightly different way than described in the previous section.
 The scene is encapsulated into a large bounding box.
 When each primitive is added, the scene bounding box is subdivided into eight sub-volumes recursively until the current level of bounding boxes are to small to fit the primitive.
 The primitive is then added to the level above that as a leaf.
-Using this structure, it is possible to traverse the ray trough the volume and just as when using the BVH tree, large parts of the tree can be ignored by checking parent nodes.
+Using this structure, it is possible to traverse the ray through the volume and, just as when using the BVH tree, large parts of the tree can be ignored by checking only parent nodes for intersection.
 
 \section{Intersection}
-The implementation needs to be able to handle several different intersection algorithm, one for each type of primitive.
+The implementation needs to be able to handle several different intersection algorithms, one for each type of primitive in the scene.
 To make sure that all kinds of primitives are supported, inheritance is used where each primitive inherits from an abstract class.
-During rendering calculation, the ray tracer calls an abstract method for calculation intersection points on the given primitive and therefore the implementation supports all primitives that can define a intersection method.
+During rendering calculation, the ray tracer calls an abstract method for calculation of intersection points on the given primitive and therefore the implementation supports all primitives that can define a intersection method.
 Each of these methods uses an incoming ray with a direction vector $d$ and a origin $o$ described by \autoref{eq:ray}.
 The intersection methods has to calculate the normal of surfaces to decide the direction of new rays spawned at the intersection point.
 \begin{equation} \label{eq:ray}
