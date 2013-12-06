@@ -170,7 +170,11 @@ C =& (\mathbf{o} - \mathbf{c}) \cdot (\mathbf{o} - \mathbf{c}) - r^2
 \subsection{Octree}
 
 \section{Anti-aliasing by sub-pixel sampling}
-To reduce aliasing effects in the final image we have implemented support for sub-pixel sampling. This means that instead of sending one view ray from the virtual camera through the center of a pixel on the view plane, we send several view rays distributed on the pixel and average their results. The view ray distribution on the pixel area can be done uniformly or by using random numbers to place them stochastically. For all renders in this report, the stochastic distribution was used. In  \autoref{fig:antialiasing} we se a comparison between using 1 view ray per pixel on the left, and 10 view rays per pixel on the right.
+To reduce aliasing effects in the final image we have implemented support for sub-pixel sampling.
+This means that instead of sending one view ray from the virtual camera through the center of a pixel on the view plane, we send several view rays distributed on the pixel and average their results.
+The view ray distribution on the pixel area can be done uniformly or by using random numbers to place them stochastically.
+For all renders in this report, the stochastic distribution was used.
+In  \autoref{fig:antialiasing} we se a comparison between using 1 view ray per pixel on the left, and 10 view rays per pixel on the right.
 
 \begin{figure}
         \centering
@@ -191,7 +195,16 @@ To reduce aliasing effects in the final image we have implemented support for su
 
 \section{Monte Carlo ray tracing}
 Beskriv rendering equation här, och hur denna kan delas in i direkt/indirekt del
-As described in the introduction a Monte Carlo ray tracer is similar to a Whitted ray tracer in that it is only interested in the radiance reaching the virtual camera, or the eye. It is a complete global illumination algorithm, and solves the rendering equation, \autoref{eq:rendering}.
+As described in the introduction a Monte Carlo ray tracer is similar to a Whitted ray tracer in that it is only interested in the radiance reaching the virtual camera, or the eye.
+It is a complete global illumination algorithm, and solves the rendering equation \autoref{eq:rendering_eq}, repeated below for convenience, by random sampling.
+
+\begin{equation}
+L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Phi \rightarrow \theta)L(x \leftarrow \Phi)cos(N_x, \Phi)d\omega_{\Phi}
+\tag{\ref{eq:rendering_eq}}
+\end{equation}
+
+The left hand side $L(x \rightarrow \theta)$ corresponds to the radiance leaving at a point \emph{x} in the direction $\theta$. The right hand side consists of an emmitance part and a reflectance part. $ L_e(x \rightarrow \theta)$ corresponds to outgoing radiance emmited from $x$, and the integral term corresponds to reflected radiance received from all directions over a hemisphere over the point $x$.
+
 \subsection{Direct illumination}
 \subsection{Indirect illumintaion}
 \subsection{Reflection}
