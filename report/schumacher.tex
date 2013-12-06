@@ -1,5 +1,5 @@
 \documentclass[]{report}   % list options between brackets
-\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, lipsum, cite}
+\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, amsmath, lipsum, cite}
 \graphicspath{{figures/}}
 
 \begin{document}
@@ -40,7 +40,7 @@ The Whitted ray tracing method described by Turner Whitted in \cite{} was the fi
 In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuser or the Phong model. \\
 
 \begin{equation} \label{eq:phong}
-\emph{I} = \emph{I}_{a} + \emph{k}_{d} \sum_{j=1}^{j=ls} (  \bar{N} .  \bar{L}_j) + \emph{k}_{s} \sum_{j=1}^{j=ls} (  \bar{R}_j .  \bar{V})^n
+\emph{I} = \emph{I}_{a} + \emph{k}_{d} \sum_{j=1}^{j=ls} (  \mathbf{N} \cdot \mathbf{L}_j) + \emph{k}_{s} \sum_{j=1}^{j=ls} (  \mathbf{R}_j \cdot \mathbf{V})^n
 \end{equation}
 
 The Phong model given by \autoref{eq:phong} is a local light model.
@@ -123,15 +123,34 @@ Each of these methods uses an incoming ray with a direction vector $d$ and a ori
 \end{equation}
 
 \subsection{Implicit sphere}
-A sphere is defined by a position vector $c$ of its centre and a radius scalar $r$. The goal is to find if any $t$ in \autoref{eq:ray} satisfies \autoref{eq:sphere}. By inserting \autoref{eq:ray} into \autoref{eq:sphere}, we receive an expression for solving the intersection point described by \autoref{eq:sphereray}.
+A sphere is defined by a position vector $c$ of its centre and a radius scalar $r$. 
+The goal is to find if any $t$ in \autoref{eq:ray} satisfies \autoref{eq:sphere}. By inserting \autoref{eq:ray} into \autoref{eq:sphere}, we receive an expression for solving the intersection point described by \autoref{eq:sphereray}.
 \begin{equation} \label{eq:sphere}
 (\mathbf{p} - \mathbf{c}).(\mathbf{p} - \mathbf{c}) = r^2
 \end{equation}
 
 \begin{equation} \label{eq:sphereray}
-(\mathbf{d} . \mathbf{d})t^2 + 2(\mathbf{o} - \mathbf{c}) * \mathbf{d} t + (\mathbf{o} - \mathbf{c}) . (\mathbf{o} - \mathbf{c}) - r^2=0
+(\mathbf{d} \cdot \mathbf{d})t^2 + 2(\mathbf{o} - \mathbf{c}) * \mathbf{d} t + (\mathbf{o} - \mathbf{c}) \cdot (\mathbf{o} - \mathbf{c}) - r^2=0
 \end{equation}
- 
+
+There are two solutions to \autoref{eq:sphereray} described in \autoref{eq:sparsol} with coefficients described by \autoref{eq:sparsub}.
+When intersecting, they represent the entry and exit point on the sphere surface.
+This 
+\begin{subequations} \label{eq:sparsol}
+\begin{align} 
+t_0 = \frac{ -B - \sqrt{B^2 - 4 A C} }{ 2 A }\\
+t_1 = \frac{ -B + \sqrt{B^2 - 4 A C} }{ 2 A }
+\end{align}
+\end{subequations}
+
+\begin{subequations} \label{eq:sparsub}
+\begin{align}
+A =& \mathbf{d} \cdot \mathbf{d} \\
+B =& 2(\mathbf{o} - \mathbf{c}) \mathbf{d} \\
+C =& (\mathbf{o} - \mathbf{c}) \cdot (\mathbf{o} - \mathbf{c}) - r^2
+\end{align}
+\end{subequations}
+
 \subsection{Axis aligned bounding box}
 \subsection{Quadrilateral}
 \subsection{Triangle}
