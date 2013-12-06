@@ -151,12 +151,12 @@ public:
 		boxFront->setMaterial(CORNELL_BACK);
 		scene.push_back(boxFront);
 
-		Sphere* sp_glass = new Sphere(1.5f, glm::vec3(3.f,-5.5f,17.5f) );
+		Sphere* sp_glass = new Sphere(1.5f, glm::vec3(3.f,-5.f,18.5f) );
 		sp_glass->setMaterial(GLASS);
 		scene.push_back(sp_glass);
 
 		Sphere* sp_mirror = new Sphere(1.5f, glm::vec3(-3.f,0.f,22.0f) );
-		sp_mirror->setMaterial(GLASS);
+		sp_mirror->setMaterial(MIRROR);
 		scene.push_back(sp_mirror);
 
 //		createLightBox(scene, CORNELL_CEIL);

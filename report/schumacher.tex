@@ -1,12 +1,12 @@
 \documentclass[]{report}   % list options between brackets
-\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, lipsum}
+\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, lipsum, cite}
 \graphicspath{{figures/}}
 
 \begin{document}
 
 \title{Monte Carlo-based ray tracer\\ Project Report}   % type title between braces
 \author{
-	Johan Beck Norén, johbe559@student.liu.se
+	Johan Beck Nor\'{e}n, johbe559@student.liu.se
 	\\Andreas Valter , andva287@student.liu.se
 	}
 \date{\today}    % type date between braces
@@ -33,7 +33,7 @@ A=B
 \end{equation}
 
 \section{Global lightning}
-Global lightning models uses contributions from the whole scene when calculating the light for each part of the screen.
+
 
 \section{Whitted ray tracing}
 The Whitted ray tracing method described by Turner Whitted in \cite{} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
@@ -48,6 +48,7 @@ It assumes that each light source $\emph{L}_j$ is located at a point with infini
 The total reflected intensity $\emph{I}$ is calculated using the reflection due to ambient light $\emph{I}_{a}$ together with two terms, one term for diffuse light and one specular term.
 The two constants $\emph{k}_{d}$ and $\emph{k}_{s}$ is reflection constants that regulates their contributions.
 The diffuse term uses the Lamberts cosine law to describe the color using a dot product between the normal and the light direction to calculate if that part of the surface is directed towards the light source.
+
 The specular term uses the direction that a perfect reflection $ \bar{V} $ from the light source would take on the surface together with a ray towards the viewer $\bar{V}$.\\
 
 Whitted extended the previous techniques and allowed for rays to bounce in the scene and thus creating the basis for global illumination.
@@ -55,15 +56,24 @@ The solution he presented allowed for true reflections, shadows and refractions.
 By using the Phong model on each ray hit and spawning new rays recursively for reflections, shadow rays and refractions a method for simulating global lightning is created.
 
 \section{Radiosity}
-By splitting the scene geometry into a number of finite elements called patches, illumination in a scene can be calculated as the exchange of energy between these patches.
+Radiosity is an algorithm for global illumination which only handles diffusely reflected light, and is therefore not dependent on any camera position or direction. This means that the solution converges toward a steady state, and can for example be pre-computed for use in static scenes. The algorithm works by splitting the scene geometry into a number of finite area elements called patches, and solves the rendering equation for surfaces that diffusely reflects light. A visibility factor, called \emph{form factor}, is used to describe a patch's visibility toward all other patches in the scene. The size of a view factor is dependent on the distance between any two patches, their orientation in relation to each other, partial or total occlusion etc. and describes the amount of radiance leaving a patch $j$ arriving at patch $i$ for all patches $j \in N$ for a scene consisting of $N$ number of patches. The form factors make up a system of linear equations, which when solved produces the radiosity for each patch. The process can be iterated to perform several passes and allowing for multiple bounces to be computed.
 
-\section{Monte Carlo ray-tracing}
+\section{Monte Carlo ray tracing}
+A rendering equation (\ref{eq:rendering_eq}) presented by Kajiya in \cite{kajiya} describes a full global illumination solution for a given scene. It is an integral equation called a Fredholm equation of the second kind because of the unknown radiance quantity, $L(...)$, appears on both sides of the equation. This makes the equation a recursive one, corresponding to a ray's multiple bounces through a scene. It is described below using the same notation as Dutr\'{e} et al. in \cite{dutre}, and we will use this notation throughout this report.
+\begin{equation}
+\label{eq:rendering_eq}
+L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Phi \rightarrow \theta)L(x \leftarrow \Phi)cos(N_x, \Phi)d\omega_{\Phi}
+\end{equation}
+The Monte Carlo integration method introduces a method for calculating an estimated value for an integral expression. This is done by sampling the integral function by random discreet numbers, and as the number of samples increase the produced solution's accuracy increases as well. Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. One difference is that Monte Carlo ray tracing handles diffuse and specular surface inter-reflections, diffuse reflections, color bleeding between objects, and soft shadows by stochastically sampling area light source surfaces for each ray intersection. As the number of samples increase the more accurate to integral estimation will be, and the algorithm produces noise if the number of samples are too low. There are several ways to reduce the noise. One could separate the calculations for direct and indirect illumination, using shadow rays to more quickly compute direct diffuse illumination and soft shadows. Sampling directions for diffuse indirect illumination could be chosen in more informed ways to reduce the noise. There have also been research on methods combining the benefits of radiosity with the benefits of ray tracing.
 
 \section{Two-pass rendering}
+Since the radiosity method handles diffuse reflections rather well, and a Monte Carlo method handles specular reflections, color bleeding etc. a lot of research has been done to find ways to combine these two methods.
 
 \section{Photon mapping}
 
 \section{Iso surface ray tracing}
+An iso surface is a surface described implicitly by a mathematical expression or equation. An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. Different data structures can be used to greatly increase the performace of intersection tests, such as storing surfaces in an \emph{octree} structure or using a \emph{bounding volume hierarchy} (BVH).
+
 
 \chapter{Background}
 \emph{Here you describe the techniques you use in your code. 
@@ -103,7 +113,26 @@ The primitive is then added to the level above that as a leaf.
 Using this structure, it is possible to traverse the ray trough the volume and just as when using the BVH tree, large parts of the tree can be ignored by checking parent nodes.
 
 \section{Intersection}
+The implementation needs to be able to handle several different intersection algorithm, one for each type of primitive.
+To make sure that all kinds of primitives are supported, inheritance is used where each primitive inherits from an abstract class.
+During rendering calculation, the ray tracer calls an abstract method for calculation intersection points on the given primitive and therefore the implementation supports all primitives that can define a intersection method.
+Each of these methods uses an incoming ray with a direction vector $d$ and a origin $o$ described by \autoref{eq:ray}.
+
+\begin{equation} \label{eq:ray}
+\mathbf{p} = \mathbf{o} + t \mathbf{d}, t \leq 0
+\end{equation}
+
 \subsection{Implicit sphere}
+A sphere is defined by a position vector $c$ of its centre and a radius scalar $r$. The goal is to find if any $t$ in \autoref{eq:ray} satisfies \autoref{eq:sphere}. By inserting \autoref{eq:ray} into \autoref{eq:sphere}, we receive an expression for solving the intersection point described by \autoref{eq:sphereray}.
+\begin{equation} \label{eq:sphere}
+(\mathbf{p} - \mathbf{c}).(\mathbf{p} - \mathbf{c}) = r^2
+\end{equation}
+
+\begin{equation} \label{eq:sphereray}
+(\mathbf{d} . \mathbf{d})t^2 + 2(\mathbf{o} - \mathbf{c}) * \mathbf{d} t + (\mathbf{o} - \mathbf{c}) . (\mathbf{o} - \mathbf{c}) - r^2=0
+\end{equation}
+ 
+\subsection{Axis aligned bounding box}
 \subsection{Quadrilateral}
 \subsection{Triangle}
 \subsection{Octree}

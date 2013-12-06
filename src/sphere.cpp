@@ -30,7 +30,7 @@ bool Sphere::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 	glm::vec3 dir = glm::normalize(ray.getDirection());
 
     if(intersecting) {// Intersection with AABB exists
-		A = glm::dot(dir, dir);
+		A = glm::dot(dir, dir); // Always 1?
 		B = 2 * glm::dot((ray.getOrigin() - _position), dir);
 		C = glm::dot((ray.getOrigin() - _position),
                  (ray.getOrigin() - _position)) - _radius*_radius;

@@ -7,8 +7,8 @@
 #define PI 3.1415926535897932384626433832795f
 
 // Viewport dimensions
-#define WIDTH 300
-#define HEIGHT 300
+#define WIDTH 512
+#define HEIGHT 512
 
 
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)

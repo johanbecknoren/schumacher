@@ -13,8 +13,8 @@ public:
 													working(true),
 													_rayCounter(0),
 													_meanRayDepth(0),
-													_maxDepth(4),
-													_minDepth(4),
+													_maxDepth(6),
+													_minDepth(30),
 													_raysPerPixel(1),
 													_lightQuad(lightQuad)
 	{};
