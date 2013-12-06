@@ -37,7 +37,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 		if (ip.getMaterial()->getMaterialType() == LIGHT) {
 			addToMeanDepth(depth);
-			return ip.getMaterial()->getDiffuseColor();
+			return ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getEmission();
 		}
 
 		// Do russian roulette to terminate rays.
@@ -57,51 +57,75 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			// diffuse indirect light
 #if 1
 			for(int i=0; i<countd; ++i) {
-				float cosTheta = glm::max(0.0f,glm::dot(ip.getNormal(), -ray.getDirection()));
-				float pdf = cosTheta / PI;//1.f/(2.f*PI);
+				float n = 0.5;
+				float r1 = _rgen.nextFloat();
+				float phi = r1 * PI * 2.f;
+				float r2 = _rgen.nextFloat();
+				float theta = acos(pow(r2, 1.f/(1.f+n)));
+
+				float cosTheta = cos(theta);//glm::max(0.0f,glm::dot(ip.getNormal(), ray.getDirection()));
+				float pdf = ((n+1)/2.f*PI) * pow(cosTheta, n);//1.f/(2.f*PI);//cosTheta / PI;
 
 				// Use PDF when picking sample direction here
 				//float thetaPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
-				float thetaPrim = (2.f*PI*_rgen.nextFloat()) / pdf;
+				//float thetaPrim = (PI*_rgen.nextFloat()) / pdf;
 				//float phiPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
-				float phiPrim = (2.f*PI*_rgen.nextFloat()) / pdf;
+				//float phiPrim = (2.f*PI*_rgen.nextFloat()) / pdf;
 
 				/*diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f, // [-1, 1]
 										2.f * _rgen.nextFloat() - 1.f,
 										2.f * _rgen.nextFloat() - 1.f);*/
-				diffuse_dir = glm::vec3 (
+				/*diffuse_dir = glm::vec3 (
 					sin(thetaPrim)*cos(phiPrim),
 					sin(thetaPrim)*sin(phiPrim),
 					cos(thetaPrim)
+					);*/
+				diffuse_dir = glm::vec3 (
+					sin(phi)*cos(theta),
+					sin(phi)*sin(theta),
+					cos(phi)
 					);
-				diffuse_dir = glm::normalize(diffuse_dir);
-				
-				if (glm::dot(diffuse_dir, ip.getNormal()) < 0.f) {
-					diffuse_dir = -diffuse_dir;
-				}
 
-				Ray diffuse_ray(ip.getPoint() + 0.0001f*diffuse_dir, diffuse_dir);
+				// Rotate diffuse_dir to distribution of normal vector
+				float el = -acos(ip.getNormal().z);
+				float az = -atan2(ip.getNormal().y, ip.getNormal().x);
+
+				// Rotate around y
+				glm::vec3 diffuse_dir2 = glm::vec3(cos(el) * diffuse_dir.x - sin(el) * diffuse_dir.z, diffuse_dir.y, sin(el) * diffuse_dir.x + cos(el) * diffuse_dir.z);
+				// Rotate around z
+				diffuse_dir = glm::normalize(glm::vec3(cos(az) * diffuse_dir2.x + sin(az) * diffuse_dir2.y, -sin(az) * diffuse_dir2.x + cos(az) * diffuse_dir2.y, diffuse_dir2.z));
+				glm::vec3 reverse_diffuse_dir = -1.f*diffuse_dir;
+				//diffuse_dir = glm::normalize(diffuse_dir);
+				
+				/*if (glm::dot(diffuse_dir, ip.getNormal()) < 0.f) {
+					diffuse_dir = -diffuse_dir;
+				}*/
+
+				Ray diffuse_ray(ip.getPoint() + 0.01f*diffuse_dir, diffuse_dir);
 
 				float cosA = glm::max(0.f, glm::dot( glm::normalize(ip.getNormal()), diffuse_dir));
 				glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;
 
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
-						glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
+						Ray reverse_diffuse_ray(ip_temp.getPoint(), reverse_diffuse_dir);
+						//glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf;// / pdf;
+						glm::vec3 val = iterateRay(reverse_diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
 						//if(glm::dot(glm::vec3(1,1,1), val)<0.0f) val *= -1.f;
-						//Lrd += val;//iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
-						Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
-							* (1.f-ip.getMaterial()->getSpecular()) * iterateRay(diffuse_ray, tree, depth+1, kill)) * cosA;
+						Lrd += val;//iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
+						//Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
+							//* (1.f-ip.getMaterial()->getSpecular()) * iterateRay(diffuse_ray, tree, depth+1, kill)) * cosA;
 	
 					}
 				}
 			}
 			//Lrd = Lrd * PI;
 			Lrd /= float(countd);
-			//Lrd = glm::clamp(Lrd, 0.0f,1.0f);
+			//Lrd = glm::clamp(Lrd, 0.f,1.f);
 #endif
-#if 0
+#if 1
 			// perfect specular reflections (även refraktion här)
+			int num_refr_rays = 0;
 			for(int i=0; i<counts; ++i) {
 				// Refraction
 				if(ip.getMaterial()->getMaterialType() == GLASS) {
@@ -123,6 +147,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 							Ls += (1.0f-ip.getMaterial()->getOpacity())
 								* ip.getMaterial()->getDiffuseColor()
 								* iterateRay(refr_ray, tree,depth+1,kill);
+							++num_refr_rays;
 						}
 						Ls += (ip.getMaterial()->getOpacity()) *
 						ip.getMaterial()->getDiffuseColor() * iterateRay(refl_ray, tree, depth+1, kill);
@@ -131,6 +156,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 						Ls += (1.0f-ip.getMaterial()->getOpacity())
 								* ip.getMaterial()->getDiffuseColor()
 								* iterateRay(refr_ray, tree,depth+1,kill);
+						++num_refr_rays;
 					}
 				}
 				// Reflection
@@ -149,6 +175,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			}
 			Ls /= float(counts);
 #endif
+#if 1
 			// direct diffuse light (shadow rays)
 			for(int i=0; i<countl; ++i) {
 				// Slumpad rikning mot ljuskälla
@@ -182,8 +209,8 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			}
 
 			Ldl /= float(countl);
-			
-			return Lrd+Ls+Ldl;
+#endif
+			return (Lrd+Ls+Ldl);
 
 		}
 		else {

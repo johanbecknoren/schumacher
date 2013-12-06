@@ -28,7 +28,7 @@ glm::vec3 MonteCarloRayTracer::iterateRay(Ray &ray, const Octree &tree, int dept
 		
 		if (ip.getMaterial()->getMaterialType() == LIGHT) {
 			addToMeanDepth(depth);
-			return ip.getMaterial()->getDiffuseColor();
+			return ip.getMaterial()->getDiffuseColor()*ip.getMaterial()->getEmission();
 		} else if(ip.getMaterial()->getMaterialType() == GLASS) {
 		}
 
@@ -175,7 +175,7 @@ void MonteCarloRayTracer::glRender(float *pixels) {
  
 void MonteCarloRayTracer::render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
 	Timer::getInstance()->start("Carlo");
-	int NUM_THREADS = 1;//std::thread::hardware_concurrency();
+	int NUM_THREADS = std::thread::hardware_concurrency();
 	std::cout << "Starting carlo tracer with ";
 	if (singleThread) {
 		NUM_THREADS = 1;
