@@ -117,7 +117,7 @@ The implementation needs to be able to handle several different intersection alg
 To make sure that all kinds of primitives are supported, inheritance is used where each primitive inherits from an abstract class.
 During rendering calculation, the ray tracer calls an abstract method for calculation intersection points on the given primitive and therefore the implementation supports all primitives that can define a intersection method.
 Each of these methods uses an incoming ray with a direction vector $d$ and a origin $o$ described by \autoref{eq:ray}.
-
+The intersection methods has to calculate the normal of surfaces to decide the direction of new rays spawned at the intersection point.
 \begin{equation} \label{eq:ray}
 \mathbf{p} = \mathbf{o} + t \mathbf{d}, t \leq 0
 \end{equation}
@@ -135,8 +135,7 @@ The goal is to find if any $t$ in \autoref{eq:ray} satisfies \autoref{eq:sphere}
 
 There are two solutions to \autoref{eq:sphereray} described in \autoref{eq:sparsol} with coefficients described by \autoref{eq:sparsub}.
 When intersecting, they represent the entry and exit point on the sphere surface.
-The resulting equations have two ways to be undefined and if either of these two cases occur, the ray is not intersecting.
-The first case is if $B^2 - 4 A C < 0$ 
+The collision point is decided dependent on if the solution is real, this means that $B^2 - 4 A C >= 0$ is true for all rays that collide with the sphere.
 \begin{subequations} \label{eq:sparsol}
 \begin{align} 
 t_0 = \frac{ -B - \sqrt{B^2 - 4 A C} }{ 2 A }\\
@@ -152,7 +151,11 @@ C =& (\mathbf{o} - \mathbf{c}) \cdot (\mathbf{o} - \mathbf{c}) - r^2
 \end{align}
 \end{subequations}
 
+When both values of $t$ are calculated, the lowest value is used for the collision point. The normal is calculated by normalizing the point on the surface and subtracting the center of the sphere.
+
 \subsection{Axis aligned bounding box}
+
+
 \subsection{Quadrilateral}
 \subsection{Triangle}
 \subsection{Octree}
