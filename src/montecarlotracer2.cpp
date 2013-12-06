@@ -29,7 +29,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 	glm::vec3 rad(0.0f);
 
-	int countd = 1, counts = 1, countl = 20;
+	int countd = 4, counts = 1, countl = 20;
 
 	if(tree.intersect(ray, ip)) {
 		
@@ -57,7 +57,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			// diffuse indirect light
 #if 1
 			for(int i=0; i<countd; ++i) {
-				float n = 0.5;
+				float n = 0.1;
 				float r1 = _rgen.nextFloat();
 				float phi = r1 * PI * 2.f;
 				float r2 = _rgen.nextFloat();
@@ -103,14 +103,15 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 				Ray diffuse_ray(ip.getPoint() + 0.01f*diffuse_dir, diffuse_dir);
 
-				float cosA = glm::max(0.f, glm::dot( glm::normalize(ip.getNormal()), diffuse_dir));
+				//float cosA = glm::max(0.f, glm::dot( glm::normalize(ip.getNormal()), diffuse_dir));
+				float cosA = glm::dot( glm::normalize(ip.getNormal()), diffuse_dir);
 				glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;
 
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
 						Ray reverse_diffuse_ray(ip_temp.getPoint(), reverse_diffuse_dir);
 						//glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf;// / pdf;
-						glm::vec3 val = iterateRay(reverse_diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
+						glm::vec3 val = (iterateRay(reverse_diffuse_ray, tree, depth+1, kill) * cosA * brdf) * pdf;
 						//if(glm::dot(glm::vec3(1,1,1), val)<0.0f) val *= -1.f;
 						Lrd += val;//iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
 						//Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
@@ -123,7 +124,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			Lrd /= float(countd);
 			//Lrd = glm::clamp(Lrd, 0.f,1.f);
 #endif
-#if 1
+#if 0
 			// perfect specular reflections (även refraktion här)
 			int num_refr_rays = 0;
 			for(int i=0; i<counts; ++i) {
