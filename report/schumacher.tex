@@ -1,5 +1,5 @@
 \documentclass[]{report}   % list options between brackets
-\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, amsmath, lipsum, cite, caption, subcaption}
+\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, amsmath, lipsum, cite}
 \graphicspath{{figures/}}
 
 \begin{document}
@@ -159,26 +159,6 @@ When both values of $t$ are calculated, the lowest value is used for the collisi
 \subsection{Quadrilateral}
 \subsection{Triangle}
 \subsection{Octree}
-
-\section{Anti-aliasing by sub-pixel sampling}
-To reduce aliasing effects in the final image we have implemented support for sub-pixel sampling. This means that instead of sending one view ray from the virtual camera through the center of a pixel on the view plane, we send several view rays distributed on the pixel and average their results. The view ray distribution on the pixel area can be done uniformly or by using random numbers to place them stochastically. For all renders in this report, the stochastic distribution was used. In  \autoref{fig:antialiasing} we se a comparison between using 1 view ray per pixel on the left, and 10 view rays per pixel on the right.
-
-\begin{figure}
-        \centering
-        \begin{subfigure}[b]{0.3\textwidth}
-                \includegraphics[width=\textwidth]{figures/aliasing_1.png}
-                \caption{1 view ray per pixel}
-                \label{fig:gull}
-        \end{subfigure}%
-        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-          %(or a blank line to force the subfigure onto a new line)
-        \begin{subfigure}[b]{0.3\textwidth}
-                \includegraphics[width=\textwidth]{figures/aliasing_10.png}
-                \caption{10 view rays per pixel}
-                \label{fig:tiger}
-        \end{subfigure}
-        \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
-\end{figure}
 
 \section{Ray tracing}
 \subsection{Reflection}
