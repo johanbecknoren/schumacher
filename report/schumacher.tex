@@ -40,7 +40,7 @@ The Whitted ray tracing method described by Turner Whitted in \cite{} was the fi
 In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuser or the Phong model. \\
 
 \begin{equation} \label{eq:phong}
-\emph{I} = \emph{I}_{a} + \emph{k}_{d} \sum_{j=1}^{j=ls} (  \bar{N} .  \bar{L}_j) + \emph{k}_{s} \sum_{j=1}^{j=ls} (  \bar{N} .  \bar{L}_j')^n
+\emph{I} = \emph{I}_{a} + \emph{k}_{d} \sum_{j=1}^{j=ls} (  \bar{N} .  \bar{L}_j) + \emph{k}_{s} \sum_{j=1}^{j=ls} (  \bar{R}_j .  \bar{V})^n
 \end{equation}
 
 The Phong model given by \autoref{eq:phong} is a local light model.
@@ -48,18 +48,15 @@ It assumes that each light source $\emph{L}_j$ is located at a point with infini
 The total reflected intensity $\emph{I}$ is calculated using the reflection due to ambient light $\emph{I}_{a}$ together with two terms, one term for diffuse light and one specular term.
 The two constants $\emph{k}_{d}$ and $\emph{k}_{s}$ is reflection constants that regulates their contributions.
 The diffuse term uses the Lamberts cosine law to describe the color using a dot product between the normal and the light direction to calculate if that part of the surface is directed towards the light source.
-The specular term uses the direction that a perfect reflection from the light source would take on the surface $\emph{}$ together with a ray towards the viewer $$.
-\\
-Reflections were calculated using environment mapping to emulate the surrounding scene.
+The specular term uses the direction that a perfect reflection $ \bar{V} $ from the light source would take on the surface together with a ray towards the viewer $\bar{V}$.\\
+
 Whitted extended the previous techniques and allowed for rays to bounce in the scene and thus creating the basis for global illumination.
 The solution he presented allowed for true reflections, shadows and refractions.
-
-
-
-
+By using the Phong model on each ray hit and spawning new rays recursively for reflections, shadow rays and refractions a method for simulating global lightning is created.
 
 \section{Radiosity}
 By splitting the scene geometry into a number of finite elements called patches, illumination in a scene can be calculated as the exchange of energy between these patches.
+
 \section{Monte Carlo ray-tracing}
 
 \section{Two-pass rendering}
