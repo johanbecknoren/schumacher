@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 //	 WhittedTracer wTracer(WIDTH, HEIGHT);
 //	 wTracer.render(pixels, tree, cam);
 	
-	//MonteCarloRayTracer mTracer(WIDTH, HEIGHT);
+	//MonteCarloRayTracer mTracer(WIDTH, HEIGHT,*SceneBuilder::getLightSourceQuad());
     //mTracer.render(pixels, tree, cam, singleThread, renderDuring);
 
 	MonteCarloRayTracer2 mTracer2(WIDTH, HEIGHT, *SceneBuilder::getLightSourceQuad());

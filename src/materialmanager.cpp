@@ -9,7 +9,7 @@ MaterialManager::MaterialManager() {
 	MaterialManager::_materials.at(GLASS)->setRefractionIndex(1.52f);
 	MaterialManager::_materials.at(GLASS)->setOpacity(0.05f);
 	MaterialManager::_materials.at(GLASS)->setSpecular(1.0f);
-	MaterialManager::_materials.at(GLASS)->setAbsorbtion(1.f);
+	MaterialManager::_materials.at(GLASS)->setAbsorbtion(0.f);
 
 	MaterialManager::_materials.at(MARBLE) = new Material();
 	MaterialManager::_materials.at(MARBLE)->setMaterialType(MARBLE);

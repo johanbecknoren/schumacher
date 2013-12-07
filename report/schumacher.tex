@@ -177,9 +177,9 @@ When both values of $t$ are calculated, the lowest value is used for the collisi
 \section{Anti-aliasing by sub-pixel sampling}
 To reduce aliasing effects in the final image we have implemented support for sub-pixel sampling.
 This means that instead of sending one view ray from the virtual camera through the center of a pixel on the view plane, we send several view rays distributed on the pixel and average their results.
-The view ray distribution on the pixel area can be done uniformly or by using random numbers to place them stochastically.
-For all renders in this report, the stochastic distribution was used.
-In  \autoref{fig:antialiasing} we se a comparison between using 1 view ray per pixel on the left, and 10 view rays per pixel on the right.
+The view ray distribution on a pixel area can be done uniform fashion or stochastically by random numbers.
+For all rendered images in this report, the stochastic distribution was used.
+In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per pixel on the left, and 10 view rays per pixel on the right.
 
 \begin{figure}
         \centering

@@ -155,8 +155,8 @@ public:
 		sp_glass->setMaterial(GLASS);
 		scene.push_back(sp_glass);
 
-		Sphere* sp_mirror = new Sphere(1.5f, glm::vec3(-3.f,0.f,22.0f) );
-		sp_mirror->setMaterial(MIRROR);
+		Sphere* sp_mirror = new Sphere(1.5f, glm::vec3(-5.f,4.f,22.0f) );
+		sp_mirror->setMaterial(GLASS);
 		scene.push_back(sp_mirror);
 
 //		createLightBox(scene, CORNELL_CEIL);
