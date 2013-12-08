@@ -121,7 +121,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
 						/*float d = glm::length(ip_temp.getPoint() - ip.getPoint());
 						std::cout<<"d="<<d;*/
-						Ray reverse_diffuse_ray(ip_temp.getPoint() + 0.001f*reverse_diffuse_dir, reverse_diffuse_dir);
+						Ray reverse_diffuse_ray(ip_temp.getPoint() - 0.001f*reverse_diffuse_dir, reverse_diffuse_dir);
 						glm::vec3 val = iterateRay(reverse_diffuse_ray, tree, depth+1, kill);
 						//glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill);
 						Lrd += val;//glm::clamp(val,0.0f,1.0f);

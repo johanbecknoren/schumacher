@@ -15,7 +15,7 @@ public:
 													_meanRayDepth(0),
 													_maxDepth(6),
 													_minDepth(5),
-													_raysPerPixel(24),
+													_raysPerPixel(200),
 													_lightQuad(lightQuad)
 	{};
 	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	

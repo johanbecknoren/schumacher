@@ -62,9 +62,16 @@ Radiosity is an algorithm for global illumination which only handles diffusely r
 A rendering equation (\ref{eq:rendering_eq}) presented by Kajiya in \cite{kajiya} describes a full global illumination solution for a given scene. It is an integral equation called a Fredholm equation of the second kind because of the unknown radiance quantity, $L(...)$, appears on both sides of the equation. This makes the equation a recursive one, corresponding to a ray's multiple bounces through a scene. It is described below using the same notation as Dutr\'{e} et al. in \cite{dutre}, and we will use this notation throughout this report.
 \begin{equation}
 \label{eq:rendering_eq}
-L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Phi \rightarrow \theta)L(x \leftarrow \Phi)cos(N_x, \Phi)d\omega_{\Phi}
+\begin{split}
+L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + L_r(x \rightarrow \theta) =\\ 
+L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Phi \rightarrow \theta)L(x \leftarrow \Phi)cos(N_x, \Phi)d\omega_{\Phi}
+\end{split}
 \end{equation}
-The Monte Carlo integration method introduces a method for calculating an estimated value for an integral expression. This is done by sampling the integral function by random discreet numbers, and as the number of samples increase the produced solution's accuracy increases as well. Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. One difference is that Monte Carlo ray tracing handles diffuse and specular surface inter-reflections, diffuse reflections, color bleeding between objects, and soft shadows by stochastically sampling area light source surfaces for each ray intersection. As the number of samples increase the more accurate to integral estimation will be, and the algorithm produces noise if the number of samples are too low. There are several ways to reduce the noise. One could separate the calculations for direct and indirect illumination, using shadow rays to more quickly compute direct diffuse illumination and soft shadows. Sampling directions for diffuse indirect illumination could be chosen in more informed ways to reduce the noise. There have also been research on methods combining the benefits of radiosity with the benefits of ray tracing.
+The Monte Carlo integration method introduces a method for calculating an estimated value for an integral expression. This is done by sampling the integral function by random discreet numbers, and as the number of samples increase the produced solution's accuracy increases as well.
+
+LÄGG IN EXEMPEL PÅ INTEGRALESTIMERING HÄR!!!
+
+Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. One difference is that Monte Carlo ray tracing handles diffuse and specular surface inter-reflections, diffuse reflections, color bleeding between objects, and soft shadows by stochastically sampling area light source surfaces for each ray intersection. As the number of samples increase the more accurate to integral estimation will be, and the algorithm produces noise if the number of samples are too low. There are several ways to reduce the noise. One could separate the calculations for direct and indirect illumination, using shadow rays to more quickly compute direct diffuse illumination and soft shadows. Sampling directions for diffuse indirect illumination could be chosen in more informed ways to reduce the noise. There have also been research on methods combining the benefits of radiosity with the benefits of ray tracing.
 
 \section{Two-pass rendering}
 Since a radiosity method handles diffuse reflections rather well, and a ray tracing method handles specular reflections well. a lot of research has been done to find ways to combine these two methods.
@@ -88,6 +95,7 @@ An iso surface is a surface described implicitly by a mathematical expression or
 
 
 \chapter{Background}
+In this section we will talk about the methods we have implemented in our Mone Carlo ray tracer using C++. Although there are several approches to some of these methods we will only talk about the methods we chose to implement in this project.
 \emph{Here you describe the techniques you use in your code. 
 Describe how you do ray-surface intersections, how you launch reflected and refracted rays, how you compute the intensities, what are shadow rays, etc. No C++ code. 
 You may use pseudocode, but it is better do discuss the techniques only from a theoretical point of view. 
@@ -208,9 +216,33 @@ L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Ph
 \tag{\ref{eq:rendering_eq}}
 \end{equation}
 
-The left hand side $L(x \rightarrow \theta)$ corresponds to the radiance leaving at a point \emph{x} in the direction $\theta$. The right hand side consists of an emmitance part and a reflectance part. $ L_e(x \rightarrow \theta)$ corresponds to outgoing radiance emmited from $x$, and the integral term corresponds to reflected radiance received from all directions over a hemisphere over the point $x$.
+The left hand side $L(x \rightarrow \theta)$ corresponds to the radiance leaving at a point \emph{x} in the direction $\theta$.
+The right hand side consists of an emmitance part and a reflectance part.
+$ L_e(x \rightarrow \theta)$ corresponds to outgoing radiance emmited from $x$, and the integral term corresponds to reflected radiance received from all directions over a hemisphere over the point $x$.
+In \cite{dutre} it is shown that \autoref{eq:rendering_eq} can be represented by separating the terms for indirect and direct illumination as in \autoref{eq:rendering_eq_split}.
+
+
+\begin{subequations} \label{eq:rendering_eq_split}
+\begin{align} 
+L(x \rightarrow \theta) = L_{direct}+L_{indirect} \\
+L_{direct}(x \rightarrow \theta) = \int_A f_r(x, \mathbf{xy}\rightarrow \theta) L_e(y \rightarrow \mathbf{yx})V(x,y)G(x,y)dA_y \\
+L_{indirect}(x \rightarrow \theta) = \int_{\Omega_x}  f_r(x, \Phi \rightarrow \theta) L_i(x \leftarrow \Phi)cos(N_x, \Phi)d\omega_{\Phi}
+\end{align}
+\end{subequations}
 
 \subsection{Direct illumination}
+The term $L_{direct}(x \rightarrow \theta)$ expresses the contribution from light sources directly.
+Since the term $L_{direct}(x \rightarrow \theta)$ is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
+Or in a discrete representation as a sum over all \emph{N} light sources in the scene.
+
+\begin{equation}
+\label{eq:disc_direct}
+L(x \rightarrow \theta) = \sum^{N}_{k=1} \int_{A_k} f_r(x, \mathbf{xy}\leftrightarrow \theta) L_e(y \rightarrow \mathbf{yx})V(x,y)G(x,y)dA_y
+\end{equation}
+
+In \autoref{eq:rendering_eq_split}b, $A$ refers to the area of a lightsource in the scene.
+For every intersection point retrieved from the scene, that point's direct illumination is calculated in two separate ways, one for direct diffuse illumination and one for direct specular illumination. For diffuse direct illumination each light source is sampled multiple times. Each sample point $\mathbf{y}$
+
 \subsection{Indirect illumintaion}
 \subsection{Reflection}
 \subsection{Refraction}
