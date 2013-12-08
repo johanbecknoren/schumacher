@@ -36,7 +36,7 @@ public:
 		return s.str();
 	}
 	glm::vec3 getPoint() const { return _point; }
-	glm::vec3 getNormal() const { return _surfaceNormal; }
+	glm::vec3 getNormal() const { return glm::normalize(_surfaceNormal); }
 	Material* getMaterial() const { return this->_material; }
 
 	void setPoint(const glm::vec3 &p) { _point = p; }

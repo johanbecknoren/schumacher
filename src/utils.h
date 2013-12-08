@@ -28,6 +28,6 @@ inline char* merge(char *folder, char* filename) {
 }
 
 // Materials enums
-enum material_t { STONE, GLASS, MARBLE, LIGHT, MIRROR, CORNELL_CEIL, CORNELL_BACK, CORNELL_RIGHT, CORNELL_LEFT, CORNELL_FLOOR, NUM_MATERIALS/*Leave in last slot*/ };
+enum material_t { STONE, GLASS, MARBLE, LIGHT, MIRROR, CORNELL_CEIL, CORNELL_BACK, CORNELL_RIGHT, CORNELL_LEFT, CORNELL_FLOOR, CORNELL_TALL_BOX, NUM_MATERIALS/*Leave in last slot*/ };
 
 #endif
