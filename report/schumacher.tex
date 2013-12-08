@@ -225,8 +225,8 @@ In \cite{dutre} it is shown that \autoref{eq:rendering_eq} can be represented by
 \begin{subequations} \label{eq:rendering_eq_split}
 \begin{align} 
 L(x \rightarrow \theta) = L_{direct}+L_{indirect} \\
-L_{direct}(x \rightarrow \theta) = \int_A f_r(x, \mathbf{xy}\rightarrow \theta) L_e(y \rightarrow \mathbf{yx})V(x,y)G(x,y)dA_y \\
-L_{indirect}(x \rightarrow \theta) = \int_{\Omega_x}  f_r(x, \Phi \rightarrow \theta) L_i(x \leftarrow \Phi)cos(N_x, \Phi)d\omega_{\Phi}
+L_{direct}(x \rightarrow \theta) = \int_A L_e(y \rightarrow \mathbf{yx})f_r(x, \mathbf{xy}\rightarrow \theta)G(x,y)V(x,y)dA_y \\
+L_{indirect}(x \rightarrow \theta) = \int_{\Omega_x} L_i(x \leftarrow \Phi) f_r(x, \Phi \rightarrow \theta)cos(N_x, \Phi)d\omega_{\Phi}
 \end{align}
 \end{subequations}
 
@@ -234,14 +234,33 @@ L_{indirect}(x \rightarrow \theta) = \int_{\Omega_x}  f_r(x, \Phi \rightarrow \t
 The term $L_{direct}(x \rightarrow \theta)$ expresses the contribution from light sources directly.
 Since the term $L_{direct}(x \rightarrow \theta)$ is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
 Or in a discrete representation as a sum over all \emph{N} light sources in the scene.
+In our implementation though, only a single planar light source is used.
+For generality's sake all equations presented will be defined to handle an arbitrary number of light sources.
 
 \begin{equation}
 \label{eq:disc_direct}
-L(x \rightarrow \theta) = \sum^{N}_{k=1} \int_{A_k} f_r(x, \mathbf{xy}\leftrightarrow \theta) L_e(y \rightarrow \mathbf{yx})V(x,y)G(x,y)dA_y
+L_{direct}(x \rightarrow \theta) = \sum^{N}_{k=1} \int_{A_k}L_e(y \rightarrow \mathbf{yx}) f_r(x, \mathbf{xy}\leftrightarrow \theta)G(x,y)V(x,y)dA_y
 \end{equation}
 
 In \autoref{eq:rendering_eq_split}b, $A$ refers to the area of a lightsource in the scene.
-For every intersection point retrieved from the scene, that point's direct illumination is calculated in two separate ways, one for direct diffuse illumination and one for direct specular illumination. For diffuse direct illumination each light source is sampled multiple times. Each sample point $\mathbf{y}$
+For every intersection point retrieved from the scene, that point's direct illumination is calculated in two separate ways, one for direct diffuse illumination and one for direct specular illumination.
+For diffuse direct illumination the light source is sampled.
+Each sample point $y_i$ is distributed randomly uniform on the surface of the light source.
+The visibility function $V(x,y)$ makes sure that only sample points visible from \emph{x} will contribute to the direct illumination by checking if \emph{x} is in line of sight of $y_i$.
+Because of this these rays are often called shadow rays, and will result in soft shadows if enough samples $y_i$ are taken. \\
+\\For a single planar area light source sampled with $N_s$ shadow rays the Monte Carlo estimator becomes
+
+\begin{equation}
+\label{eq:monte_carlo_direct}
+\langle L_{direct}(x \rightarrow \theta) \rangle = \frac{1}{N_s} \sum^{N_s}_{i=1} \frac{L_e(y_i \rightarrow \mathbf{y_ix}) f_r(x, \theta \leftrightarrow \mathbf{xy_i})G(x,y_i)V(x,y_i)}{pdf(y_i)}
+\end{equation}
+
+A uniform probability distribution function of $\frac{1}{A}$ is used where \emph{A} is the area of the light source.
+From \autoref{eq:monte_carlo_direct} we see that it is required to evaluate visibility, BRDF and radiance emmited for each sample point
+
+Direct specular illumination is more straight forward to handle.
+If a ray intersects with a specular object, a new ray is traced in the direction of a perfect reflection of that first incoming ray.
+If this new ray intersects a lightsource the point at the initial intersection receives radiance contribution in the form of emmitance from that light source.
 
 \subsection{Indirect illumintaion}
 \subsection{Reflection}
@@ -255,6 +274,7 @@ Length: about 5-6 pages .}
 
 
 \chapter{Discussion}
+Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.
 \emph{Here you should repeat the key findings of your article and discuss how you could improve them. 
 Do not go into details, but just give a general description. 
 Do not use bullet points. 
