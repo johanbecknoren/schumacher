@@ -69,12 +69,12 @@ glm::vec3 MonteCarloRayTracer2::iterateAirToGlass(Ray &ray, const Octree &tree, 
 		
 	if( (depth <= _minDepth || !kill) && depth < _maxDepth) {
 		if(tree.intersect(ray, ip)) {
-
 			// Reflection
 			/*glm::vec3 refl_dir = glm::reflect(ray.getDirection(), ip.getNormal());
 			Ray refl_ray(ip.getPoint(), refl_dir);*/
 			Ray refl_ray = calculateReflection(ray, ip);
-			if(glm::dot(ip.getNormal(), refl_ray.getDirection()) < 0.0f) std::cout <<"Error in air->glass reflection!\n";
+			//if(glm::dot(ip.getNormal(), refl_ray.getDirection()) < 0.0f) std::cout <<"Error in air->glass reflection 1!\n";
+			//if(glm::dot(ip.getNormal(), refl_ray.getDirection()) < 0.0f) refl_ray.setDirection(-refl_ray.getDirection());
 			//std::cout<<"refl->norm dot: "<<glm::to_string(glm::dot(ip.getNormal(), refl_ray.getDirection()))<<std::endl;
 			if(tree.intersect(refl_ray, ip_temp)) {
 				// Indirect illumination
@@ -89,7 +89,8 @@ glm::vec3 MonteCarloRayTracer2::iterateAirToGlass(Ray &ray, const Octree &tree, 
 
 			// Refraction
 			Ray refr_ray = calculateRefraction(ray, ip); // flippa normalen på ip här? tror inte det...
-			//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) std::cout<<"Error in air->glass refraction ray!\n";
+			//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) std::cout<<"Error in air->glass refraction ray 2!\n";
+			//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) refr_ray.setDirection(-refr_ray.getDirection());
 			//if(glm::dot(refr_ray.getDirection(), -ip.getNormal()) < glm::dot(refl_ray.getDirection(), ip.getNormal())) std::cout << "Felaktig refraktion beräkning1" << std::endl;
 			if(tree.intersect(refr_ray, ip_temp)) {
 				fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS, 0.0f);
@@ -132,9 +133,9 @@ glm::vec3 MonteCarloRayTracer2::iterateGlassToAir(Ray &ray, const Octree &tree, 
 			// Inner reflection
 			Ray refl_ray = calculateReflection(ray, iIp);
 			float rCosA = std::min(glm::dot(iIp.getNormal(), refl_ray.getDirection()), 1.0f);
-			if(glm::dot(refl_ray.getDirection(), iIp.getNormal()) < 0.0f) std::cout<<"Error in internal reflection!\n";
+			//if(glm::dot(refl_ray.getDirection(), iIp.getNormal()) < 0.0f) std::cout<<"Error in internal reflection3!\n";
+			//if(glm::dot(refl_ray.getDirection(), iIp.getNormal()) < 0.0f) refl_ray.setDirection(-refl_ray.getDirection());
 			if(tree.intersect(refl_ray, ip_temp)) {
-
 				glm::vec3 val = iterateGlassToAir(refl_ray, tree, depth+1, kill);
 				Lr = val;
 			}
@@ -147,14 +148,15 @@ glm::vec3 MonteCarloRayTracer2::iterateGlassToAir(Ray &ray, const Octree &tree, 
 				iIp.getMaterial()->setRefractionIndex(REFRACTION_AIR);
 				Ray refr_ray = calculateRefraction(ray, iIp);
 				iIp.getMaterial()->setRefractionIndex(REFRACTION_GLASS);
-				if(glm::dot(refr_ray.getDirection(), ip.getNormal()) < 0.0f) std::cout<<"Error in glass->air refraction!\n";
+				//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) std::cout<<"Error in glass->air refraction4!\n";
+				//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) refr_ray.setDirection(-refr_ray.getDirection());
 
 				if(tree.intersect(refr_ray, ip_temp)) {
 					float tCosA = glm::dot(iIp.getNormal(), refr_ray.getDirection());
 
 					// Indirect illumination
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
-						glm::vec3 val = iterateRay(refr_ray, tree,depth+1, kill);
+						glm::vec3 val = iterateRay(refr_ray, tree, depth+1, kill);
 						Lt = val;
 					} else { // Direct illumination, ip_temp on light source
 						Lt = ip_temp.getMaterial()->getEmission()
@@ -192,7 +194,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			addToMeanDepth(depth);
 			return ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getEmission();
 		} else if(ip.getMaterial()->getMaterialType() == GLASS) {
-			return iterateAirToGlass(ray, tree,depth,kill);
+			//return iterateAirToGlass(ray, tree,depth,kill);
 		}
 
 		// Do russian roulette to terminate rays.
@@ -245,7 +247,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			// perfect direct and indirect specular reflections (refraktion here aswell)
 			int num_refr_rays = 0;
 			for(int i=0; i<num_specular_rays; ++i) {
-#if 0
+#if 1
 				float fresnel_factor = 1.0f;
 				// Refraction
 				float old_ray_refr_index = ray.getRefractionIndex();
@@ -311,7 +313,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 						if(tree.intersect(refr_ray, ip_temp)) {
 							fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS, glm::dot(ray.getDirection(), ip.getNormal()) );
 							//radiance_refracted += iterateRay(refr_ray, tree, depth+1, kill);
-							radiance_refracted = iterateGlassToAir(refr_ray, tree, depth+1, kill);
+							radiance_refracted = iterateGlassToAir(refr_ray, tree, depth, kill);
 						}
 
 						Ls += ((fresnel_factor*radiance_reflected) + radiance_refracted)
@@ -341,7 +343,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 						}
 					}
 				}
-			//}
+			}
 			Ls /= float(num_specular_rays);
 #endif
 #if 1

@@ -10,6 +10,8 @@
 #define WIDTH 300
 #define HEIGHT 300
 
+typedef double real;
+
 
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)
 #ifndef REFRACTION_AIR
