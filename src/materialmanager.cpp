@@ -9,7 +9,7 @@ MaterialManager::MaterialManager() {
 	MaterialManager::_materials.at(GLASS)->setRefractionIndex(1.52f);
 	MaterialManager::_materials.at(GLASS)->setOpacity(0.05f);
 	MaterialManager::_materials.at(GLASS)->setSpecular(1.0f);
-	MaterialManager::_materials.at(GLASS)->setAbsorbtion(1.f);
+	MaterialManager::_materials.at(GLASS)->setAbsorbtion(0.f);
 
 	MaterialManager::_materials.at(MARBLE) = new Material();
 	MaterialManager::_materials.at(MARBLE)->setMaterialType(MARBLE);
@@ -20,7 +20,7 @@ MaterialManager::MaterialManager() {
 	MaterialManager::_materials.at(LIGHT) = new Material();
 	MaterialManager::_materials.at(LIGHT)->setMaterialType(LIGHT);
 	MaterialManager::_materials.at(LIGHT)->setDiffuseColor(glm::vec3(1.0f));
-	MaterialManager::_materials.at(LIGHT)->setEmission(glm::vec3(8.0f));
+	MaterialManager::_materials.at(LIGHT)->setEmission(glm::vec3(6.0f));
 
 	MaterialManager::_materials.at(MIRROR) = new Material();
 	MaterialManager::_materials.at(MIRROR)->setMaterialType(MIRROR);
@@ -54,8 +54,15 @@ MaterialManager::MaterialManager() {
 
 	MaterialManager::_materials.at(CORNELL_LEFT) = new Material();
 	MaterialManager::_materials.at(CORNELL_LEFT)->setMaterialType(CORNELL_LEFT);
-	MaterialManager::_materials.at(CORNELL_LEFT)->setDiffuseColor(glm::vec3(237.f/255.f,67.f/255.f,55.f/255.f));
+	MaterialManager::_materials.at(CORNELL_LEFT)->setDiffuseColor(glm::vec3(194.f/255.f,63.f/255.f,56.f/255.f));
 	MaterialManager::_materials.at(CORNELL_LEFT)->setAbsorbtion(1.f);
+	MaterialManager::_materials.at(CORNELL_LEFT)->setSpecular(0.0f);
+
+	MaterialManager::_materials.at(CORNELL_TALL_BOX) = new Material();
+	MaterialManager::_materials.at(CORNELL_TALL_BOX)->setMaterialType(CORNELL_TALL_BOX);
+	MaterialManager::_materials.at(CORNELL_TALL_BOX)->setDiffuseColor(glm::vec3(145.f/255.f,167.f/255.f,204.f/255.f));
+	MaterialManager::_materials.at(CORNELL_TALL_BOX)->setAbsorbtion(1.f);
+	MaterialManager::_materials.at(CORNELL_TALL_BOX)->setSpecular(0.0f);
 	}
 }
 

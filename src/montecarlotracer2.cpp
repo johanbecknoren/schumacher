@@ -22,6 +22,26 @@ void MonteCarloRayTracer2::addToMeanDepth(int d) {
 	_depthMutex.unlock();
 }
 
+// 3dim Reflection of a vector on a normal //
+glm::vec3 rotate(const glm::vec3 &n, glm::vec3 &v) {
+    if (!std::abs(1 - std::abs( glm::dot(n, glm::vec3(0,1,0)) )) <= float(1e-3)) {
+	    glm::vec3 bX = glm::cross(n, glm::vec3(0,1,0) );
+		glm::vec3 bZ = glm::normalize(glm::cross(n, glm::normalize(bX)));
+            
+	    return bX * v.x + n * v.y + bZ * v.z;
+    } else{
+        return v * glm::sign(glm::dot(v, n));
+    }
+}
+glm::vec3 hemisphereRotate(const glm::vec3 &n, const float theta, const float phi) {
+    glm::vec3 exitant(std::cos(phi)*std::sin(theta),
+                    std::cos(theta),
+                    std::sin(phi)*std::sin(theta));
+    exitant = rotate(n, exitant);
+   
+	return glm::normalize(exitant);
+}
+
 glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, bool kill) {
 	IntersectionPoint ip;
 
@@ -29,7 +49,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 	glm::vec3 rad(0.0f);
 
-	int countd = 1, counts = 1, countl = 30;
+	int countd = 1, counts = 1, countl = 2;
 
 	if(tree.intersect(ray, ip)) {
 		
@@ -37,6 +57,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 		if (ip.getMaterial()->getMaterialType() == LIGHT) {
 			addToMeanDepth(depth);
+			//std::cout <<"Hej!";
 			return ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getEmission();
 		}
 
@@ -46,7 +67,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 		float killRange = 0.9f;
 		if (killRange < russianRandom) kill = true;
 		
-		if( (depth < _minDepth || !kill) && depth < _maxDepth) {
+		if( (depth <= _minDepth || !kill) && depth < _maxDepth) {
 			
 			rad = ip.getMaterial()->getEmission();
 			bool isInsideObj = ( glm::dot(ray.getDirection(), ip.getNormal() ) >= 0.0f) ? true : false;
@@ -55,83 +76,76 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			IntersectionPoint ip_temp;
 
 			// diffuse indirect light
-#if 0
+#if 1
 			for(int i=0; i<countd; ++i) {
-				float n = 0.1;
+				float n = 0.1f;
 				float r1 = _rgen.nextFloat();
 				float phi = r1 * PI * 2.f;
 				float r2 = _rgen.nextFloat();
-				float theta = acos(pow(r2, 1.f/(1.f+n)));
+				float theta = acos(pow(r2, 1.f/(1.f+n))); // USE THIS!!
+				//float theta = 0.5f*PI*r2; // DO NOT USE
+				//float cosTheta = cos(theta);//glm::max(0.0f,glm::dot(ip.getNormal(), ray.getDirection()));
+				//float pdf = cosTheta / PI;//((n+1)/2.f*PI) * pow(cosTheta, n);//1.f/(2.f*PI);
 
-				float cosTheta = cos(theta);//glm::max(0.0f,glm::dot(ip.getNormal(), ray.getDirection()));
-				float pdf = ((n+1)/2.f*PI) * pow(cosTheta, n);//1.f/(2.f*PI);//cosTheta / PI;
-
-				// Use PDF when picking sample direction here
-				//float thetaPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
-				//float thetaPrim = (PI*_rgen.nextFloat()) / pdf;
-				//float phiPrim = (2.f*_rgen.nextFloat()-1.f) / pdf;
-				//float phiPrim = (2.f*PI*_rgen.nextFloat()) / pdf;
-
-				/*diffuse_dir = glm::vec3(2.f * _rgen.nextFloat() - 1.f, // [-1, 1]
-										2.f * _rgen.nextFloat() - 1.f,
-										2.f * _rgen.nextFloat() - 1.f);*/
 				/*diffuse_dir = glm::vec3 (
-					sin(thetaPrim)*cos(phiPrim),
-					sin(thetaPrim)*sin(phiPrim),
-					cos(thetaPrim)
-					);*/
-				diffuse_dir = glm::vec3 (
 					sin(phi)*cos(theta),
 					sin(phi)*sin(theta),
 					cos(phi)
-					);
+					);*/
 
+				diffuse_dir = hemisphereRotate(ip.getNormal(), theta, phi);
+				/*
 				// Rotate diffuse_dir to distribution of normal vector
-				float el = -acos(ip.getNormal().z);
+				float el = -acos(ip.getNormal().z); // angle of z-part of normal vector?
 				float az = -atan2(ip.getNormal().y, ip.getNormal().x);
 
 				// Rotate around y
 				glm::vec3 diffuse_dir2 = glm::vec3(cos(el) * diffuse_dir.x - sin(el) * diffuse_dir.z, diffuse_dir.y, sin(el) * diffuse_dir.x + cos(el) * diffuse_dir.z);
 				// Rotate around z
 				diffuse_dir = glm::normalize(glm::vec3(cos(az) * diffuse_dir2.x + sin(az) * diffuse_dir2.y, -sin(az) * diffuse_dir2.x + cos(az) * diffuse_dir2.y, diffuse_dir2.z));
-				glm::vec3 reverse_diffuse_dir = -1.f*diffuse_dir;
-				//diffuse_dir = glm::normalize(diffuse_dir);
-				
-				/*if (glm::dot(diffuse_dir, ip.getNormal()) < 0.f) {
-					diffuse_dir = -diffuse_dir;
-				}*/
+				*/
+				//if(glm::dot(ip.getNormal(), diffuse_dir) < 0.0f)
+					//diffuse_dir *= -1.f;
 
 				Ray diffuse_ray(ip.getPoint() + 0.01f*diffuse_dir, diffuse_dir);
 
-				//float cosA = glm::max(0.f, glm::dot( glm::normalize(ip.getNormal()), diffuse_dir));
-				float cosA = glm::dot( glm::normalize(ip.getNormal()), diffuse_dir);
-				glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;
+				//TODO nåt är väldigt galet, *-1 ger samma resultat som *1...
+				glm::vec3 reverse_diffuse_dir = -1.f*diffuse_dir;
 
+				//float cosA = glm::dot( glm::normalize(ip.getNormal()), diffuse_dir);
+				//glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;
+
+				//std::cout<<"diff:"<<glm::to_string(diffuse_dir)<<"reverse:"<<glm::to_string(reverse_diffuse_dir)<<std::endl;
+				
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
-						Ray reverse_diffuse_ray(ip_temp.getPoint(), reverse_diffuse_dir);
-						//glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf;// / pdf;
-						glm::vec3 val = (iterateRay(reverse_diffuse_ray, tree, depth+1, kill) * cosA * brdf) * pdf;
-						//if(glm::dot(glm::vec3(1,1,1), val)<0.0f) val *= -1.f;
-						Lrd += val;//iterateRay(diffuse_ray, tree, depth+1, kill) * cosA * brdf / pdf;
-						//Lrd += (2.f * ip.getMaterial()->getDiffuseColor()
-							//* (1.f-ip.getMaterial()->getSpecular()) * iterateRay(diffuse_ray, tree, depth+1, kill)) * cosA;
-	
+						/*float d = glm::length(ip_temp.getPoint() - ip.getPoint());
+						std::cout<<"d="<<d;*/
+						Ray reverse_diffuse_ray(ip_temp.getPoint() - 0.001f*reverse_diffuse_dir, reverse_diffuse_dir);
+						glm::vec3 val = iterateRay(reverse_diffuse_ray, tree, depth+1, kill);
+						//glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill);
+						Lrd += val;//glm::clamp(val,0.0f,1.0f);
 					}
 				}
+				//Lrd = diffuse_dir;
+				//Lrd = ip.getNormal();
+				
+
+				//Lrd= glm::vec3( glm::dot( glm::normalize(ip.getNormal()), glm::normalize(reverse_diffuse_dir) ) );
 			}
-			//Lrd = Lrd * PI;
+			Lrd *= ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular());
 			Lrd /= float(countd);
-			//Lrd = glm::clamp(Lrd, 0.f,1.f);
+			//Lrd = (Lrd + 1.f) * 0.5f;
 #endif
-#if 1
-			// perfect specular reflections (även refraktion här)
+#if 0
+			// perfect specular reflections (refraktion here aswell)
 			int num_refr_rays = 0;
 			for(int i=0; i<counts; ++i) {
 				// Refraction
+				float old_ray_refr_index = ray.getRefractionIndex();
 				if(ip.getMaterial()->getMaterialType() == GLASS) {
 					if(isInsideObj) { // coming from inside object
-						ip.setNormal(-ip.getNormal());
+						ip.setNormal(-1.0f*ip.getNormal());
 						float n2overn1 = REFRACTION_AIR / REFRACTION_GLASS;
 						float snell = n2overn1;
 						float angle_in = acos(glm::dot( ip.getNormal(), -ray.getDirection()));
@@ -145,32 +159,39 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 							ip.getMaterial()->setRefractionIndex(REFRACTION_AIR);
 							Ray refr_ray = calculateRefraction(ray, ip);
 							ip.getMaterial()->setRefractionIndex(REFRACTION_GLASS);
+
 							Ls += (1.0f-ip.getMaterial()->getOpacity())
 								* ip.getMaterial()->getDiffuseColor()
-								* iterateRay(refr_ray, tree,depth+1,kill);
-							++num_refr_rays;
+								* iterateRay(refr_ray, tree, depth+1, kill);
 						}
-						Ls += (ip.getMaterial()->getOpacity()) *
-						ip.getMaterial()->getDiffuseColor() * iterateRay(refl_ray, tree, depth+1, kill);
-					} else {	// Coming from outside (air)
+
+						// Flytta in denna i satsen för total intern reflektion?!
+						Ls += ip.getMaterial()->getOpacity()
+							* ip.getMaterial()->getDiffuseColor()
+							* iterateRay(refl_ray, tree, depth+1, kill);
+						//ip.setNormal(-ip.getNormal());
+					} else { // Coming from outside (air)
 						Ray refr_ray = calculateRefraction(ray, ip);
-						Ls += (1.0f-ip.getMaterial()->getOpacity())
-								* ip.getMaterial()->getDiffuseColor()
-								* iterateRay(refr_ray, tree,depth+1,kill);
-						++num_refr_rays;
+						Ls += (1.0f - ip.getMaterial()->getOpacity())//ip.getMaterial()->getSpecular()
+							* ip.getMaterial()->getDiffuseColor()
+							* iterateRay(refr_ray, tree, depth+1, kill);
 					}
 				}
+				//ray.setRefractionIndex(old_ray_refr_index);
 				// Reflection
 				Ray refl_ray = calculateReflection(ray, ip);
 				//float cosA = glm::dot(ip.getNormal(), refl_ray.getDirection());
 				if(tree.intersect(refl_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) { // Indirect
 						Ls += ip.getMaterial()->getDiffuseColor() 
-							* ip.getMaterial()->getSpecular() * iterateRay(refl_ray, tree, depth+1, kill)// * cosA/1.f
-							* ip.getMaterial()->getOpacity();
-
+							* ip.getMaterial()->getSpecular()
+							* ip.getMaterial()->getOpacity()
+							* iterateRay(refl_ray, tree, depth+1, kill);// * cosA/1.f
 					} else { // Direct
-						Ls += ip_temp.getMaterial()->getEmission() * ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getSpecular();// * cosA/1.f;
+						Ls += ip_temp.getMaterial()->getEmission() 
+							* ip.getMaterial()->getDiffuseColor() 
+							* ip.getMaterial()->getSpecular()// * cosA/1.f;
+							* ip.getMaterial()->getOpacity();
 					}
 				}
 			}
@@ -182,8 +203,6 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 				// Slumpad rikning mot ljuskälla
 				// Kolla så att strålen verkligen når ljuskällan och inte är skuggad.
 				glm::vec3 randLightPoint = _lightQuad.getRandomPoint(_rgen.nextFloat(),_rgen.nextFloat(),_rgen.nextFloat());
-				//std::cout<<glm::to_string(randLightPoint);
-				//randLightPoint = glm::normalize(randLightPoint);
 				glm::vec3 d = randLightPoint - ip.getPoint();
 				float lightDist = glm::length(d);
 				glm::vec3 randLightDir = glm::normalize(ip.getPoint() - randLightPoint); // From light source to ip
@@ -191,20 +210,15 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 				Ray reverseLightSourceRay(ip.getPoint() - 0.001f*randLightDir, -randLightDir);
 
 				if(tree.intersect(reverseLightSourceRay, ip_temp)) {
-					//if(ip_temp.getMaterial()->getMaterialType() == LIGHT) {
-						float visibility = (ip_temp.getMaterial()->getMaterialType()==LIGHT) ? 1 : 0;
-						float cosThetaPrim = glm::dot(-ip_temp.getNormal(), d);
-						float cosTheta = glm::dot(ip.getNormal(), d);
-						cosThetaPrim = glm::max(0.0f, cosThetaPrim);
-						cosTheta = glm::max(0.0f, cosTheta);
+					float visibility = (ip_temp.getMaterial()->getMaterialType()==LIGHT) ? 1 : 0;
+					float cosThetaPrim = glm::dot(-ip_temp.getNormal(), d);
+					float cosTheta = glm::dot(ip.getNormal(), d);
+					cosThetaPrim = glm::max(0.0f, cosThetaPrim);
+					cosTheta = glm::max(0.0f, cosTheta);
 
-						Ldl += (ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular())
-							* _lightQuad.getArea() * ip_temp.getMaterial()->getEmission()
-							* cosTheta * cosThetaPrim) / (lightDist*lightDist*lightDist*lightDist);
-					//} 
-					//else {
-					//	std::cout<<"MissedLightSås!";
-					//}
+					Ldl += visibility*(ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular())
+						* _lightQuad.getArea() * ip_temp.getMaterial()->getEmission()
+						* cosTheta * cosThetaPrim) / (lightDist*lightDist*lightDist*lightDist);
 				}
 				
 			}
@@ -212,6 +226,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			Ldl /= float(countl);
 #endif
 			return (Lrd+Ls+Ldl);
+			//return Lrd;
 
 		}
 		else {
@@ -288,6 +303,7 @@ void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool
 	std::vector<std::thread> threads;
 	// Start threads
 	
+	//  10+3*_H/4
 	for (int row = _H - 1; row >= 0 ; --row) {
 		for (int i = 0; i < NUM_THREADS; ++i) {
 			ThreadData thd(i, row, NUM_THREADS);

@@ -5,16 +5,18 @@
 #include <mutex>
 #include "SFMT.h"
 #include "glrenderer.h"
+#include "quadrilateral.h"
 
 class MonteCarloRayTracer : Tracer {
 public:
-	MonteCarloRayTracer(const int W, const int H) : Tracer(W, H),
+	MonteCarloRayTracer(const int W, const int H, const Quadrilateral lightQuad) : Tracer(W, H),
 													working(true),
 													_rayCounter(0),
 													_meanRayDepth(0),
 													_maxDepth(10),
 													_minDepth(4),
-													_raysPerPixel(10)
+													_raysPerPixel(10),
+													_lightQuad(lightQuad)
 	{};
 	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 
@@ -64,6 +66,7 @@ private:
 	int _maxDepth;
 	int _minDepth;
 	int _raysPerPixel;
+	Quadrilateral _lightQuad;
 	};
 
 
