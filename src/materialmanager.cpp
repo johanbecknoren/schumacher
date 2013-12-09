@@ -56,13 +56,11 @@ MaterialManager::MaterialManager() {
 	MaterialManager::_materials.at(CORNELL_LEFT)->setMaterialType(CORNELL_LEFT);
 	MaterialManager::_materials.at(CORNELL_LEFT)->setDiffuseColor(glm::vec3(194.f/255.f,63.f/255.f,56.f/255.f));
 	MaterialManager::_materials.at(CORNELL_LEFT)->setAbsorbtion(1.f);
-	MaterialManager::_materials.at(CORNELL_LEFT)->setSpecular(0.0f);
 
 	MaterialManager::_materials.at(CORNELL_TALL_BOX) = new Material();
 	MaterialManager::_materials.at(CORNELL_TALL_BOX)->setMaterialType(CORNELL_TALL_BOX);
 	MaterialManager::_materials.at(CORNELL_TALL_BOX)->setDiffuseColor(glm::vec3(145.f/255.f,167.f/255.f,204.f/255.f));
 	MaterialManager::_materials.at(CORNELL_TALL_BOX)->setAbsorbtion(1.f);
-	MaterialManager::_materials.at(CORNELL_TALL_BOX)->setSpecular(0.0f);
 	}
 }
 

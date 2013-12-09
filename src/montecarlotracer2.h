@@ -15,9 +15,11 @@ public:
 													_meanRayDepth(0),
 													_maxDepth(6),
 													_minDepth(5),
-													_raysPerPixel(200),
+													_raysPerPixel(10),
 													_lightQuad(lightQuad)
-	{};
+	{
+		_buffer = new float[W*H*3];
+	};
 	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 
 private:
@@ -67,6 +69,7 @@ private:
 	int _minDepth;
 	int _raysPerPixel;
 	Quadrilateral _lightQuad;
+	float *_buffer;
 	};
 
 

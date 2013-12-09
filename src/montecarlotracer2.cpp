@@ -10,6 +10,9 @@
 //#include "sphere.h"
 //#include "scenebuilder.h"
 
+#define SCANLINE 0
+#define PER_SAMPLE 1
+
 void MonteCarloRayTracer2::addToCount() {
 	_mutex.lock();
 	++_rayCounter;
@@ -40,6 +43,10 @@ glm::vec3 hemisphereRotate(const glm::vec3 &n, const float theta, const float ph
     exitant = rotate(n, exitant);
    
 	return glm::normalize(exitant);
+}
+
+inline float getFresnel(const float &n1, const float &n2) {
+	return std::powf( (n1 - n2)/(n1 + n2), float(2.f));
 }
 
 glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, bool kill) {
@@ -87,25 +94,7 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 				//float cosTheta = cos(theta);//glm::max(0.0f,glm::dot(ip.getNormal(), ray.getDirection()));
 				//float pdf = cosTheta / PI;//((n+1)/2.f*PI) * pow(cosTheta, n);//1.f/(2.f*PI);
 
-				/*diffuse_dir = glm::vec3 (
-					sin(phi)*cos(theta),
-					sin(phi)*sin(theta),
-					cos(phi)
-					);*/
-
-				diffuse_dir = hemisphereRotate(ip.getNormal(), theta, phi);
-				/*
-				// Rotate diffuse_dir to distribution of normal vector
-				float el = -acos(ip.getNormal().z); // angle of z-part of normal vector?
-				float az = -atan2(ip.getNormal().y, ip.getNormal().x);
-
-				// Rotate around y
-				glm::vec3 diffuse_dir2 = glm::vec3(cos(el) * diffuse_dir.x - sin(el) * diffuse_dir.z, diffuse_dir.y, sin(el) * diffuse_dir.x + cos(el) * diffuse_dir.z);
-				// Rotate around z
-				diffuse_dir = glm::normalize(glm::vec3(cos(az) * diffuse_dir2.x + sin(az) * diffuse_dir2.y, -sin(az) * diffuse_dir2.x + cos(az) * diffuse_dir2.y, diffuse_dir2.z));
-				*/
-				//if(glm::dot(ip.getNormal(), diffuse_dir) < 0.0f)
-					//diffuse_dir *= -1.f;
+				diffuse_dir = hemisphereRotate(ip.getNormal(), theta, phi);	
 
 				Ray diffuse_ray(ip.getPoint() + 0.01f*diffuse_dir, diffuse_dir);
 
@@ -114,8 +103,6 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 				//float cosA = glm::dot( glm::normalize(ip.getNormal()), diffuse_dir);
 				//glm::vec3 brdf = ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular()) / PI;
-
-				//std::cout<<"diff:"<<glm::to_string(diffuse_dir)<<"reverse:"<<glm::to_string(reverse_diffuse_dir)<<std::endl;
 				
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
@@ -123,78 +110,81 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 						std::cout<<"d="<<d;*/
 						Ray reverse_diffuse_ray(ip_temp.getPoint() - 0.001f*reverse_diffuse_dir, reverse_diffuse_dir);
 						glm::vec3 val = iterateRay(reverse_diffuse_ray, tree, depth+1, kill);
-						//glm::vec3 val = iterateRay(diffuse_ray, tree, depth+1, kill);
 						Lrd += val;//glm::clamp(val,0.0f,1.0f);
 					}
 				}
-				//Lrd = diffuse_dir;
-				//Lrd = ip.getNormal();
-				
-
-				//Lrd= glm::vec3( glm::dot( glm::normalize(ip.getNormal()), glm::normalize(reverse_diffuse_dir) ) );
 			}
 			Lrd *= ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular());
 			Lrd /= float(countd);
-			//Lrd = (Lrd + 1.f) * 0.5f;
 #endif
-#if 0
+#if 1
 			// perfect specular reflections (refraktion here aswell)
 			int num_refr_rays = 0;
-			for(int i=0; i<counts; ++i) {
-				// Refraction
-				float old_ray_refr_index = ray.getRefractionIndex();
-				if(ip.getMaterial()->getMaterialType() == GLASS) {
-					if(isInsideObj) { // coming from inside object
-						ip.setNormal(-1.0f*ip.getNormal());
-						float n2overn1 = REFRACTION_AIR / REFRACTION_GLASS;
-						float snell = n2overn1;
-						float angle_in = acos(glm::dot( ip.getNormal(), -ray.getDirection()));
-						float critical_angle = asin(snell);
+			//if(ip.getMaterial()->getSpecular() > EPSILON) {
+				for(int i=0; i<counts; ++i) {
+					float fresnel_factor = 1.0f;
+					// Refraction
+					float old_ray_refr_index = ray.getRefractionIndex();
+					if(ip.getMaterial()->getMaterialType() == GLASS) {
+						if(isInsideObj) { // coming from inside object
+							ip.setNormal(-1.0f*ip.getNormal());
+							float n2overn1 = REFRACTION_AIR / REFRACTION_GLASS;
+							float snell = n2overn1;
+							float angle_in = acos(glm::dot( ip.getNormal(), -ray.getDirection()));
+							float critical_angle = asin(snell);
 						
-						ray.setRefractionIndex(REFRACTION_GLASS);
-						Ray refl_ray = calculateReflection(ray, ip);
+							ray.setRefractionIndex(REFRACTION_GLASS);
+							Ray refl_ray = calculateReflection(ray, ip);
 
-						if(angle_in > critical_angle) {	// Total internal reflection
-						} else {
-							ip.getMaterial()->setRefractionIndex(REFRACTION_AIR);
+							if(angle_in > critical_angle) {	// Total internal reflection
+								Ls += ip.getMaterial()->getOpacity()
+								* ip.getMaterial()->getDiffuseColor()
+								* iterateRay(refl_ray, tree, depth+1, kill);
+							} else {
+								fresnel_factor = getFresnel(REFRACTION_GLASS, REFRACTION_AIR);
+								ip.getMaterial()->setRefractionIndex(REFRACTION_AIR);
+								Ray refr_ray = calculateRefraction(ray, ip);
+								ip.getMaterial()->setRefractionIndex(REFRACTION_GLASS);
+
+								Ls += (1.f - fresnel_factor)//(1.0f-ip.getMaterial()->getOpacity())
+									* ip.getMaterial()->getDiffuseColor()
+									* iterateRay(refr_ray, tree, depth+1, kill);
+							}
+
+							// Flytta in denna i satsen för total intern reflektion?!
+							/*Ls += ip.getMaterial()->getOpacity()
+								* ip.getMaterial()->getDiffuseColor()
+								* iterateRay(refl_ray, tree, depth+1, kill);*/
+							ip.setNormal(-1.0f*ip.getNormal());
+						} else { // Coming from outside (air)
+							fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS);
 							Ray refr_ray = calculateRefraction(ray, ip);
-							ip.getMaterial()->setRefractionIndex(REFRACTION_GLASS);
-
-							Ls += (1.0f-ip.getMaterial()->getOpacity())
+							Ls += (1.f - fresnel_factor)//(1.0f - ip.getMaterial()->getOpacity())
 								* ip.getMaterial()->getDiffuseColor()
 								* iterateRay(refr_ray, tree, depth+1, kill);
 						}
-
-						// Flytta in denna i satsen för total intern reflektion?!
-						Ls += ip.getMaterial()->getOpacity()
-							* ip.getMaterial()->getDiffuseColor()
-							* iterateRay(refl_ray, tree, depth+1, kill);
-						//ip.setNormal(-ip.getNormal());
-					} else { // Coming from outside (air)
-						Ray refr_ray = calculateRefraction(ray, ip);
-						Ls += (1.0f - ip.getMaterial()->getOpacity())//ip.getMaterial()->getSpecular()
-							* ip.getMaterial()->getDiffuseColor()
-							* iterateRay(refr_ray, tree, depth+1, kill);
+					}
+					ray.setRefractionIndex(old_ray_refr_index);
+					// Reflection
+					Ray refl_ray = calculateReflection(ray, ip);
+					//float cosA = glm::dot(ip.getNormal(), refl_ray.getDirection());
+					if(tree.intersect(refl_ray, ip_temp)) {
+						if(ip_temp.getMaterial()->getSpecular() > EPSILON
+							&& ip_temp.getMaterial()->getMaterialType() != LIGHT) { // Indirect
+							Ls += ip.getMaterial()->getDiffuseColor() 
+								* ip.getMaterial()->getSpecular()
+								//* ip.getMaterial()->getOpacity()
+								* fresnel_factor
+								* iterateRay(refl_ray, tree, depth+1, kill);// * cosA/1.f
+						} else { // Direct
+							Ls += ip_temp.getMaterial()->getEmission() 
+								* ip.getMaterial()->getDiffuseColor() 
+								* ip.getMaterial()->getSpecular()// * cosA/1.f;
+								* ip.getMaterial()->getOpacity();
+						}
 					}
 				}
-				//ray.setRefractionIndex(old_ray_refr_index);
-				// Reflection
-				Ray refl_ray = calculateReflection(ray, ip);
-				//float cosA = glm::dot(ip.getNormal(), refl_ray.getDirection());
-				if(tree.intersect(refl_ray, ip_temp)) {
-					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) { // Indirect
-						Ls += ip.getMaterial()->getDiffuseColor() 
-							* ip.getMaterial()->getSpecular()
-							* ip.getMaterial()->getOpacity()
-							* iterateRay(refl_ray, tree, depth+1, kill);// * cosA/1.f
-					} else { // Direct
-						Ls += ip_temp.getMaterial()->getEmission() 
-							* ip.getMaterial()->getDiffuseColor() 
-							* ip.getMaterial()->getSpecular()// * cosA/1.f;
-							* ip.getMaterial()->getOpacity();
-					}
-				}
-			}
+			//}
 			Ls /= float(counts);
 #endif
 #if 1
@@ -237,46 +227,87 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 	return rad;
 }
 
+#if SCANLINE
+void MonteCarloRayTracer2::threadRender(float *pixels, const Octree &tree, const Camera &cam, MonteCarloRayTracer2::ThreadData thd) {
+        for (int u = 0; u < _W / thd.NUM_THREADS; ++u) {
+                glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
+
+                float randU, randV;
+                for(int rpp=1; rpp<=_raysPerPixel; ++rpp) {
+                        float x;
+                        float y;
+                        {
+                                randU = _rgen.nextFloat() / 1.f;
+                                randV = _rgen.nextFloat() / 1.f;
+                                
+                                float u2 = u * thd.NUM_THREADS + thd.tId + randU;
+                                float v2 = thd.row + randV;
+                                
+                                calculateXnY(u2, v2, x, y);
+                        }
+                        Ray r = cam.createRay(x, y);
+                        IntersectionPoint ip;
+                                
+                        if (tree.intersect(r, ip)) {
+
+                                r.setOrigin(ip.getPoint() + r.getDirection() * 0.00001f);
+
+                                glm::vec3 color = iterateRay(r, tree, 0, false);
+                                accumDiffColor += color;
+                        }
+                        addToCount();
+                                
+                        ProgressBar::printTimedProgBar(_rayCounter, _W * _H * _raysPerPixel, "Carlo");
+                }
+                int id = calculateId(u * thd.NUM_THREADS + thd.tId, thd.row);
+
+                pixels[id + 0] = glm::min(1.f, accumDiffColor.x/float(_raysPerPixel));
+                pixels[id + 1] = glm::min(1.f, accumDiffColor.y/float(_raysPerPixel));
+                pixels[id + 2] = glm::min(1.f, accumDiffColor.z/float(_raysPerPixel));
+
+                
+        }
+}
+#endif
+
+#if PER_SAMPLE
 void MonteCarloRayTracer2::threadRender(float *pixels, const Octree &tree, const Camera &cam, MonteCarloRayTracer2::ThreadData thd) {
 	for (int u = 0; u < _W / thd.NUM_THREADS; ++u) {
 		glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
 
 		float randU, randV;
-		for(int rpp=1; rpp<=_raysPerPixel; ++rpp) {
-			float x;
-			float y;
-			{
-				randU = _rgen.nextFloat() / 1.f;
-				randV = _rgen.nextFloat() / 1.f;
+		float x;
+		float y;
+		{
+			randU = _rgen.nextFloat() / 1.f;
+			randV = _rgen.nextFloat() / 1.f;
 				
-				float u2 = u * thd.NUM_THREADS + thd.tId + randU;
-				float v2 = thd.row + randV;
+			float u2 = u * thd.NUM_THREADS + thd.tId + randU;
+			float v2 = thd.row + randV;
 				
-				calculateXnY(u2, v2, x, y);
-			}
-			Ray r = cam.createRay(x, y);
-			IntersectionPoint ip;
-				
-			if (tree.intersect(r, ip)) {
-
-				r.setOrigin(ip.getPoint() + r.getDirection() * 0.00001f);
-
-				glm::vec3 color = iterateRay(r, tree, 0, false);
-				accumDiffColor += color;
-			}
-			addToCount();
-				
-			ProgressBar::printTimedProgBar(_rayCounter, _W * _H * _raysPerPixel, "Carlo");
+			calculateXnY(u2, v2, x, y);
 		}
+		Ray r = cam.createRay(x, y);
+		IntersectionPoint ip;
+				
+		if (tree.intersect(r, ip)) {
+
+			r.setOrigin(ip.getPoint() + r.getDirection() * 0.00001f);
+
+			glm::vec3 color = iterateRay(r, tree, 0, false);
+			accumDiffColor += color;
+		}
+		addToCount();
+				
+		ProgressBar::printTimedProgBar(_rayCounter, _W * _H * _raysPerPixel, "Carlo");
 		int id = calculateId(u * thd.NUM_THREADS + thd.tId, thd.row);
 
-		pixels[id + 0] = glm::min(1.f, accumDiffColor.x/float(_raysPerPixel));
-		pixels[id + 1] = glm::min(1.f, accumDiffColor.y/float(_raysPerPixel));
-		pixels[id + 2] = glm::min(1.f, accumDiffColor.z/float(_raysPerPixel));
-
-		
+		_buffer[id + 0] = glm::min(1.f, accumDiffColor.x);
+		_buffer[id + 1] = glm::min(1.f, accumDiffColor.y);
+		_buffer[id + 2] = glm::min(1.f, accumDiffColor.z);		
 	}
 }
+#endif
 
 void MonteCarloRayTracer2::glRender(float *pixels) {
 #ifdef USE_OPENGL
@@ -302,26 +333,57 @@ void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool
 	_rgen = Rng();
 	std::vector<std::thread> threads;
 	// Start threads
-	
+#if SCANLINE
 	//  10+3*_H/4
-	for (int row = _H - 1; row >= 0 ; --row) {
-		for (int i = 0; i < NUM_THREADS; ++i) {
-			ThreadData thd(i, row, NUM_THREADS);
-			threads.push_back(std::thread(&MonteCarloRayTracer2::threadRender, this,
-										  pixels, *tree, *cam, thd));
-		}
-		for (auto &thread : threads) {
-			thread.join();
-		}
-		threads.clear();
+        for (int row = _H - 1; row >= 0 ; --row) {
+                for (int i = 0; i < NUM_THREADS; ++i) {
+                        ThreadData thd(i, row, NUM_THREADS);
+                        threads.push_back(std::thread(&MonteCarloRayTracer2::threadRender, this,
+                                                                                  pixels, *tree, *cam, thd));
+                }
+                for (auto &thread : threads) {
+                        thread.join();
+                }
+                threads.clear();
 #ifdef USE_OPENGL
-		if (renderDuring) {
-			glRender(pixels);
-		}
+                if (renderDuring) {
+                        glRender(pixels);
+                }
 #endif
+        }
+#endif
+#if PER_SAMPLE
+	for(int rpp=1; rpp<=_raysPerPixel; ++rpp) {
+		std::cout<<std::endl<<"Processing view-ray no. :"<<rpp<<std::endl;
+		//  10+3*_H/4
+		for (int row = _H - 1; row >= 0 ; --row) {
+			for (int i = 0; i < NUM_THREADS; ++i) {
+				ThreadData thd(i, row, NUM_THREADS);
+				threads.push_back(std::thread(&MonteCarloRayTracer2::threadRender, this,
+											  _buffer, *tree, *cam, thd));
+			}
+			for (auto &thread : threads) {
+				thread.join();
+			}
+			threads.clear();
+			
+			
+
+	#ifdef USE_OPENGL
+			if (renderDuring) {
+				glRender(pixels);
+			}
+	#endif
+		}
+		// Vikta buffer mot pixels RAD FÖR RAD; EJ HELA BUFFERTEN
+		for(int id=0; id<_W*_H*3; id+=3) {
+			pixels[id + 0] = (pixels[id + 0]*(rpp-1) + _buffer[id + 0])/rpp;
+			pixels[id + 1] = (pixels[id + 1]*(rpp-1) + _buffer[id + 1])/rpp;
+			pixels[id + 2] = (pixels[id + 2]*(rpp-1) + _buffer[id + 2])/rpp;
+		}
 	}
-    
-	// Join threads
+#endif
+
 	std::cout << std::endl;
 	Timer::getInstance()->stop("Carlo");
 	Timer::getInstance()->printRealTime("Carlo");
