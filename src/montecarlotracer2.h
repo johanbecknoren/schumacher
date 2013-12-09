@@ -15,7 +15,7 @@ public:
 													_meanRayDepth(0),
 													_maxDepth(7),
 													_minDepth(6),
-													_raysPerPixel(300),
+													_raysPerPixel(12),
 													_lightQuad(lightQuad)
 	{
 		_buffer = new float[W*H*3];
@@ -24,6 +24,8 @@ public:
 
 private:
 	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
+	glm::vec3 iterateGlassToAir(Ray &ray, const Octree &tree, int depth, bool kill);
+	glm::vec3 iterateAirToGlass(Ray &ray, const Octree &tree, int depth, bool kill);
 	
 	struct Rng
 	{
