@@ -124,86 +124,84 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 				float old_ray_refr_index = ray.getRefractionIndex();
 				if(ip.getMaterial()->getMaterialType() == GLASS) {
 					if(isInsideObj) { // coming from inside object GLASS->AIR
+
+						glm::vec3 radiance_reflected(0.0f);
+						glm::vec3 radiance_refracted(0.0f);
+
 						ip.setNormal(-1.0f*ip.getNormal());
+
 						float n2overn1 = REFRACTION_AIR / REFRACTION_GLASS;
 						float snell = n2overn1;
 						float angle_in = acos(glm::dot( ip.getNormal(), -ray.getDirection()));
 						float critical_angle = asin(snell);
 						
-						//ray.setRefractionIndex(REFRACTION_GLASS);
-						fresnel_factor = getFresnel(REFRACTION_GLASS, REFRACTION_AIR, glm::dot(ray.getDirection(), ip.getNormal()));
+						ray.setRefractionIndex(REFRACTION_GLASS);
 						// Inner reflection
 						Ray refl_ray = calculateReflection(ray, ip);
 						if(tree.intersect(refl_ray, ip_temp)) {
-							Ls += fresnel_factor//ip.getMaterial()->getOpacity()
+							radiance_reflected += fresnel_factor//ip.getMaterial()->getOpacity()
 								* ip.getMaterial()->getDiffuseColor()
 								* iterateRay(refl_ray, tree, depth+1, kill);
 						}
 
-						// Refraction
-						if(angle_in <= critical_angle) {	// Do refraction
+						// Refraction GLASS -> AIR
+						if(angle_in < critical_angle) {	// Do refraction
+							fresnel_factor = getFresnel(REFRACTION_GLASS, REFRACTION_AIR, glm::dot(ray.getDirection(), ip.getNormal()));
 							ip.getMaterial()->setRefractionIndex(REFRACTION_AIR);
 							Ray refr_ray = calculateRefraction(ray, ip);
 							ip.getMaterial()->setRefractionIndex(REFRACTION_GLASS);
-
-							//fresnel_factor = getFresnel(REFRACTION_GLASS, REFRACTION_AIR, glm::dot(ray.getDirection(), ip.getNormal()));
-							//fresnel_factor = getFresnel(ip.getMaterial()->getRefractionIndex(), REFRACTION_AIR, glm::dot(ray.getDirection(), ip.getNormal()));
-
-							Ls += (1.f - fresnel_factor)//(1.0f-ip.getMaterial()->getOpacity())
+							
+							radiance_refracted += (1.f - fresnel_factor)//(1.0f-ip.getMaterial()->getOpacity())
 								* ip.getMaterial()->getDiffuseColor()
 								* iterateRay(refr_ray, tree, depth+1, kill);
 						}
 
-						
+						Ls += fresnel_factor*radiance_reflected + (1.f-fresnel_factor)*radiance_refracted;
 						//ip.setNormal(-1.0f*ip.getNormal());
 					} else { // Coming from outside AIR->GLASS
-						//fresnel_factor = getFresnel(REFRACTION_AIR, ip.getMaterial()->getRefractionIndex(), glm::dot(ray.getDirection(), ip.getNormal()) );
-						fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS, glm::dot(ray.getDirection(), ip.getNormal()) );
+
+						glm::vec3 radiance_reflected(0.0f);
+						glm::vec3 radiance_refracted(0.0f);
 
 						// Reflection
-						// Indirect spec. reflection
 						Ray refl_ray = calculateReflection(ray, ip);
-						Ls += fresnel_factor
-							* ip.getMaterial()->getDiffuseColor()
-							*iterateRay(refl_ray, tree, depth+1, kill);
-
-						// Direct spec. reflection
 						if(tree.intersect(refl_ray, ip_temp)) {
+							// Indirect specular reflection
+							radiance_reflected += iterateRay(refl_ray, tree, depth+1, kill);
+
+							// Direct specular reflection
 							if(ip_temp.getMaterial()->getMaterialType() == LIGHT) {
-								Ls += ip_temp.getMaterial()->getEmission() 
-								* ip_temp.getMaterial()->getDiffuseColor()
-								* ip.getMaterial()->getDiffuseColor() 
-								* ip.getMaterial()->getSpecular()
-								* fresnel_factor;
+								radiance_reflected += ip_temp.getMaterial()->getEmission() 
+									* ip_temp.getMaterial()->getDiffuseColor();
 							}
 						}
 						
 						// Refraction
 						Ray refr_ray = calculateRefraction(ray, ip);
 						if(tree.intersect(refr_ray, ip_temp)) {
-							Ls += (1.f - fresnel_factor)//(1.0f - ip.getMaterial()->getOpacity())
-								* ip.getMaterial()->getDiffuseColor()
-								* iterateRay(refr_ray, tree, depth+1, kill);
+							fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS, glm::dot(ray.getDirection(), ip.getNormal()) );
+							radiance_refracted += iterateRay(refr_ray, tree, depth+1, kill);
 						}
+
+						Ls += (fresnel_factor*radiance_reflected + (1.f-fresnel_factor)*radiance_refracted)
+							*ip.getMaterial()->getDiffuseColor();
 					}
-					//ray.setRefractionIndex(old_ray_refr_index);
 				} else { // Not GLASS
 					// Reflection
-					Ray refl_ray = calculateReflection(ray, ip);
-					if(tree.intersect(refl_ray, ip_temp)) {
-						// Indirect
-						if(ip_temp.getMaterial()->getMaterialType() != LIGHT
-							&& ip.getMaterial()->getSpecular() > EPSILON) {
-							Ls += ip.getMaterial()->getDiffuseColor() 
-								* ip.getMaterial()->getSpecular()
-								* fresnel_factor
-								* iterateRay(refl_ray, tree, depth+1, kill);// * cosA/1.f
-						} else { // Direct, ip_temp is on light source
-							Ls += ip_temp.getMaterial()->getEmission() 
-								* ip_temp.getMaterial()->getDiffuseColor()
-								* ip.getMaterial()->getDiffuseColor() 
-								* ip.getMaterial()->getSpecular()// * cosA/1.f;
-								* fresnel_factor;
+					if(ip.getMaterial()->getSpecular() > EPSILON) { // Not diffuse materials
+						Ray refl_ray = calculateReflection(ray, ip);
+						if(tree.intersect(refl_ray, ip_temp)) {
+							// Indirect specular reflection
+							if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
+								Ls += ip.getMaterial()->getDiffuseColor() 
+									* ip.getMaterial()->getSpecular()
+									* iterateRay(refl_ray, tree, depth+1, kill);// * cosA/1.f
+							} else { // Direct specular reflection, ip_temp is on light source
+								Ls += ip_temp.getMaterial()->getEmission() 
+									* ip_temp.getMaterial()->getDiffuseColor()
+									* ip.getMaterial()->getDiffuseColor() 
+									* ip.getMaterial()->getSpecular();// * cosA/1.f;
+							}
 						}
 					}
 				}
