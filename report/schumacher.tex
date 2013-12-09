@@ -209,7 +209,6 @@ In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per 
 \section{Russian Roulette}
 
 \section{Monte Carlo ray tracing}
-Beskriv rendering equation här, och hur denna kan delas in i direkt/indirekt del
 As described in the introduction a Monte Carlo ray tracer is similar to a Whitted ray tracer in that it is only interested in the radiance reaching the virtual camera, or the eye.
 It is a complete global illumination algorithm, and solves the rendering equation \autoref{eq:rendering_eq}, repeated below for convenience, by random sampling.
 
@@ -234,9 +233,9 @@ L_{indirect}(x \rightarrow \theta) = \int_{\Omega_x} L_r(x \leftarrow \Phi) f_r(
 
 \subsection{Direct illumination}
 The term $L_{direct}(x \rightarrow \theta)$ expresses the contribution to a point \emph{x} from light sources directly.
-Since the term $L_{direct}(x \rightarrow \theta)$ is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
-Or in a discrete representation as a sum over all \emph{N} light sources in the scene.
-In our implementation though, only a single planar light source is used.
+Since the term $L_{direct}(x \rightarrow \theta)$ contains the emmitance term $L_e$ it is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
+Or as a discrete representation as a sum over all \emph{N} light sources in the scene.
+In our implementation only a single planar light source is considered.
 For generality's sake all equations presented will be defined to handle an arbitrary number of light sources.
 
 \begin{equation}
@@ -266,7 +265,9 @@ If a ray intersects with a specular object, a new ray is traced from the interse
 If this new ray intersects a lightsource the point at the initial intersection receives radiance contribution in the form of emmitance from that light source.
 
 \subsection{Indirect illumintaion}
-Indirect illumination corresponds to radiance received through one or more reflections against other objects in the scene. The contribution from indirect illumination for a point \emph{x} is done by evaluating the integral over the hemisphere in \autoref{eq:rendering_eq_split}c. Unfortunately we cannot transform this expression into an integral over a smaller domain as we did for direct illumination since the reflectance term $L_r$, which in turn contains radiance from other points in the scene, appears on both sides of the equation. The recursive nature of this algorithm is evident and it is clear that an exact solution is cannot be found. We instead use a Monte Carlo estimator as presented in \cite{dutre}.
+Indirect illumination corresponds to radiance received through one or more reflections against other objects in the scene.
+The contribution from indirect illumination for a point \emph{x} is done by evaluating the integral over the hemisphere in \autoref{eq:rendering_eq_split}c. Unfortunately we cannot transform this expression into an integral over a smaller domain as we did for direct illumination since the reflectance term $L_r$, which in turn contains radiance from other points in the scene, appears on both sides of the equation.
+The recursive nature of this algorithm is evident and it is clear that an exact solution is cannot be found. We instead use a Monte Carlo estimator as presented in \cite{dutre}.
 
 \begin{equation}
 \label{eq:monte_carlo_indirect}
