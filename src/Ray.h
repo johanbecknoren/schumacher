@@ -15,7 +15,7 @@ public:
 	void setTMax(float tmax) { _tmax = tmax; }
 	glm::vec3 getOrigin() const { return _origin; } ;
 	glm::vec3 getPosition() const { return _origin * _tmin; };
-	glm::vec3 getDirection() const { return _direction; };
+	glm::vec3 getDirection() const { return glm::normalize(_direction); };
 	float getRefractionIndex() const { return _refractionIndex; }
 	void setOrigin(const glm::vec3 o) { _origin = o; };
 	void setDirection(const glm::vec3 d) { _direction = glm::normalize(d); };

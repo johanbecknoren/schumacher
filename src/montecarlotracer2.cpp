@@ -45,8 +45,10 @@ glm::vec3 hemisphereRotate(const glm::vec3 &n, const float theta, const float ph
 	return glm::normalize(exitant);
 }
 
-inline float getFresnel(const float &n1, const float &n2) {
-	return std::powf( (n1 - n2)/(n1 + n2), float(2.f));
+inline float getFresnel(const float &n1, const float &n2, const float& cosTheta) {
+	//float R0 = std::pow( (n1 - n2)/(n1 + n2), float(2.f));
+	//return R0 + (1-R0)*std::pow(1-cosTheta, 5.f);
+	return std::pow( (n1 - n2)/(n1 + n2), float(2.f));
 }
 
 glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, bool kill) {
@@ -136,12 +138,16 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 							ray.setRefractionIndex(REFRACTION_GLASS);
 							Ray refl_ray = calculateReflection(ray, ip);
 
+							fresnel_factor = getFresnel(REFRACTION_GLASS, REFRACTION_AIR, 
+									glm::dot(ray.getDirection(), ip.getNormal()));
+							//std::cout<<"fresnel="<<fresnel_factor;
 							if(angle_in > critical_angle) {	// Total internal reflection
-								Ls += ip.getMaterial()->getOpacity()
+								fresnel_factor = 1.f;
+								Ls += fresnel_factor//ip.getMaterial()->getOpacity()
 								* ip.getMaterial()->getDiffuseColor()
 								* iterateRay(refl_ray, tree, depth+1, kill);
+							ip.setNormal(-1.0f*ip.getNormal());
 							} else {
-								fresnel_factor = getFresnel(REFRACTION_GLASS, REFRACTION_AIR);
 								ip.getMaterial()->setRefractionIndex(REFRACTION_AIR);
 								Ray refr_ray = calculateRefraction(ray, ip);
 								ip.getMaterial()->setRefractionIndex(REFRACTION_GLASS);
@@ -152,25 +158,31 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 							}
 
 							// Flytta in denna i satsen för total intern reflektion?!
-							/*Ls += ip.getMaterial()->getOpacity()
+							/*Ls += fresnel_factor//ip.getMaterial()->getOpacity()
 								* ip.getMaterial()->getDiffuseColor()
-								* iterateRay(refl_ray, tree, depth+1, kill);*/
-							ip.setNormal(-1.0f*ip.getNormal());
+								* iterateRay(refl_ray, tree, depth+1, kill);
+							ip.setNormal(-1.0f*ip.getNormal());*/
 						} else { // Coming from outside (air)
-							fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS);
 							Ray refr_ray = calculateRefraction(ray, ip);
+							fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS,
+								glm::dot(ray.getDirection(), ip.getNormal()) );
+
 							Ls += (1.f - fresnel_factor)//(1.0f - ip.getMaterial()->getOpacity())
 								* ip.getMaterial()->getDiffuseColor()
 								* iterateRay(refr_ray, tree, depth+1, kill);
 						}
 					}
 					ray.setRefractionIndex(old_ray_refr_index);
+
 					// Reflection
 					Ray refl_ray = calculateReflection(ray, ip);
 					//float cosA = glm::dot(ip.getNormal(), refl_ray.getDirection());
 					if(tree.intersect(refl_ray, ip_temp)) {
-						if(ip_temp.getMaterial()->getSpecular() > EPSILON
-							&& ip_temp.getMaterial()->getMaterialType() != LIGHT) { // Indirect
+						//if(ip_temp.getMaterial()->getSpecular() > EPSILON
+							//&& ip_temp.getMaterial()->getMaterialType() != LIGHT) { // Indirect
+						if(ip_temp.getMaterial()->getMaterialType() != LIGHT
+							&& ip.getMaterial()->getSpecular() > EPSILON) {
+								//std::cout<<"fresnel="<<fresnel_factor;
 							Ls += ip.getMaterial()->getDiffuseColor() 
 								* ip.getMaterial()->getSpecular()
 								//* ip.getMaterial()->getOpacity()
@@ -178,9 +190,11 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 								* iterateRay(refl_ray, tree, depth+1, kill);// * cosA/1.f
 						} else { // Direct
 							Ls += ip_temp.getMaterial()->getEmission() 
+								* ip_temp.getMaterial()->getDiffuseColor()
 								* ip.getMaterial()->getDiffuseColor() 
 								* ip.getMaterial()->getSpecular()// * cosA/1.f;
-								* ip.getMaterial()->getOpacity();
+								//* ip.getMaterial()->getOpacity();
+								* fresnel_factor;
 						}
 					}
 				}
@@ -354,7 +368,7 @@ void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool
 #endif
 #if PER_SAMPLE
 	for(int rpp=1; rpp<=_raysPerPixel; ++rpp) {
-		std::cout<<std::endl<<"Processing view-ray no. :"<<rpp<<std::endl;
+		std::cout<<std::endl<<"Processing view-ray no.: "<<rpp<<std::endl;
 		//  10+3*_H/4
 		for (int row = _H - 1; row >= 0 ; --row) {
 			for (int i = 0; i < NUM_THREADS; ++i) {

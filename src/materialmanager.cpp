@@ -25,7 +25,7 @@ MaterialManager::MaterialManager() {
 	MaterialManager::_materials.at(MIRROR) = new Material();
 	MaterialManager::_materials.at(MIRROR)->setMaterialType(MIRROR);
 	MaterialManager::_materials.at(MIRROR)->setDiffuseColor(glm::vec3(1.0f));
-	MaterialManager::_materials.at(MIRROR)->setAbsorbtion(0.1f);
+	MaterialManager::_materials.at(MIRROR)->setAbsorbtion(0.0f);
 	MaterialManager::_materials.at(MIRROR)->setSpecular(1.0f);
 
 	MaterialManager::_materials.at(STONE) = new Material();
