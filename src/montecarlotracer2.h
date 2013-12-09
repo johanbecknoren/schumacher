@@ -14,7 +14,7 @@ public:
 													_rayCounter(0),
 													_meanRayDepth(0),
 													_maxDepth(8),
-													_minDepth(3),
+													_minDepth(6),
 													_raysPerPixel(300),
 													_lightQuad(lightQuad)
 	{

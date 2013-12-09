@@ -62,11 +62,9 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 	if(tree.intersect(ray, ip)) {
 		
-		//ip.setPoint(ip.getPoint() - 0.01f*ray.getDirection());
 
 		if (ip.getMaterial()->getMaterialType() == LIGHT) {
 			addToMeanDepth(depth);
-			//std::cout <<"Hej!";
 			return ip.getMaterial()->getDiffuseColor() * ip.getMaterial()->getEmission();
 		}
 
@@ -100,7 +98,6 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 				Ray diffuse_ray(ip.getPoint() + 0.01f*diffuse_dir, diffuse_dir);
 
-				//TODO nåt är väldigt galet, *-1 ger samma resultat som *1...
 				glm::vec3 reverse_diffuse_dir = -1.f*diffuse_dir;
 
 				//float cosA = glm::dot( glm::normalize(ip.getNormal()), diffuse_dir);
@@ -108,11 +105,9 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 				
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
-						/*float d = glm::length(ip_temp.getPoint() - ip.getPoint());
-						std::cout<<"d="<<d;*/
 						Ray reverse_diffuse_ray(ip_temp.getPoint() - 0.001f*reverse_diffuse_dir, reverse_diffuse_dir);
 						glm::vec3 val = iterateRay(reverse_diffuse_ray, tree, depth+1, kill);
-						Lrd += val;//glm::clamp(val,0.0f,1.0f);
+						Lrd += val;
 					}
 				}
 			}
@@ -120,9 +115,8 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			Lrd /= float(countd);
 #endif
 #if 1
-			// perfect specular reflections (refraktion here aswell)
+			// perfect direct and indirect specular reflections (refraktion here aswell)
 			int num_refr_rays = 0;
-			//if(ip.getMaterial()->getSpecular() > EPSILON) {
 				for(int i=0; i<counts; ++i) {
 					float fresnel_factor = 1.0f;
 					// Refraction
@@ -156,12 +150,6 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 									* ip.getMaterial()->getDiffuseColor()
 									* iterateRay(refr_ray, tree, depth+1, kill);
 							}
-
-							// Flytta in denna i satsen för total intern reflektion?!
-							/*Ls += fresnel_factor//ip.getMaterial()->getOpacity()
-								* ip.getMaterial()->getDiffuseColor()
-								* iterateRay(refl_ray, tree, depth+1, kill);
-							ip.setNormal(-1.0f*ip.getNormal());*/
 						} else { // Coming from outside (air)
 							Ray refr_ray = calculateRefraction(ray, ip);
 							fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS,
@@ -176,29 +164,23 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 
 					// Reflection
 					Ray refl_ray = calculateReflection(ray, ip);
-					//float cosA = glm::dot(ip.getNormal(), refl_ray.getDirection());
 					if(tree.intersect(refl_ray, ip_temp)) {
-						//if(ip_temp.getMaterial()->getSpecular() > EPSILON
-							//&& ip_temp.getMaterial()->getMaterialType() != LIGHT) { // Indirect
+						// Indirect
 						if(ip_temp.getMaterial()->getMaterialType() != LIGHT
 							&& ip.getMaterial()->getSpecular() > EPSILON) {
-								//std::cout<<"fresnel="<<fresnel_factor;
 							Ls += ip.getMaterial()->getDiffuseColor() 
 								* ip.getMaterial()->getSpecular()
-								//* ip.getMaterial()->getOpacity()
 								* fresnel_factor
 								* iterateRay(refl_ray, tree, depth+1, kill);// * cosA/1.f
-						} else { // Direct
+						} else { // Direct, ip_temp is on light source
 							Ls += ip_temp.getMaterial()->getEmission() 
 								* ip_temp.getMaterial()->getDiffuseColor()
 								* ip.getMaterial()->getDiffuseColor() 
 								* ip.getMaterial()->getSpecular()// * cosA/1.f;
-								//* ip.getMaterial()->getOpacity();
 								* fresnel_factor;
 						}
 					}
 				}
-			//}
 			Ls /= float(counts);
 #endif
 #if 1
@@ -230,8 +212,6 @@ glm::vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int dep
 			Ldl /= float(countl);
 #endif
 			return (Lrd+Ls+Ldl);
-			//return Lrd;
-
 		}
 		else {
 			addToMeanDepth(depth);
