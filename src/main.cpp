@@ -46,17 +46,19 @@ int main(int argc, char **argv) {
 	tree->addObject(scene);
 
 	// tree->print(false);
-	float* pixels = new float[3 * WIDTH * HEIGHT];
+	//float* pixels = new float[3 * WIDTH * HEIGHT];
+	real* pixels = new real[3 * WIDTH * HEIGHT];
 	int* pixelsInt = new int[3 * WIDTH * HEIGHT];
 #ifdef USE_OPENGL
 	glfwInit();
 	
 	// GLFW_WINDOW
-	if(!glfwOpenWindow(WIDTH, HEIGHT, 8,8,8,8, 32,0, GLFW_WINDOW)) {
+	//if(!glfwOpenWindow(WIDTH, HEIGHT, 8,8,8,8, 32,0, GLFW_WINDOW)) {
+	if(!glfwOpenWindow(WIDTH, HEIGHT, sizeof(real),sizeof(real),sizeof(real),sizeof(real), 32,0, GLFW_WINDOW)) {
 		glfwTerminate(); // glfwOpenWindow failed, quit the program.
 		return 0;
 	}
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);        // making default background color black
+    glClearColor(real(0.0), real(0.0), real(0.0), real(0.0));        // making default background color black
     glfwSwapInterval(0);
 #endif
 	
@@ -75,7 +77,7 @@ int main(int argc, char **argv) {
 	// caster.render(pixels, tree, cam);	
 
 	for(int i = 0; i < 3 * WIDTH * HEIGHT; ++i)
-		pixelsInt[i] = int(pixels[i] * 255.0f);
+		pixelsInt[i] = int(pixels[i] * real(255.0));
 
 	if (exportImage)
 		ImageExporter::saveImage(pixelsInt, (char*)"render1", WIDTH, HEIGHT);

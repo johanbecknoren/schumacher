@@ -277,6 +277,15 @@ The recursive nature of this algorithm is evident and it is clear that an exact 
 In \autoref{eq:monte_carlo_indirect} \emph{N} is the number of rays used to sample indirect radiance, $L_r$ is the reflected radiance, $\Phi_i$ is the hemisphere direction of the \emph{i}:th sampled ray, $f_r$ is the BRDF of the surface material of \emph{x}, $N_x$ is the surface normal, and finally $p(\Phi_i)$ is the probability distribution function.
 
 \subsubsection{Diffuse indirect illumination}
+Since a (Lambertian) diffuse surface per definition reflects equal amounts of radiance in every direction, the BRDF for such a surface can be treated as a constant. We define the BRDF for all diffuse surfaces as 
+\begin{subequations} \label{eq:diffuse_indirect}
+\begin{align} 
+BRDF &= color*k_d\pi \\
+pdf &= \frac{cos(\theta)}{\pi} \\
+L_{indirect}(x \rightarrow \theta) &= \int_{\Omega_x} L_r(x \leftarrow \Phi) f_r(x, \Phi \rightarrow \theta)cos(N_x, \Phi)d\omega_{\Phi}
+\end{align}
+\end{subequations}
+
 \subsubsection{Specular indirect illumination}
 \subsection{Reflection}
 \subsection{Refraction}

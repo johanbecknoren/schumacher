@@ -11,8 +11,8 @@
 #define WIDTH 300
 #define HEIGHT 300
 
-typedef double real;
-typedef glm::dvec3 Vec3;
+typedef float real;
+typedef glm::vec3 Vec3;
 
 
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)

@@ -234,14 +234,14 @@ Vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, b
 				
 				if(tree.intersect(diffuse_ray, ip_temp)) {
 					if(ip_temp.getMaterial()->getMaterialType() != LIGHT) {
-						Ray reverse_diffuse_ray(ip_temp.getPoint() - 0.001f*reverse_diffuse_dir, reverse_diffuse_dir);
+						Ray reverse_diffuse_ray(ip_temp.getPoint() - real(0.001)*reverse_diffuse_dir, reverse_diffuse_dir);
 						Vec3 val = iterateRay(reverse_diffuse_ray, tree, depth+1, kill);
 						Lrd += val;
 					}
 				}
 			}
 			Lrd *= ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular());
-			Lrd /= float(num_diffuse_rays);
+			Lrd /= real(num_diffuse_rays);
 #endif
 #if 1
 			// perfect direct and indirect specular reflections (refraktion here aswell)
@@ -372,7 +372,7 @@ Vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, b
 				
 			}
 
-			Ldl /= float(num_shadow_rays);
+			Ldl /= real(num_shadow_rays);
 #endif
 			return (Lrd+Ls+Ldl);
 		}
@@ -428,54 +428,56 @@ void MonteCarloRayTracer2::threadRender(float *pixels, const Octree &tree, const
 #endif
 
 #if PER_SAMPLE
-void MonteCarloRayTracer2::threadRender(float *pixels, const Octree &tree, const Camera &cam, MonteCarloRayTracer2::ThreadData thd) {
+void MonteCarloRayTracer2::threadRender(real *pixels, const Octree &tree, const Camera &cam, MonteCarloRayTracer2::ThreadData thd) {
 	for (int u = 0; u < _W / thd.NUM_THREADS; ++u) {
-		glm::vec3 accumDiffColor(0.0f,0.0f,0.0f);
+		Vec3 accumDiffColor(real(0.0));
 
-		float randU, randV;
-		float x;
-		float y;
+		real randU, randV;
+		real x;
+		real y;
 		{
-			randU = _rgen.nextFloat() / 1.f;
-			randV = _rgen.nextFloat() / 1.f;
+			randU = _rgen.nextFloat() / real(1);
+			randV = _rgen.nextFloat() / real(1);
 				
-			float u2 = u * thd.NUM_THREADS + thd.tId + randU;
-			float v2 = thd.row + randV;
+			real u2 = u * thd.NUM_THREADS + thd.tId + randU;
+			real v2 = thd.row + randV;
 				
 			calculateXnY(u2, v2, x, y);
 		}
 		Ray r = cam.createRay(x, y);
 		IntersectionPoint ip;
-				
+			
 		if (tree.intersect(r, ip)) {
 
 			r.setOrigin(ip.getPoint() + r.getDirection() * real(0.00001));
 
 			Vec3 color = iterateRay(r, tree, 0, false);
 			accumDiffColor += color;
+
+			std::cout<<"Intersection, color="<<glm::to_string(accumDiffColor);
 		}
 		addToCount();
 				
 		ProgressBar::printTimedProgBar(_rayCounter, _W * _H * _raysPerPixel, "Carlo");
 		int id = calculateId(u * thd.NUM_THREADS + thd.tId, thd.row);
 
-		_buffer[id + 0] = glm::min(1.f, accumDiffColor.x);
-		_buffer[id + 1] = glm::min(1.f, accumDiffColor.y);
-		_buffer[id + 2] = glm::min(1.f, accumDiffColor.z);		
+		_buffer[id + 0] = glm::min(real(1), accumDiffColor.x);
+		_buffer[id + 1] = glm::min(real(1), accumDiffColor.y);
+		_buffer[id + 2] = glm::min(real(1), accumDiffColor.z);		
 	}
 }
 #endif
 
-void MonteCarloRayTracer2::glRender(float *pixels) {
+void MonteCarloRayTracer2::glRender(real *pixels) {
 #ifdef USE_OPENGL
-	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+	glClearColor(real(0.0), real(1.0), real(0.0), real(0.0));
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawPixels(_W, _H, GL_RGB, GL_FLOAT, pixels);
 	glfwSwapBuffers();
 #endif
 }
  
-void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
+void MonteCarloRayTracer2::render(real *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
 	Timer::getInstance()->start("Carlo");
 	int NUM_THREADS = std::thread::hardware_concurrency();
 	std::cout << "Starting carlo tracer with ";
@@ -534,9 +536,9 @@ void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool
 		}
 		// Vikta buffer mot pixels RAD FÖR RAD; EJ HELA BUFFERTEN
 		for(int id=0; id<_W*_H*3; id+=3) {
-			pixels[id + 0] = (pixels[id + 0]*(real(rpp-1)) + _buffer[id + 0])/real(rpp);
-			pixels[id + 1] = (pixels[id + 1]*(real(rpp-1)) + _buffer[id + 1])/real(rpp);
-			pixels[id + 2] = (pixels[id + 2]*(real(rpp-1)) + _buffer[id + 2])/real(rpp);
+			pixels[id + 0] = (pixels[id + 0]*(rpp-1) + _buffer[id + 0])/(rpp);
+			pixels[id + 1] = (pixels[id + 1]*(rpp-1) + _buffer[id + 1])/(rpp);
+			pixels[id + 2] = (pixels[id + 2]*(rpp-1) + _buffer[id + 2])/(rpp);
 		}
 	}
 #endif

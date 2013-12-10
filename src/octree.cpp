@@ -104,14 +104,14 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
 }
 
 bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
-	float lMin = FLT_MAX;
+	real lMin = FLT_MAX;
 	bool found = false;
 	
 	for (size_t i = 0; i < _leafs.size(); ++i) {
 		IntersectionPoint ip;
 		if (_leafs[i].getRenderable()->getIntersectionPoint(ray, ip)) {
-			glm::vec3 vec = ip.getPoint() - ray.getOrigin();
-			float len = glm::length((vec));
+			Vec3 vec = ip.getPoint() - ray.getOrigin();
+			real len = glm::length((vec));
 			if(len < lMin && len < ray.getTMax()) {
 				lMin = len;
 				isect = ip;
@@ -127,7 +127,7 @@ bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
 
 
 bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
-	float tmin = 0, tmax = FLT_MAX;
+	real tmin = 0, tmax = FLT_MAX;
 	if (!_root->getBoundingBox()->IntersectT(&ray, &tmin, &tmax))
 		return false;
 	
@@ -154,12 +154,12 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 		}
 		// Process interior nodes				
 		int id = -1;
-		float mint = FLT_MAX;
-		float maxt = 0;
+		real mint = FLT_MAX;
+		real maxt = 0;
 		for (int i = 0; i < 8; ++i) {
 			if (node->getChild(i) != NULL) {
 
-				float max, tplane;
+				real max, tplane;
 				// If colliding with octree child boxes
 				if (node->getChild(i)->getBoundingBox()->IntersectT(&ray, &tplane, &max)) {
 					if(tplane < mint && tplane > 0)
@@ -206,12 +206,12 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 	}
 	// Find closest intersection
 	if (pts.size() > 0) {
-		float min = glm::distance(pts[0].getPoint(), ray.getOrigin());
+		real min = glm::distance(pts[0].getPoint(), ray.getOrigin());
 		int id = 0;
 		for (size_t i = 0; i < pts.size(); ++i) {
-			// glm::vec3 vec = pts[i].getPoint() - ray.getOrigin();
+			// Vec3 vec = pts[i].getPoint() - ray.getOrigin();
 
-			float len = glm::distance(ray.getOrigin(), pts[i].getPoint());
+			real len = glm::distance(ray.getOrigin(), pts[i].getPoint());
 
 			if(len < min && len > 0) {
 				min = len;
@@ -226,40 +226,40 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 
 AABB *Octree::createBoundingBox(const Node *node, const int octant) {
 	const AABB *box = node->getBoundingBox();
-	glm::vec3 lowerLeft = box->getLowerLeftBack();
-	glm::vec3 upperRight = box->getUpperRightFront();
-	glm::vec3 diff = (upperRight - lowerLeft) / 2.0f;
+	Vec3 lowerLeft = box->getLowerLeftBack();
+	Vec3 upperRight = box->getUpperRightFront();
+	Vec3 diff = (upperRight - lowerLeft) / real(2.0);
 
 	switch(octant) {
 		case 0: {
 
 		} break;
 		case 1: {
-			lowerLeft += glm::vec3(diff.x, 0.0f, 0.0f);
+			lowerLeft += Vec3(diff.x, real(0.0), real(0.0));
 		} break;
 		case 2: {
-			lowerLeft += glm::vec3(0.0f, 0.0f, diff.z);
+			lowerLeft += Vec3(real(0.0), real(0.0), diff.z);
 		} break;
 		case 3: {
-			lowerLeft += glm::vec3(diff.x, 0.0f, diff.z);
+			lowerLeft += Vec3(diff.x, real(0.0), diff.z);
 		} break;
 		case 4: {
-			lowerLeft += glm::vec3(0.0f, diff.y, .0f);
+			lowerLeft += Vec3(real(0.0), diff.y, real(0.0));
 		} break;
 		case 5: {
-			lowerLeft += glm::vec3(diff.x, diff.y, .0f);
+			lowerLeft += Vec3(diff.x, diff.y, real(0.0));
 		} break;
 		case 6: {
-			lowerLeft += glm::vec3(0.0f, diff.y, diff.z);
+			lowerLeft += Vec3(real(0.0), diff.y, diff.z);
 		} break;
 		case 7: {
-			lowerLeft += glm::vec3(diff.x, diff.y, diff.z);
+			lowerLeft += Vec3(diff.x, diff.y, diff.z);
 		}
 		default: {
 		} break;
 	}
 	upperRight = lowerLeft + diff;
-	glm::vec3 origin = (lowerLeft + upperRight) / 2.0f;
+	Vec3 origin = (lowerLeft + upperRight) / real(2.0);
 	AABB *bb = new AABB(lowerLeft, upperRight, origin);
 	return bb;
 }
@@ -277,10 +277,10 @@ void Octree::subdivideBoundingBox(Node *parent, Renderable *object) {
 	const AABB *parentBox = parent->getBoundingBox();
 	const AABB *objectBox = object->getBoundingBox();	
 	
-	const glm::vec3 lowerLeft = objectBox->getLowerLeftBack();
+	const Vec3 lowerLeft = objectBox->getLowerLeftBack();
 	int q1 = parentBox->getQuadrant(lowerLeft);
 
-	const glm::vec3 upperRight = objectBox->getUpperRightFront();
+	const Vec3 upperRight = objectBox->getUpperRightFront();
 	int q2 = parentBox->getQuadrant(upperRight);
 
 	if(q1 != -1 && q2 != -1 && q1 == q2) {		
