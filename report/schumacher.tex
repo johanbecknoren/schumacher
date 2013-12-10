@@ -267,7 +267,8 @@ If this new ray intersects a lightsource the point at the initial intersection r
 \subsection{Indirect illumintaion}
 Indirect illumination corresponds to radiance received through one or more reflections against other objects in the scene.
 The contribution from indirect illumination for a point \emph{x} is done by evaluating the integral over the hemisphere in \autoref{eq:rendering_eq_split}c. Unfortunately we cannot transform this expression into an integral over a smaller domain as we did for direct illumination since the reflectance term $L_r$, which in turn contains radiance from other points in the scene, appears on both sides of the equation.
-The recursive nature of this algorithm is evident and it is clear that an exact solution is cannot be found. We instead use a Monte Carlo estimator as presented in \cite{dutre}.
+The recursive nature of this algorithm is evident and it is clear that an exact solution is cannot be found.
+We instead use a Monte Carlo estimator as presented in \cite{dutre}.
 
 \begin{equation}
 \label{eq:monte_carlo_indirect}
@@ -275,16 +276,31 @@ The recursive nature of this algorithm is evident and it is clear that an exact 
 \end{equation}
 
 In \autoref{eq:monte_carlo_indirect} \emph{N} is the number of rays used to sample indirect radiance, $L_r$ is the reflected radiance, $\Phi_i$ is the hemisphere direction of the \emph{i}:th sampled ray, $f_r$ is the BRDF of the surface material of \emph{x}, $N_x$ is the surface normal, and finally $p(\Phi_i)$ is the probability distribution function.
+Specular indirect illumination och diffuse indirect illumination are handled separately.
 
 \subsubsection{Diffuse indirect illumination}
-Since a (Lambertian) diffuse surface per definition reflects equal amounts of radiance in every direction, the BRDF for such a surface can be treated as a constant. We define the BRDF for all diffuse surfaces as 
-\begin{subequations} \label{eq:diffuse_indirect}
+In this project all diffuse surfaces are of Lambertian type.
+Since a Lambertian diffuse surface per definition reflects equal amounts of radiance in every direction, the BRDF and the pdf for such a surface can both be treated as constants.
+We define the BRDF and the pdf for all diffuse surfaces as  in \autoref{eq:diffuse_indirect1}.
+\begin{subequations} \label{eq:diffuse_indirect1}
 \begin{align} 
-BRDF &= color*k_d\pi \\
-pdf &= \frac{cos(\theta)}{\pi} \\
-L_{indirect}(x \rightarrow \theta) &= \int_{\Omega_x} L_r(x \leftarrow \Phi) f_r(x, \Phi \rightarrow \theta)cos(N_x, \Phi)d\omega_{\Phi}
+BRDF &= \frac{color}{\pi} \\
+p(\Phi_i) &= \frac{cos(\Phi_i, N_x)}{\pi}
 \end{align}
 \end{subequations}
+
+Inserting \autoref{eq:diffuse_indirect1} into \autoref{eq:monte_carlo_indirect} and reducing and realising that constants can be placed outside the sum produces \autoref{eq:diffuse_indirect2}.
+
+\begin{subequations} \label{eq:diffuse_indirect2}
+\begin{align}
+\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
+\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+\end{align}
+\end{subequations}
+
+The random hemisphere sample direction $\Phi_i$ is created by randomly picking two angles $\theta$ and $\phi$, which will represent a sampling direction in spherical coordinates.
+The angle $\phi$ is randomly assigned a value in the interval $[0,2\pi]$ and $\theta$ is assigned a value of $cos^{-1}(r^{ \frac{1}{1+n} })$ where \emph{r} is a random number in the interval $[0,1]$ and \emph{n} is a user selected number in the interval $[0,1]$ which dictates the sample direction's alignment with $N_x$.
 
 \subsubsection{Specular indirect illumination}
 \subsection{Reflection}

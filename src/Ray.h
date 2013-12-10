@@ -16,7 +16,7 @@ public:
 	Vec3 getOrigin() const { return _origin; } ;
 	Vec3 getPosition() const { return _origin * _tmin; };
 	Vec3 getDirection() const { return glm::normalize(_direction); };
-	float getRefractionIndex() const { return _refractionIndex; }
+	real getRefractionIndex() const { return _refractionIndex; }
 	void setOrigin(const Vec3 o) { _origin = o; };
 	void setDirection(const Vec3 d) { _direction = glm::normalize(d); };
 	void setRefractionIndex(const real r) { _refractionIndex = r; };

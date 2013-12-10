@@ -39,14 +39,14 @@ class Tracer {
 			return u * 3 + _W * v * 3;
 		}
 
-		inline void calculateXnY(const int u, const int v, float &x, float &y) {
-			x = ( (2.0f*real(u)-real(_W))/real(_W) ) * _tanfovx;
-			y = -( (2.0f*real(v)-real(_H))/real(_H) ) * _tanfovy;
+		inline void calculateXnY(const int u, const int v, real &x, real &y) {
+			x = ( (real(2.0)*real(u)-real(_W))/real(_W) ) * _tanfovx;
+			y = -( (real(2.0)*real(v)-real(_H))/real(_H) ) * _tanfovy;
 		}
 
 		inline void calculateXnY(const real u, const real v, real &x, real &y) {
-			x = ( (2.0f*real(u)-real(_W))/real(_W) ) * _tanfovx;
-			y = -( (2.0f*real(v)-real(_H))/real(_H) ) * _tanfovy;
+			x = ( (real(2.0)*real(u)-real(_W))/real(_W) ) * _tanfovx;
+			y = -( (real(2.0)*real(v)-real(_H))/real(_H) ) * _tanfovy;
 		}
 
 	protected:

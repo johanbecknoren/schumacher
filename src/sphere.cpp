@@ -43,9 +43,9 @@ bool Sphere::getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const {
 
 		real t0, t1, q;
 		if(B<0)
-			q = (-B - sqrtf(sqrtTerm))/2.0f;
+			q = (-B - sqrt(sqrtTerm))/real(2.0);
 		else
-			q = (-B + sqrtf(sqrtTerm))/2.0f;
+			q = (-B + sqrt(sqrtTerm))/real(2.0);
 
 		//To avoid poor numerical prec. when B ~= sqrt(sqrtTerm)
 		t0 = q / A;

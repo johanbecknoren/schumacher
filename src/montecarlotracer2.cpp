@@ -7,8 +7,7 @@
 #include "SFMT.h"
 #include <glm/gtx/random.hpp>
 #include "glmprint.h"
-//#include "sphere.h"
-//#include "scenebuilder.h"
+#include "imageexporter.h"
 
 #define SCANLINE 0
 #define PER_SAMPLE 1
@@ -27,7 +26,7 @@ void MonteCarloRayTracer2::addToMeanDepth(int d) {
 
 // 3dim Reflection of a vector on a normal //
 Vec3 rotate(const Vec3 &n, Vec3 &v) {
-    if (!std::abs(1 - std::abs( glm::dot(n, Vec3(0,1,0)) )) <= float(1e-3)) {
+    if (!(std::abs(1 - std::abs( glm::dot(n, Vec3(0,1,0)) )) <= real(1e-3))) {
 	    Vec3 bX = glm::cross(n, Vec3(0,1,0) );
 		Vec3 bZ = glm::normalize(glm::cross(n, glm::normalize(bX)));
             
@@ -45,17 +44,39 @@ Vec3 hemisphereRotate(const Vec3 &n, const real theta, const real phi) {
 	return glm::normalize(exitant);
 }
 
+// More accurate Fresnel reflection equation
+inline real getFresnelBig(const real &n1, const real &n2, const Vec3 &R, const Vec3 &N) {
+	real cosA = std::min(glm::dot(R, N), real(1));
+
+	real term = std::sqrt( real(1) - std::pow((n1/n2) * std::sin( std::acos(cosA) ), real(2)) );
+
+	real Rs = std::pow((n1*cosA - n2*term)/(n1*cosA + n2*term), real(2));
+	real Rp = std::pow((n1*term - n2*cosA)/(n1*term + n2*cosA), real(2));
+
+	real t = (Rs + Rp)*real(0.5);
+	if(!(t >= real(0) && t <= real(1.01))) {//TODO ta bort detta sen.
+		std::cout << "Fresnel fel: t = " << t << ", " << cosA << ", " << term  << ", " << Rs  << ", " << Rp << std::endl;
+		std::cout << "Term = " << (n1/n2) << ", " << std::acos(cosA) << ", " << std::sin( std::acos(cosA) ) << ", " << std::pow((n1/n2) * std::sin( std::acos(cosA) ), real(2)) << std::endl;
+		std::cin >> t;
+	}
+	
+	return (Rs + Rp)*real(0.5);
+}
+
 // Ray going from n1 to n2
+// Approximation of Fresnel reflection equation
 inline real getFresnel(const real &n1, const real &n2, const real& cosTheta) {
 	//float R0 = std::pow( (n1 - n2)/(n1 + n2), real(2));
 	//return R0 + (1-R0)*std::pow(1-cosTheta, 5.f);
 	return std::pow( (n1 - n2)/(n1 + n2), real(2));
+
+	
 }
 Vec3 MonteCarloRayTracer2::iterateAirToGlass(Ray &ray, const Octree &tree, int depth, bool kill) {
 	Vec3 Lr(real(0.0)); // reflected radiance
 	Vec3 Lt(real(0.0)); // refracted/trasmitted radiance;
 	//std::cout<<"In glass->air! depth="<<depth<<"kill="<<kill<<std::endl;
-	float R=1.f,T=0.f;
+	real R=1,T=0;
 
 	IntersectionPoint ip, ip_temp, iIp;
 
@@ -68,12 +89,13 @@ Vec3 MonteCarloRayTracer2::iterateAirToGlass(Ray &ray, const Octree &tree, int d
 	if (killRange < russianRandom) kill = true;
 		
 	if( (depth <= _minDepth || !kill) && depth < _maxDepth) {
-		if(tree.intersect(ray, ip)) {
+		if(tree.intersect(ray, ip)) { // ip should be on GLASS obj here
+			std::cout<<"ray.refr="<<ray.getRefractionIndex()<<"ip.mat="<<ip.getMaterial()->getMaterialType()<<std::endl;
 			// Reflection
 			/*Vec3 refl_dir = glm::reflect(ray.getDirection(), ip.getNormal());
 			Ray refl_ray(ip.getPoint(), refl_dir);*/
 			Ray refl_ray = calculateReflection(ray, ip);
-			//if(glm::dot(ip.getNormal(), refl_ray.getDirection()) < 0.0f) std::cout <<"Error in air->glass reflection 1!\n";
+			if(glm::dot(ip.getNormal(), refl_ray.getDirection()) < real(0.0)) std::cout <<"Error in air->glass reflection 1!\n";
 			//if(glm::dot(ip.getNormal(), refl_ray.getDirection()) < 0.0f) refl_ray.setDirection(-refl_ray.getDirection());
 			//std::cout<<"refl->norm dot: "<<glm::to_string(glm::dot(ip.getNormal(), refl_ray.getDirection()))<<std::endl;
 			if(tree.intersect(refl_ray, ip_temp)) {
@@ -89,12 +111,12 @@ Vec3 MonteCarloRayTracer2::iterateAirToGlass(Ray &ray, const Octree &tree, int d
 
 			// Refraction
 			Ray refr_ray = calculateRefraction(ray, ip); // flippa normalen på ip här? tror inte det...
-			//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) std::cout<<"Error in air->glass refraction ray 2!\n";
+			if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= real(0.0)) std::cout<<"Error in air->glass refraction ray 2!\n";
 			//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) refr_ray.setDirection(-refr_ray.getDirection());
 			//if(glm::dot(refr_ray.getDirection(), -ip.getNormal()) < glm::dot(refl_ray.getDirection(), ip.getNormal())) std::cout << "Felaktig refraktion beräkning1" << std::endl;
 			if(tree.intersect(refr_ray, ip_temp)) {
 				fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS, real(0));
-				float cosA = glm::dot(-ip.getNormal(), refr_ray.getDirection());
+				real cosA = glm::dot(-ip.getNormal(), refr_ray.getDirection());
 				//if(cosA < 0.0f) std::cout<<"Error in air->glass refraction ray!\n";
 
 				Vec3 val = iterateGlassToAir(refr_ray, tree, depth+1, kill);
@@ -103,8 +125,9 @@ Vec3 MonteCarloRayTracer2::iterateAirToGlass(Ray &ray, const Octree &tree, int d
 		}
 		Vec3 ret = (fresnel_factor*Lr + (real(1)-fresnel_factor)*Lt) * ip.getMaterial()->getDiffuseColor();
 	} else {
-	return Vec3(real(0));
+		return Vec3(real(0));
 	}
+	return Vec3(real(0));
 }
 Vec3 MonteCarloRayTracer2::iterateGlassToAir(Ray &ray, const Octree &tree, int depth, bool kill) {
 	Vec3 Lr(real(0.0)); // reflected radiance
@@ -133,7 +156,7 @@ Vec3 MonteCarloRayTracer2::iterateGlassToAir(Ray &ray, const Octree &tree, int d
 			// Inner reflection
 			Ray refl_ray = calculateReflection(ray, iIp);
 			real rCosA = std::min(glm::dot(iIp.getNormal(), refl_ray.getDirection()), real(1.0));
-			//if(glm::dot(refl_ray.getDirection(), iIp.getNormal()) < 0.0f) std::cout<<"Error in internal reflection3!\n";
+			if(glm::dot(refl_ray.getDirection(), iIp.getNormal()) < 0.0f) std::cout<<"Error in internal reflection3!\n";
 			//if(glm::dot(refl_ray.getDirection(), iIp.getNormal()) < 0.0f) refl_ray.setDirection(-refl_ray.getDirection());
 			if(tree.intersect(refl_ray, ip_temp)) {
 				Vec3 val = iterateGlassToAir(refl_ray, tree, depth+1, kill);
@@ -144,11 +167,11 @@ Vec3 MonteCarloRayTracer2::iterateGlassToAir(Ray &ray, const Octree &tree, int d
 			float critical_angle = asin(REFRACTION_AIR/REFRACTION_GLASS);
 			float angle_in = acos(rCosA);//acos(glm::dot( ip.getNormal(), -ray.getDirection()));
 			if(angle_in < critical_angle) {
-				fresnel_factor = getFresnel(REFRACTION_GLASS, REFRACTION_AIR, 0.0f);
+				fresnel_factor = getFresnel(REFRACTION_GLASS, REFRACTION_AIR, real(0.0));
 				iIp.getMaterial()->setRefractionIndex(REFRACTION_AIR);
 				Ray refr_ray = calculateRefraction(ray, iIp);
 				iIp.getMaterial()->setRefractionIndex(REFRACTION_GLASS);
-				//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) std::cout<<"Error in glass->air refraction4!\n";
+				if(glm::dot(refr_ray.getDirection(), iIp.getNormal()) >= real(0.0)) std::cout<<"Error in glass->air refraction4!\n";
 				//if(glm::dot(refr_ray.getDirection(), ip.getNormal()) >= 0.0f) refr_ray.setDirection(-refr_ray.getDirection());
 
 				if(tree.intersect(refr_ray, ip_temp)) {
@@ -167,14 +190,14 @@ Vec3 MonteCarloRayTracer2::iterateGlassToAir(Ray &ray, const Octree &tree, int d
 			}
 			
 		}
-		Vec3 ret = //Vec3(0.f,0.0f,1000.f)*
+		Vec3 ret = //Vec3(0.,0.,1000.)*
 			(fresnel_factor*Lr + (1.f-fresnel_factor)*Lt) * ip.getMaterial()->getDiffuseColor();
 		//std::cout<<glm::to_string(ret)<<std::endl;
 		return ret;
 	}
 	else
 	{
-		return Vec3(0.0f);
+		return Vec3(real(0.0));
 	}
 }
 
@@ -248,7 +271,7 @@ Vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, b
 			int num_refr_rays = 0;
 			for(int i=0; i<num_specular_rays; ++i) {
 #if 1
-				real fresnel_factor = 1.0f;
+				real fresnel_factor = real(1.0);
 				// Refraction
 				real old_ray_refr_index = ray.getRefractionIndex();
 				if(ip.getMaterial()->getMaterialType() == GLASS) {
@@ -320,7 +343,7 @@ Vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, b
 							*ip.getMaterial()->getDiffuseColor();
 					}
 
-					return iterateAirToGlass(ray, tree, depth, kill);
+					//return iterateAirToGlass(ray, tree, depth, kill);
 				} else { // Not GLASS
 #endif
 					if(ip.getMaterial()->getMaterialType() != GLASS) {
@@ -428,7 +451,7 @@ void MonteCarloRayTracer2::threadRender(float *pixels, const Octree &tree, const
 #endif
 
 #if PER_SAMPLE
-void MonteCarloRayTracer2::threadRender(real *pixels, const Octree &tree, const Camera &cam, MonteCarloRayTracer2::ThreadData thd) {
+void MonteCarloRayTracer2::threadRender(float *pixels, const Octree &tree, const Camera &cam, MonteCarloRayTracer2::ThreadData thd) {
 	for (int u = 0; u < _W / thd.NUM_THREADS; ++u) {
 		Vec3 accumDiffColor(real(0.0));
 
@@ -468,16 +491,17 @@ void MonteCarloRayTracer2::threadRender(real *pixels, const Octree &tree, const 
 }
 #endif
 
-void MonteCarloRayTracer2::glRender(real *pixels) {
+void MonteCarloRayTracer2::glRender(float *pixels) {
 #ifdef USE_OPENGL
-	glClearColor(real(0.0), real(1.0), real(0.0), real(0.0));
+	//glClearColor(real(0.0), real(1.0), real(0.0), real(0.0));
+	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawPixels(_W, _H, GL_RGB, GL_FLOAT, pixels);
 	glfwSwapBuffers();
 #endif
 }
  
-void MonteCarloRayTracer2::render(real *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
+void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
 	Timer::getInstance()->start("Carlo");
 	int NUM_THREADS = std::thread::hardware_concurrency();
 	std::cout << "Starting carlo tracer with ";
@@ -539,6 +563,16 @@ void MonteCarloRayTracer2::render(real *pixels, Octree *tree, Camera *cam, bool 
 			pixels[id + 0] = (pixels[id + 0]*(rpp-1) + _buffer[id + 0])/(rpp);
 			pixels[id + 1] = (pixels[id + 1]*(rpp-1) + _buffer[id + 1])/(rpp);
 			pixels[id + 2] = (pixels[id + 2]*(rpp-1) + _buffer[id + 2])/(rpp);
+		}
+
+		// Export image every 50th rpp
+		if(rpp % 50 == 0 || rpp == 1) {
+			std::string str = "-"+std::to_string(rpp)+"rpp-";
+			char* c_str = const_cast<char*>(str.c_str());
+			for(int i = 0; i < 3 * _W * _H; ++i)
+				_pixelsInt[i] = int(pixels[i] * float(255.0));
+
+			ImageExporter::saveImage(_pixelsInt, c_str, _W, _H);
 		}
 	}
 #endif

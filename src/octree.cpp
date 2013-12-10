@@ -104,7 +104,7 @@ bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
 }
 
 bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
-	real lMin = real(10e5);//FLT_MAX;
+	real lMin = FLT_MAX;
 	bool found = false;
 	
 	for (size_t i = 0; i < _leafs.size(); ++i) {
@@ -127,7 +127,7 @@ bool Octree::intersectSimple(Ray &ray, IntersectionPoint &isect) const {
 
 
 bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
-	real tmin = 0, tmax = real(10e5);//FLT_MAX;
+	real tmin = 0, tmax = FLT_MAX;
 	if (!_root->getBoundingBox()->IntersectT(&ray, &tmin, &tmax))
 		return false;
 	

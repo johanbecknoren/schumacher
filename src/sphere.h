@@ -14,7 +14,7 @@ public:
 	virtual std::string getName() const { return "Sphere"; };
 	Vec3 getPosition() const { return _position; }
 private:
-	float _radius;
+	real _radius;
 	Vec3 _position;
 
 };

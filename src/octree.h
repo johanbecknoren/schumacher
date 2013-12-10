@@ -74,6 +74,6 @@ private:
 };
 struct ToDo {
 	const Node *node;
-	float tmin, tmax;
+	real tmin, tmax;
 };
 #endif

@@ -15,12 +15,13 @@ public:
 													_meanRayDepth(0),
 													_maxDepth(7),
 													_minDepth(6),
-													_raysPerPixel(12),
+													_raysPerPixel(500),
 													_lightQuad(lightQuad)
 	{
-		_buffer = new real[W*H*3];
+		_buffer = new float[W*H*3];
+		_pixelsInt = new int[W*H*3];
 	};
-	void render(real *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
+	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 
 private:
 	Vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
@@ -51,9 +52,9 @@ private:
         const int NUM_THREADS;
         ThreadData(int i, int row, const int NUM_THREADS) : tId(i), row(row), NUM_THREADS(NUM_THREADS) {};
     };
-	void glRender(real *pixels);
+	void glRender(float *pixels);
 
-	void threadRender(real *pixels, const Octree &tree, 
+	void threadRender(float *pixels, const Octree &tree, 
         const Camera &cam, ThreadData thd);
 	bool working;
 	void addToCount();
@@ -71,7 +72,8 @@ private:
 	int _minDepth;
 	int _raysPerPixel;
 	Quadrilateral _lightQuad;
-	real *_buffer;
+	float *_buffer;
+	int *_pixelsInt;
 	};
 
 

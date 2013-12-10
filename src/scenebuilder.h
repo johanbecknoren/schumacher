@@ -117,7 +117,7 @@ static void createMesh(std::vector<Renderable *> &scene, material_t m, Vec3 t, r
 	}
 
 	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
-		createMesh(scene, m, Vec3(-1, -3.5, 20.), real(20), "/models/bunny_small.obj");	
+		createMesh(scene, m, Vec3(-2, -3.6, 20.), real(30), "/models/bunny_small.obj");	
 	}
 	
 public:	
@@ -155,15 +155,15 @@ public:
 		sp_glass->setMaterial(MIRROR);
 		scene.push_back(sp_glass);
 
-		Sphere* sp_mirror = new Sphere(real(1.5), Vec3(real(-5),real(4),real(22)) );
+		Sphere* sp_mirror = new Sphere(real(1.5), Vec3(real(-1.),real(2),real(21.)) );
 		sp_mirror->setMaterial(GLASS);
 		scene.push_back(sp_mirror);
 
 //		createLightBox(scene, CORNELL_CEIL);
-//		createTallBox(scene, CORNELL_TALL_BOX);
-//		createShortBox(scene, CORNELL_CEIL);
+		createTallBox(scene, CORNELL_TALL_BOX);
+		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
-//		createBunny(scene, MARBLE);
+		createBunny(scene, MARBLE);
 //		createSmallObj(scene, LIGHT);
 
 		return scene;
