@@ -448,13 +448,13 @@ void MonteCarloRayTracer2::threadRender(real *pixels, const Octree &tree, const 
 		IntersectionPoint ip;
 			
 		if (tree.intersect(r, ip)) {
-
 			r.setOrigin(ip.getPoint() + r.getDirection() * real(0.00001));
 
 			Vec3 color = iterateRay(r, tree, 0, false);
 			accumDiffColor += color;
 
-			std::cout<<"Intersection, color="<<glm::to_string(accumDiffColor);
+			//std::cout<<"Intersection, color="<<glm::to_string(accumDiffColor);
+			
 		}
 		addToCount();
 				

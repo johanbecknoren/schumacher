@@ -5,8 +5,8 @@
 class Camera {
 public:
 	Camera() {
-		_up = Vec3(real(0),real(0),real(0));
-		_direction = Vec3(real(0),real(0),real(0));
+		_up = Vec3(real(0),real(1),real(0));
+		_direction = Vec3(real(0),real(0),real(1));
 		_position = Vec3(real(0),real(0),real(-1));
 	}
 
