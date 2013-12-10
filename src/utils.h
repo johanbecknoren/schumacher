@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include "glm/glm.hpp"
 #define EPSILON 0.00001f//float(1e06)
 #define PI 3.1415926535897932384626433832795f
 
@@ -11,6 +12,7 @@
 #define HEIGHT 300
 
 typedef double real;
+typedef glm::dvec3 Vec3;
 
 
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)

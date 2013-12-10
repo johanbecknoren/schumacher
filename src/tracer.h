@@ -9,30 +9,30 @@ class Tracer {
 	public:
 		Tracer(const int W, const int H) : _W(W), _H(H) {
 			// Godtycklig FOV (http://www.unknownroad.com/rtfm/graphics/rt_eyerays.html)
-			_tanfovx = -(float(PI)/8.0f);
-			_tanfovy = tan((float(H)/float(W)) * _tanfovx);
+			_tanfovx = -(real(PI)/real(8));
+			_tanfovy = tan((real(H)/real(W)) * _tanfovx);
 			_tanfovx = tan(_tanfovx);
 		}
 
 		Ray calculateReflection(const Ray &inRay, const IntersectionPoint &ip) {
-			glm::vec3 reflection = inRay.getDirection() - 2.0f * glm::dot(inRay.getDirection(), ip.getNormal()) * ip.getNormal();			
-			Ray r = Ray(ip.getPoint() + 0.001f * reflection, glm::normalize(reflection), inRay.getRefractionIndex());
+			Vec3 reflection = inRay.getDirection() - real(2) * glm::dot(inRay.getDirection(), ip.getNormal()) * ip.getNormal();			
+			Ray r = Ray(ip.getPoint() + real(0.001) * reflection, glm::normalize(reflection), inRay.getRefractionIndex());
 			return r;
 		}
 
 		Ray calculateRefraction(const Ray &inRay, const IntersectionPoint &ip) {
 			// Snell's Law
-			float cosIn = glm::dot(ip.getNormal(), glm::normalize(inRay.getDirection()*-1.0f) );
-			float n1overn2 = inRay.getRefractionIndex()/ip.getMaterial()->getRefractionIndex();
-			float cosOut = sqrtf(1.0f - (n1overn2*n1overn2)*(1.0f - cosIn*cosIn));
+			real cosIn = glm::dot(ip.getNormal(), glm::normalize(inRay.getDirection()*real(-1)) );
+			real n1overn2 = inRay.getRefractionIndex()/ip.getMaterial()->getRefractionIndex();
+			real cosOut = sqrtf(real(1) - (n1overn2*n1overn2)*(real(1) - cosIn*cosIn));
 
-			glm::vec3 refr_dir;
-			if(cosIn > 0.0f)
+			Vec3 refr_dir;
+			if(cosIn > real(0))
 				refr_dir = (n1overn2) * inRay.getDirection() + (n1overn2*cosIn - cosOut)*ip.getNormal();
 			else		
 				refr_dir = (n1overn2) * inRay.getDirection() + (n1overn2*cosIn + cosOut)*ip.getNormal();
 
-			return Ray(ip.getPoint()+0.001f*glm::normalize(refr_dir), glm::normalize(refr_dir), ip.getMaterial()->getRefractionIndex());
+			return Ray(ip.getPoint()+real(0.001)*glm::normalize(refr_dir), glm::normalize(refr_dir), ip.getMaterial()->getRefractionIndex());
 		}
 
 		inline int calculateId(const int u, const int v) const {
@@ -40,20 +40,20 @@ class Tracer {
 		}
 
 		inline void calculateXnY(const int u, const int v, float &x, float &y) {
-			x = ( (2.0f*float(u)-float(_W))/float(_W) ) * _tanfovx;
-			y = -( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
+			x = ( (2.0f*real(u)-real(_W))/real(_W) ) * _tanfovx;
+			y = -( (2.0f*real(v)-real(_H))/real(_H) ) * _tanfovy;
 		}
 
-		inline void calculateXnY(const float u, const float v, float &x, float &y) {
-			x = ( (2.0f*float(u)-float(_W))/float(_W) ) * _tanfovx;
-			y = -( (2.0f*float(v)-float(_H))/float(_H) ) * _tanfovy;
+		inline void calculateXnY(const real u, const real v, real &x, real &y) {
+			x = ( (2.0f*real(u)-real(_W))/real(_W) ) * _tanfovx;
+			y = -( (2.0f*real(v)-real(_H))/real(_H) ) * _tanfovy;
 		}
 
 	protected:
 		const int _W;
 		const int _H;
-		float _tanfovx;
-		float _tanfovy;
+		real _tanfovx;
+		real _tanfovy;
 };
 
 #endif
