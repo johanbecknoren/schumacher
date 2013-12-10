@@ -84,7 +84,7 @@ private:
 		SceneBuilder::lightSourceQuad = lightQuad;
 	}
 
-static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3 t, float scale, std::string name) {
+static void createMesh(std::vector<Renderable *> &scene, material_t m, Vec3 t, real scale, std::string name) {
 	Mesh *mesh = new Mesh();
 
 	#pragma GCC diagnostic ignored "-Wwrite-strings"
@@ -94,7 +94,7 @@ static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3
 	for (unsigned int s = 0; s < triangles->size(); ++s) {
 		Triangle *tri = (*triangles)[s];
 		tri->setMaterial(m);
-		glm::vec3 center = mesh->getCenter();
+		Vec3 center = mesh->getCenter();
 		tri->translate(-center);
 		tri->scale(scale);
 		tri->translate(center);
@@ -113,11 +113,11 @@ static void createMesh(std::vector<Renderable *> &scene, material_t m, glm::vec3
 	
 	static void createSmallObj(std::vector<Renderable *> &scene, material_t m) {
 		
-		createMesh(scene, m, glm::vec3(0.5f, 0.f, 20.f), 0.15f, "/models/box.obj");
+		createMesh(scene, m, Vec3(real(0.5), real(0), real(20)), real(0.15), "/models/box.obj");
 	}
 
 	static void createBunny(std::vector<Renderable *> &scene, material_t m) {
-		createMesh(scene, m, glm::vec3(-1, -3.5, 20.), 20.f, "/models/bunny_small.obj");	
+		createMesh(scene, m, Vec3(-1, -3.5, 20.), real(20), "/models/bunny_small.obj");	
 	}
 	
 public:	
@@ -151,11 +151,11 @@ public:
 		boxFront->setMaterial(CORNELL_BACK);
 		scene.push_back(boxFront);
 
-		Sphere* sp_glass = new Sphere(1.5f, glm::vec3(3.f,-5.f,18.5f) );
+		Sphere* sp_glass = new Sphere(real(1.5), Vec3(real(3),real(-5),real(18.5)) );
 		sp_glass->setMaterial(MIRROR);
 		scene.push_back(sp_glass);
 
-		Sphere* sp_mirror = new Sphere(1.5f, glm::vec3(-5.f,4.f,22.0f) );
+		Sphere* sp_mirror = new Sphere(real(1.5), Vec3(real(-5),real(4),real(22)) );
 		sp_mirror->setMaterial(GLASS);
 		scene.push_back(sp_mirror);
 

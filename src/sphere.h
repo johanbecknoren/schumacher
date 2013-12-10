@@ -6,16 +6,16 @@
 class Sphere : public Renderable
 {
 public:
-    Sphere(const float &radius, const glm::vec3 &position);
+    Sphere(const real &radius, const Vec3 &position);
     ~Sphere() {};
 	virtual void createAABB();
     virtual bool getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const;
 	virtual std::string asString() const;
 	virtual std::string getName() const { return "Sphere"; };
-	glm::vec3 getPosition() const { return _position; }
+	Vec3 getPosition() const { return _position; }
 private:
 	float _radius;
-	glm::vec3 _position;
+	Vec3 _position;
 
 };
 

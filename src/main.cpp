@@ -10,7 +10,7 @@
 #include "quadrilateral.h"
 #include "cornellboxfactory.h"
 #include "triangle.h"
-#include "montecarlotracer.h"
+//#include "montecarlotracer.h"
 #include "scenebuilder.h"
 #include "materialmanager.h"
 #include "montecarlotracer2.h"
