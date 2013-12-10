@@ -23,9 +23,9 @@ public:
 	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 
 private:
-	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
-	glm::vec3 iterateGlassToAir(Ray &ray, const Octree &tree, int depth, bool kill);
-	glm::vec3 iterateAirToGlass(Ray &ray, const Octree &tree, int depth, bool kill);
+	Vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
+	Vec3 iterateGlassToAir(Ray &ray, const Octree &tree, int depth, bool kill);
+	Vec3 iterateAirToGlass(Ray &ray, const Octree &tree, int depth, bool kill);
 	
 	struct Rng
 	{

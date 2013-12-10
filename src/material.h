@@ -9,11 +9,11 @@ public:
 	Material() {
 		//default material (stone-isch)
 		_diffuseColor = Vec3(real(0),real(0),real(0)); // black
-		_refractionIndex = 1.0f; // almost none (float precision)
-		_specular = 0.0f; // diffuse (low specularity)
-		_opacity = 1.0f; // completely solid
-		_emission = Vec3(0.0f);
-		_absorbtion = 0.5f;
+		_refractionIndex = real(1); // almost none (float precision)
+		_specular = real(0.0); // diffuse (low specularity)
+		_opacity = real(1.0); // completely solid
+		_emission = Vec3(real(0.0));
+		_absorbtion = real(0.5);
 	}
 	Material(const Vec3 &d, const real &rI, const real &s, const real &o) {
 		_diffuseColor = d;
