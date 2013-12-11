@@ -266,7 +266,7 @@ Vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, b
 			Lrd *= ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular());
 			Lrd /= real(num_diffuse_rays);
 #endif
-#if 1
+#if 0
 			// perfect direct and indirect specular reflections (refraktion here aswell)
 			int num_refr_rays = 0;
 			for(int i=0; i<num_specular_rays; ++i) {
@@ -336,7 +336,7 @@ Vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, b
 						if(tree.intersect(refr_ray, ip_temp)) {
 							fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS, glm::dot(ray.getDirection(), ip.getNormal()) );
 							//radiance_refracted += iterateRay(refr_ray, tree, depth+1, kill);
-							radiance_refracted = iterateGlassToAir(refr_ray, tree, depth, kill);
+							radiance_refracted = iterateGlassToAir(refr_ray, tree, depth+1, kill);
 						}
 
 						Ls += ((fresnel_factor*radiance_reflected) + radiance_refracted)
@@ -564,6 +564,7 @@ void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool
 			pixels[id + 1] = (pixels[id + 1]*(rpp-1) + _buffer[id + 1])/(rpp);
 			pixels[id + 2] = (pixels[id + 2]*(rpp-1) + _buffer[id + 2])/(rpp);
 		}
+
 
 		// Export image every 10th rpp
 		if(rpp % 10 == 0 || rpp == 1) {
