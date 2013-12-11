@@ -295,8 +295,8 @@ Since a Lambertian diffuse surface per definition reflects equal amounts of radi
 We define the BRDF and the pdf for all diffuse surfaces as  in \autoref{eq:diffuse_indirect1}.
 \begin{subequations} \label{eq:diffuse_indirect1}
 \begin{align} 
-BRDF &= \frac{color}{\pi} \\
-p(\Phi_i) &= \frac{cos(\Phi_i, N_x)}{\pi}
+	&BRDF = \frac{color}{\pi} \\
+	&p(\Phi_i) = \frac{cos(\Phi_i, N_x)}{\pi}
 \end{align}
 \end{subequations}
 
@@ -304,9 +304,9 @@ Inserting \autoref{eq:diffuse_indirect1} into \autoref{eq:monte_carlo_indirect} 
 
 \begin{subequations} \label{eq:diffuse_indirect2}
 \begin{align}
-\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
-\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
-\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
+	&\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
 \end{align}
 \end{subequations}
 
@@ -316,6 +316,28 @@ Lastly, the sample direction is transformed to Carthesian coordinates and is rot
 
 \subsubsection{Specular indirect illumination}
 Perfect specular surfaces are implemented in this project.
+The BRDF for a specular surface is different from 0 in only a single directon, the perfect reflection direction. 
+The BRDF and pdf are defined in equation \autoref{eq:specular_indirect1} where $\theta_0$ is the incident ray's angle to the surface normal and $\Phi_i$ is the reflected ray angle.
+Since we are dealing with perfectly specular materials the pdf will be equal to 1 as well, and $\Phi_i = \theta_0$ thus the dirac function will return 1.
+
+\begin{subequations} \label{eq:specular_indirect1}
+\begin{align}
+	&BRDF = \frac{color}{cos(\Phi_i)}\delta(\Phi_i - \theta_0) = \frac{color}{cos(\Phi_i)} \\
+	&pdf = 1
+\end{align}
+\end{subequations}
+
+Inserting \autoref{eq:specular_indirect1} into \autoref{eq:monte_carlo_indirect} yields
+
+\begin{subequations} \label{eq:specular_indirect2}
+\begin{align}
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) \dfrac{color}{cos(\Phi_i)} cos(\Phi_i, N_x)}{1} \rightarrow \\
+	&\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+\end{align}
+\end{subequations}
+which, if $\Phi_i$ does not intersect a light source, is a recursive calls that lets the reflected ray continue through the scene.
+
 An intersection with a specular surface can have two results. 
 For a specular material that is perfectly opaque, for example a mirror-like material, a reflected ray will be created. 
 If the reflected ray in turn does not intersect with a light source it will be recursively iterated and continue through the scene.
@@ -325,8 +347,8 @@ To decide how much of the radiance should be contributed from the reflected ray 
 
 \begin{subequations} \label{eq:schlicks}
 \begin{align}
-R_0 = \left( \frac{n_1-n_2}{n_1+n_2} \right) ^2 \rightarrow \\
-R(\theta) = R_0+ (1-R_0)(1-cos(\theta))^5
+	&R_0 = \left( \frac{n_1-n_2}{n_1+n_2} \right) ^2 \\
+	&R(\theta) = R_0+ (1-R_0)(1-cos(\theta))^5
 \end{align}
 \end{subequations}
 
@@ -392,9 +414,9 @@ Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides r
         \end{subfigure}%
 	~
 	\begin{subfigure}[b]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{figures/specular_400rpp-.png}
-                \caption{400 view rays per pixel}
-                \label{fig:400rpp}
+                \includegraphics[width=\textwidth]{figures/specular_600rpp-.png}
+                \caption{600 view rays per pixel}
+                \label{fig:600rpp}
         \end{subfigure}
         \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
 \end{figure}
