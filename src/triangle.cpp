@@ -67,3 +67,9 @@ void Triangle::scale(const real s) {
 	x0 *= s;
 	createAABB();
 }
+
+void Triangle::rotate(const real &x, const real &y, const real &z) {
+	// Translate to origin by -1*(x0+x1+x2)/3
+	// Rotate angel x around x-axis and so on
+	// Translate back
+}

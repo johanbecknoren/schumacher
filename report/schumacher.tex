@@ -67,11 +67,22 @@ L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + L_r(x \rightarrow \theta) 
 L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Phi \rightarrow \theta)L(x \leftarrow \Phi)cos(N_x, \Phi)d\omega_{\Phi}
 \end{split}
 \end{equation}
-The Monte Carlo integration method introduces a method for calculating an estimated value for an integral expression. This is done by sampling the integral function by random discreet numbers, and as the number of samples increase the produced solution's accuracy increases as well.
+The Monte Carlo integration method introduces a method for calculating an estimated value for an integral expression. 
+This is especially useful for solving integrals which may be hard or impossible to solve analytically. 
+This is done by sampling the integral function by random discreet numbers according to a probability distribution function, pdf, and as the number of samples increase the produced solution's accuracy increases as well.
 
-LÄGG IN EXEMPEL PÅ INTEGRALESTIMERING HÄR!!!
-
-Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. One difference is that Monte Carlo ray tracing handles diffuse and specular surface inter-reflections, diffuse reflections, color bleeding between objects, and soft shadows by stochastically sampling area light source surfaces for each ray intersection. As the number of samples increase the more accurate to integral estimation will be, and the algorithm produces noise if the number of samples are too low. There are several ways to reduce the noise. One could separate the calculations for direct and indirect illumination, using shadow rays to more quickly compute direct diffuse illumination and soft shadows. Sampling directions for diffuse indirect illumination could be chosen in more informed ways to reduce the noise. There have also been research on methods combining the benefits of radiosity with the benefits of ray tracing.
+\begin{equation}
+\label{eq:monte_carlo_example1}
+I = \int f(x) dx
+\end{equation}
+\begin{equation}
+\label{eq:monte_carlo_example2}
+\langle I \rangle = \frac{1}{N} \sum^N_i \frac{f(x_i)}{p(x_i)} dx
+\end{equation}
+The intergral in \autoref{eq:monte_carlo_example1} with a value of \emph{I} can me \emph{estimated} as in equation \autoref{eq:monte_carlo_example2} as $\langle I \rangle$ by $N$ number of samples distibuted according to the pdf $p(x_i)$. 
+This method will later be used to estimate the solution to \autoref{eq:rendering_eq}.
+\\ \\
+Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. One difference is that Monte Carlo ray tracing handles diffuse interreflections and specular-diffuse surface interreflections, color bleeding between objects, and soft shadows by sampling area light source surfaces for each ray intersection. As the number of samples increase the more accurate the integral estimation will be, and the algorithm produces noise if the number of samples are too low. There are several ways to reduce the noise. One could separate the calculations for direct and indirect illumination, using shadow rays to more quickly compute direct diffuse illumination and soft shadows. Sampling directions for diffuse indirect illumination could be chosen in more informed ways to reduce the noise. There have also been research on methods combining the benefits of radiosity with the benefits of ray tracing.
 
 \section{Two-pass rendering}
 Since a radiosity method handles diffuse reflections rather well, and a ray tracing method handles specular reflections well. a lot of research has been done to find ways to combine these two methods.
@@ -85,14 +96,13 @@ By subdividing patches in parts with high importance, and ignoring patches in ar
 \section{Photon mapping}
 Monte carlo methods for ray tracing suffers from noise in the final results if not enough samples are used when calculating radiance from diffuse indirect illumination.
 Photon mapping is two-pass global illumination method presented by Jensen \cite{photon_maps} which computes diffuse indirect illumination faster than a Monte Carlo solution.
-The method works by emitting packets of energt (light) from the light sources toward different objects in the scene.
+The method works by emitting packets of energy (light) from the light sources toward different objects in the scene.
 Different packets can be used for different materials, e.g. a high resolution photon map can be used for caustics that are visualized directly, while a lower resolution map can be stored for later use in the ray tracing step.
 Shadow photons can be used to more efficiently compute shadows, and be used as directional information to produce more accurate sampling directions during the rendering step.
 The method has been shown to reduce rendering time as well as the noise in the final image when used in a Monte Carlo ray tracer algorithm.
   
 \section{Iso surface ray tracing}
-An iso surface is a surface described implicitly by a mathematical expression or equation. An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. Different data structures can be used to greatly increase the performace of intersection tests, such as storing surfaces in an \emph{octree} structure or using a \emph{bounding volume hierarchy} (BVH).
-
+An iso surface is a surface described implicitly by a mathematical expression or equation. An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. 
 
 \chapter{Background}
 In this section we will talk about the methods we have implemented in our Mone Carlo ray tracer using C++. Although there are several approches to some of these methods we will only talk about the methods we chose to implement in this project.
@@ -106,20 +116,20 @@ The figures must be referred to from the text and described and interpreted in m
 Length: about 5-6 pages.}
 
 \section{Scene storage}
-When calculating global lightning for the scene, all objects need to be taken into consideration when calculating the illumination for one part of the scene due to the recursive nature of \autoref{eq:rendering_eq}.
+When calculating global illumination for the scene, all objects need to be taken into consideration when calculating the illumination for one part of the scene due to the recursive nature of \autoref{eq:rendering_eq}.
 
-For ray tracing solutions, this means that as rays bounce inside the scene, the first intersecting object needs to be located.
+For ray tracing solutions, this means that as rays bounce inside the scene the first intersecting object needs to be located.
 A na\"{\i}ve solution would be to store all objects without any information about where in the scene they are located.
 When traversing a ray through the scene, the algorithm would have to check against all objects, even if almost all of the checks would be misses.
-For a simple scene with only a few implicit objects this is a good solution. The overhead when dealing with an more complex storage method would make it slower.
+For a simple scene with only a few implicit objects this is a good solution. The overhead when dealing with an more complex storage method would make it slower than simply checking against all objects in the scene.
 But when using a more complex scene consisting of models with hundreds of thousands of elements, it is possible to take advantage of the spatial information of each element to subtract a small subset and only do collision tests against those.
 
 There are several methods for storing the scene using different techniques.
 
 \subsection{Bounding box}
-An axis aligned bounding box is a crucial part of most scene storage methods.
-This is the smallest box with axes aligned to the Cartesian coordinates axes that can encapsulate the primitive that owns the bounding box.
-The bounding box will not be the smallest box that can encapsulate the primitive but the intersection tests is much simpler compared to doing collision tests against arbitrarily rotated primitives.
+An axis aligned bounding box is an essential part of most scene storage methods.
+This is the smallest box with its axes aligned to the Cartesian coordinates axes that can encapsulate the primitive that owns the bounding box.
+The bounding box will not be the smallest box that can encapsulate the primitive but the intersection tests are much simpler compared to doing collision tests against arbitrarily rotated primitives.
 
 \subsection{Bounding volume hierarchy}
 Bounding volume hierarchy (BVH) uses a tree structure with bounding volumes like axis aligned bounding boxes. 
@@ -185,8 +195,8 @@ When both values of $t$ are calculated, the lowest value is used for the collisi
 \section{Anti-aliasing by sub-pixel sampling}
 To reduce aliasing effects in the final image we have implemented support for sub-pixel sampling.
 This means that instead of sending one view ray from the virtual camera through the center of a pixel on the view plane, we send several view rays distributed on the pixel and average their results.
-The view ray distribution on a pixel area can be done uniform fashion or stochastically by random numbers.
-For all rendered images in this report, the stochastic distribution was used.
+The view ray distribution on a pixel area can be done in a uniform random fashion or simply placed linearly evenly spaced.
+For all rendered images in this report, the uniform random distribution was used.
 In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per pixel on the left, and 10 view rays per pixel on the right.
 
 \begin{figure}
@@ -194,14 +204,14 @@ In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per 
         \begin{subfigure}[b]{0.3\textwidth}
                 \includegraphics[width=\textwidth]{figures/aliasing_1.png}
                 \caption{1 view ray per pixel}
-                \label{fig:gull}
+                \label{fig:aliasing1}
         \end{subfigure}%
         ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
           %(or a blank line to force the subfigure onto a new line)
         \begin{subfigure}[b]{0.3\textwidth}
                 \includegraphics[width=\textwidth]{figures/aliasing_10.png}
                 \caption{10 view rays per pixel}
-                \label{fig:tiger}
+                \label{fig:aliasing10}
         \end{subfigure}
         \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
 \end{figure}
@@ -248,8 +258,9 @@ For every intersection point retrieved from the scene, that point's direct illum
 For diffuse direct illumination the light source is sampled.
 Each sample point $y_i$ is distributed uniformly on the surface of the light source.
 The visibility function $V(x,y)$ makes sure that only sample points visible from \emph{x} will contribute to the direct illumination by checking if $y_i$ is in line of sight of \emph{x}.
-Because of this these rays are often called shadow rays, and will result in soft shadows if enough samples $y_i$ are taken. \\
-\\For a single planar area light source sampled with $N_s$ shadow rays the Monte Carlo estimator becomes
+Because of this these rays are often called shadow rays, and will result in soft shadows if enough samples $y_i$ are taken.
+
+For a single planar area light source sampled with $N_s$ shadow rays the Monte Carlo estimator becomes
 
 \begin{equation}
 \label{eq:monte_carlo_direct}
@@ -284,8 +295,8 @@ Since a Lambertian diffuse surface per definition reflects equal amounts of radi
 We define the BRDF and the pdf for all diffuse surfaces as  in \autoref{eq:diffuse_indirect1}.
 \begin{subequations} \label{eq:diffuse_indirect1}
 \begin{align} 
-BRDF &= \frac{color}{\pi} \\
-p(\Phi_i) &= \frac{cos(\Phi_i, N_x)}{\pi}
+	&BRDF = \frac{color}{\pi} \\
+	&p(\Phi_i) = \frac{cos(\Phi_i, N_x)}{\pi}
 \end{align}
 \end{subequations}
 
@@ -293,25 +304,234 @@ Inserting \autoref{eq:diffuse_indirect1} into \autoref{eq:monte_carlo_indirect} 
 
 \begin{subequations} \label{eq:diffuse_indirect2}
 \begin{align}
-\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
-\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
-\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
+	&\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
 \end{align}
 \end{subequations}
 
 The random hemisphere sample direction $\Phi_i$ is created by randomly picking two angles $\theta$ and $\phi$, which will represent a sampling direction in spherical coordinates.
-The angle $\phi$ is randomly assigned a value in the interval $[0,2\pi]$ and $\theta$ is assigned a value of $cos^{-1}(r^{ \frac{1}{1+n} })$ where \emph{r} is a random number in the interval $[0,1]$ and \emph{n} is a user selected number in the interval $[0,1]$ which dictates the sample direction's alignment with $N_x$.
+The angle $\phi$ is assigned a uniform random value in the interval $[0,2\pi]$ and $\theta$ is assigned a value of $cos^{-1}(r^{ \frac{1}{1+n} })$ where \emph{r} is a uniform random number in the interval $[0,1]$ and \emph{n} is a number in the interval $[0,1]$ which dictates the sample direction's alignment within the cosine lobe around $N_x$. 
+Lastly, the sample direction is transformed to Carthesian coordinates and is rotated along $N_x$.
 
 \subsubsection{Specular indirect illumination}
+Perfect specular surfaces are implemented in this project.
+The BRDF for a specular surface is different from 0 in only a single directon, the perfect reflection direction. 
+The BRDF and pdf are defined in equation \autoref{eq:specular_indirect1} where $\theta_0$ is the incident ray's angle to the surface normal and $\Phi_i$ is the reflected ray angle.
+Since we are dealing with perfectly specular materials the pdf will be equal to 1 as well, and $\Phi_i = \theta_0$ thus the dirac function will return 1.
+
+\begin{subequations} \label{eq:specular_indirect1}
+\begin{align}
+	&BRDF = \frac{color}{cos(\Phi_i)}\delta(\Phi_i - \theta_0) = \frac{color}{cos(\Phi_i)} \\
+	&pdf = 1
+\end{align}
+\end{subequations}
+
+Inserting \autoref{eq:specular_indirect1} into \autoref{eq:monte_carlo_indirect} yields
+
+\begin{subequations} \label{eq:specular_indirect2}
+\begin{align}
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) \dfrac{color}{cos(\Phi_i)} cos(\Phi_i, N_x)}{1} \rightarrow \\
+	&\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+\end{align}
+\end{subequations}
+which, if $\Phi_i$ does not intersect a light source, is a recursive call that lets the reflected ray continue through the scene.
+
+An intersection with a specular surface can have two results. 
+For a specular material that is perfectly opaque, for example a mirror-like material, a reflected ray will be created. 
+If the reflected ray in turn does not intersect with a light source it will be recursively iterated and continue through the scene.
+If the material instead is not perfectly opaque two rays will be created.
+One reflected ray created in the same fashion as described above, and one refracted (transmitted) ray that will continue into the object.
+To decide how much of the radiance should be contributed from the reflected ray an approximation of Fresnel's equation as presented by Schlick et al. \cite{schlick} in \autoref{eq:schlicks}
+
+\begin{subequations} \label{eq:schlicks}
+\begin{align}
+	&R_0 = \left( \frac{n_1-n_2}{n_1+n_2} \right) ^2 \\
+	&R(\theta) = R_0+ (1-R_0)(1-cos(\theta))^5
+\end{align}
+\end{subequations}
+
+$R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is come from and going into respectively.
+The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector. \autoref{eq:schlicks} describes what fraction of the reflected ray should be used in computing the radiance for the intersection point. 
+The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
+
 \subsection{Reflection}
 \subsection{Refraction}
 \subsection{Intensity calculations}
 \subsection{Shadow rays}
-
+Har redan tagit upp och beskrivit shadow rays under direkt illumination, tror ej det behövs repeteras igen.
 \chapter{Results and benchmarks}
-\emph{Here you show results obtained with your code. You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. You can compare in detail images computed from the same scene with different resolutions. You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. Here you can be creative and look at things you like. 
+\emph{Here you show results obtained with your code. 
+You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. 
+You can compare in detail images computed from the same scene with different resolutions. 
+You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. 
+You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. 
+Here you can be creative and look at things you like. 
 Length: about 5-6 pages .}
+\section{Shadow rays}
+The quality of the direct diffuse illumination is directly related to the number of shadow rays used to sample the light source from each intersection point. \autoref{fig:shadow_rays} shows images with different number of shadow rays per sample. Notice how the amount of noise on the floor decreases as the number of shadow rays increases. \autoref{tb:shadow_rays} shows the effect the number of shadow rays has on the rendering time.
 
+\begin{figure}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/shadowrays-1-10rpp.png}
+	\caption{1 shadow ray}
+	\label{fig:1sr}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-10-10rpp.png}
+                \caption{10 shadow rays}
+                \label{fig:10sr}
+        \end{subfigure}
+
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-20-10rpp.png}
+                \caption{20 shadow rays}
+                \label{fig:20sr}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-80-10rpp.png}
+                \caption{80 shadow rays}
+                \label{fig:80sr}
+        \end{subfigure}
+        \caption{Number of shadow rays increasing from left to right, top to bottom.}\label{fig:shadow_rays}
+\end{figure}
+
+
+\begin{table}[h]
+\begin{center}
+
+	\begin{tabular}{| l | l |}
+		\hline
+		Shadow rays & Time \\ \hline
+		1 & 6s \\ \hline
+		10 & 20s \\ \hline
+		20 & 34s \\ \hline
+		80 & 126s \\ \hline
+	\end{tabular}
+	\caption{Rendering time for shadow rays.}
+	\label{tb:shadow_rays}
+\end{center}
+\end{table}
+
+\section{Recursion depth}
+Recursion depth refers to the number of recursive calls allowed in the algorithm, e.g. how many bounces a ray will make in the scene before terminating and returning. 
+The recursion depth affects the noise in the final image, but it also has an impact on the resulting reflections and refractions for specular objects.
+As seen in \autoref{fig:recursion_depth} a recursion depth of 0 results in only direct illumination present.
+Notice how all specular objects are void of any indirect illumination since only once bounce per ray is allowed. 
+A recursion depth of 1 yields slightly better results, we now see objects that are opaque and specular since rays are allowed to bounce once before termination.
+Notice that the glass sphere is still void of indirect illumination since a succesful refraction involves at least 3 recursive iterations.
+A depth of 2 recursions allows for a single refraction instance and the glass sphere is now better represented.
+Lastly a render depth of 6 is shown in \autoref{fig:6rd}. This is the recursion depth used for most of the images in this report.
+\autoref{tb:recursion} show the effect recursion depth has on rendering time.
+\begin{figure}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-1-100rpp.png}
+	\caption{0 recursions}
+	\label{fig:1rd}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-2-100rpp.png}
+                \caption{1 recursion}
+                \label{fig:2rd}
+        \end{subfigure}
+
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-3-100rpp.png}
+                \caption{2 recursions}
+                \label{fig:3rd}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-6-100rpp.png}
+                \caption{6 recursions}
+                \label{fig:6rd}
+        \end{subfigure}
+        \caption{Increasing recursion depth from left to right, top to bottom.}\label{fig:recursion_depth}
+\end{figure}
+
+\begin{table}[h]
+\begin{center}
+	\begin{tabular}{| l | l |}
+		\hline
+		Recursion depth & Time \\ \hline
+		0 & 11s \\ \hline
+		1 & 17s \\ \hline
+		2 & 24s \\ \hline
+		6 & 55s \\ \hline
+	\end{tabular}
+	\caption{Rendering time for different recursion depths.}
+	\label{tb:recursion}
+\end{center}
+\end{table}
+
+
+
+\section{Samples per pixel}
+Another way of reducing the noise in the images is by sending several rays through the same pixel from the camera. 
+Instead of sending a single ray through the center of the pixel we send multiple rays placed in the pixel in a uniform random fashion. 
+The contributions from each view ray are summed up and normalized to form the final intensity value for the pixel. 
+This technique is sometimes referred to as sub-pixel sampling. In \autoref{fig:vew_rays} we see a scene rendered with an increasing amount of view rays per pixel from left to right, top to bottom. 
+Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides rather quickly, while the noise in areas not directly visible to the light source persists much longer even though the number of samples increase.
+
+\begin{figure}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/specular_50rpp-.png}
+	\caption{50 view rays per pixel}
+	\label{fig:50rpp}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
+                \caption{100 view rays per pixel}
+                \label{fig:100rpp}
+        \end{subfigure}
+
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_600rpp-.png}
+                \caption{600 view rays per pixel}
+                \label{fig:600rpp}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_1000rpp.png}
+                \caption{1000 view rays per pixel}
+                \label{fig:1000rpp}
+        \end{subfigure}
+        \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
+\end{figure}
+
+\section{Noise introduced by specular materials}
+Specular materials that produce reflected and to some extent refracted rays is and additional source for noise in the final image and require more samples to reach the same quality level as a scene with only diffuse samples.
+
+\begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.65\textwidth}
+                \includegraphics[width=\textwidth]{figures/diffuse-100rpp-.png}
+                \caption{Diffuse materials only}
+                \label{fig:diff_spec1}
+        \end{subfigure}%
+         %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+
+        \begin{subfigure}[b]{0.65\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
+                \caption{Specular and diffuse materials}
+                \label{fig:dif_spec2}
+        \end{subfigure}
+        \caption{Scene rendered with the same resolution, recursion depth, shadow rays, and a low number of samples per pixel to illustrate the increased noise when specular objects are used in a scene.}\label{fig:diff_spec_diff}
+\end{figure}
+
+Notice the increased noise on the surface of the back wall and on the box nearest to the camera in \autoref{fig:diff_spec_diff}.
 
 \chapter{Discussion}
 Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.

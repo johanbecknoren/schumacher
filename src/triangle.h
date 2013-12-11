@@ -11,6 +11,7 @@ public:
 	bool getIntersectionPoint(Ray &ray, IntersectionPoint &ip) const;
 	void createAABB();
 	void translate(const Vec3 &t);
+	void rotate(const real &x, const real &y, const real &z);
 	void scale(const real s);
 	virtual std::string getName() const { return "Triangle"; };
 	virtual std::string asString() const { return glm::to_string(x0) + " " + glm::to_string(x1) + " " + glm::to_string(x2); };
