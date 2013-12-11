@@ -96,14 +96,6 @@ An iso surface is a surface described implicitly by a mathematical expression or
 
 \chapter{Background}
 In this section we will talk about the methods we have implemented in our Mone Carlo ray tracer using C++. Although there are several approches to some of these methods we will only talk about the methods we chose to implement in this project.
-\emph{Here you describe the techniques you use in your code. 
-Describe how you do ray-surface intersections, how you launch reflected and refracted rays, how you compute the intensities, what are shadow rays, etc. No C++ code. 
-You may use pseudocode, but it is better do discuss the techniques only from a theoretical point of view. 
-These descriptions should be accompanied by figures. 
-The figures are numbered consecutively in order of appearance. 
-Each figure must have a caption with a brief description of what you see in it. 
-The figures must be referred to from the text and described and interpreted in more detail in the text.
-Length: about 5-6 pages.}
 
 \section{Scene storage}
 When calculating global lightning for the scene, all objects need to be taken into consideration when calculating the illumination for one part of the scene due to the recursive nature of \autoref{eq:rendering_eq}.
@@ -341,7 +333,65 @@ The term $cos(\theta)$ is the dot product between the halfway direction vector a
 %\end{figure}
 
 \subsection{Reflection}
+When a ray travels trough a medium, colliding with another medium, the ray will be reflected.
+The law of reflection says that the angle of incidence $\theta_i$ is equal to the angle of reflection $ \theta_r $ is equal to each other.
+The incoming ray can be divided into two different parts, the tangent part to the surface $ \mathbf{i}_\bot $ and the normal part $ \mathbf{i}_\| $.
+The tangiental part can be found using orthogonal projection onto the normal using \autoref{eq:projection}. The normal part is found using \autoref{eq:projectionrest}.
+
+\begin{equation} \label{eq:projection}
+\mathbf{i}_\bot = \frac{\mathbf{i} \cdot \mathbf{n}} {\vert \mathbf{n}^2} \mathbf{n} = (\mathbf{v} \cdot \mathbf{n})\mathbf{n}
+\end{equation}
+
+\begin{equation} \label{eq:projectionrest}
+\mathbf{i}_\| = \mathbf{i} - \mathbf{i}_\bot
+\end{equation}
+By doing a dot product between these two rays, it is possible to prove that the result is zero and thus proving that these two are orthogonal and that $ \mathbf{i}_\bot $ is an orthogonal projection on $ \mathbf{n} $. By combining \autoref{eq:projectionrest} and \autoref{eq:projection} the reflected ray $ \mathbf{r} $ can be calculated using \autoref{eq:reflectioncalc}.
+
+\begin{subequations}\label{eq:reflectioncalc}
+\begin{align}
+r =& \mathbf{i}_\| - \mathbf{i}_\bot \\
+  =& [\mathbf{i} - (\mathbf{i} \cdot \mathbf{n})\mathbf{n}] - (\mathbf{i} \cdot \mathbf{n}) \mathbf{n} \\
+  =& \mathbf{i} - 2 ( \mathbf{i} \cdot \mathbf{n} ) \mathbf{n}
+\end{align}
+\end{subequations}
+
+%\begin{subequations} \label{eq:refl}
+%\begin{align}
+%\vert \mathbf{r}_\bot \vert =& cos \theta_r = \theta_i = \vert \mathbf{i} \bot \vert \\ 
+%\vert \mathbf{r}_\| \vert =& sin \theta_r = sin \theta_i = \vert \mathbf{i}_\| \vert
+%\end{align}
+%\end{subequations}
+
 \subsection{Refraction}
+
+Refraction calcultaions uses Snell's law that states that the product of the refractive indices and sines of the angles must be equal, as stated in \autoref{eq:snell}.\\
+
+\begin{equation} \label{eq:snell}
+\eta_1 sin \theta_i = \eta_2 sin \theta_t
+\end{equation}
+
+This equation has a problem, when $ sin \theta_1 > \dfrac{\eta_1}{\eta_2} $
+the other term $ sin \theta_2 $ has to be greater then 1. 
+This case is what is called total internal reflection.
+When calculating the refracted ray $ t $, continued calculation assumes that the condition is not satisfied.\\
+
+The refractored vector is also divided into two parts, just the same as in \autoref{eq:projectionrest} and the norms are calculated first. By taking advantage of the fact that norms and tangents to the plane is equal to the sines \autoref{eq:snell} it can be rewritten into \autoref{eq:refraction}.
+
+\begin{equation} \label{eq:refraction}
+\mathbf{t}_\| = \frac{\eta_1}{\eta_2} \mathbf{i}_\| = \frac{\eta_1}{\eta_2} 
+[\mathbf{i} + cos \theta_i \mathbf{n}]
+\end{equation}
+
+The tangential calculation uses Pythagoras which gives \autoref{eq:refractiontan}. The combination of these two, described in \autoref{eq:refractiontot} is all that is needed to calculate the refraction vector 
+
+\begin{equation} \label{eq:refractiontan}
+\mathbf{t}_\bot = - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2}\mathbf{n}
+\end{equation}
+
+\begin{equation} \label{eq:refractiontot}
+\mathbf{t} = \frac{\eta_1}{\eta_2} \mathbf{i} + (\frac{\eta_1}{\eta_2} cos \theta_i - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2})\mathbf{n}
+\end{equation}
+
 \subsection{Intensity calculations}
 \subsection{Shadow rays}
 Har redan tagit upp och beskrivit shadow rays under direkt illumination, tror ej det behövs repeteras igen.
