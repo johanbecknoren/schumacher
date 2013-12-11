@@ -339,14 +339,18 @@ You can list benchmarks (e.g. how long it took your computer to calculate a fram
 Here you can be creative and look at things you like. 
 Length: about 5-6 pages .}
 \section{Shadow rays}
+The quality of the direct diffuse illumination is directly connected to the number of shadow rays used to sample the light source from each intersection point.
+
+
+A better scheme for choosing sample points on the light source could also reduce the noise produced from the direct illumination.
 \section{Recursion depth}
 \section{Samples per pixel}
-Another way of reducing the noise in the images is by sending several rays from the camera through the same pixel. 
-In stead of sending a single ray through the center of the pixel we send multiple rays placed in the pixel in a uniform random fashion. 
+Another way of reducing the noise in the images is by sending several rays through the same pixel from the camera. 
+Instead of sending a single ray through the center of the pixel we send multiple rays placed in the pixel in a uniform random fashion. 
 The contributions from each view ray are summed up and normalized to form the final intensity value for the pixel. 
-This technique is sometimes refered to as sub-pixel sampling In \autoref{fig:vew_rays} we see a scene rendered with an increasing amount of view rays per pixel from left to right, top to bottom. 
-Notice how to noise seen on the back wall in \autoref{fig:vew_rays}a subsides rather quickly, but the noise in areas not directly visible to the light source persists much longer even though the number of samples increase.
-% TA EJ BORT sparar till senare :P
+This technique is sometimes referred to as sub-pixel sampling. In \autoref{fig:vew_rays} we see a scene rendered with an increasing amount of view rays per pixel from left to right, top to bottom. 
+Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides rather quickly, while the noise in areas not directly visible to the light source persists much longer even though the number of samples increase.
+
 \begin{figure}
         \centering
         \begin{subfigure}[b]{0.5\textwidth}
@@ -373,7 +377,7 @@ Notice how to noise seen on the back wall in \autoref{fig:vew_rays}a subsides ra
                 \caption{400 view rays per pixel}
                 \label{fig:400rpp}
         \end{subfigure}
-        \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:vew_rays}
+        \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
 \end{figure}
 
 \chapter{Discussion}
