@@ -2,7 +2,7 @@
 // #include "sphere.h"
 #include <climits>
 #include "glmprint.h"
-#define USE_OCTREE
+#define USE_OCTREE 1
 
 Node::Node(int nodeDepth, AABB nodeBoundingBox) {
 	_boundingBox = nodeBoundingBox;

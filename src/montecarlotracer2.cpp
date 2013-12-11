@@ -336,7 +336,7 @@ Vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, b
 						if(tree.intersect(refr_ray, ip_temp)) {
 							fresnel_factor = getFresnel(REFRACTION_AIR, REFRACTION_GLASS, glm::dot(ray.getDirection(), ip.getNormal()) );
 							//radiance_refracted += iterateRay(refr_ray, tree, depth+1, kill);
-							radiance_refracted = iterateGlassToAir(refr_ray, tree, depth, kill);
+							radiance_refracted = iterateGlassToAir(refr_ray, tree, depth+1, kill);
 						}
 
 						Ls += ((fresnel_factor*radiance_reflected) + radiance_refracted)
@@ -566,8 +566,8 @@ void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool
 		}
 
 		// Export image every 50th rpp
-		if(rpp % 50 == 0 || rpp == 1) {
-			std::string str = "-"+std::to_string(rpp)+"rpp-";
+		if(rpp % 10 == 0 || rpp == 1) {
+			std::string str = "-"+std::to_string(rpp)+"rpp";
 			char* c_str = const_cast<char*>(str.c_str());
 			for(int i = 0; i < 3 * _W * _H; ++i)
 				_pixelsInt[i] = int(pixels[i] * float(255.0));
