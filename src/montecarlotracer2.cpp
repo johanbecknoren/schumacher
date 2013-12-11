@@ -565,15 +565,16 @@ void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool
 			pixels[id + 2] = (pixels[id + 2]*(rpp-1) + _buffer[id + 2])/(rpp);
 		}
 
-		// Export image every 50th rpp
-		if(rpp % 50 == 0 || rpp == 1) {
-			std::string str = "-"+std::to_string(rpp)+"rpp-";
+		// Export image every 10th rpp
+		if(rpp % 10 == 0 || rpp == 1) {
+			std::string str = "-"+std::to_string(rpp)+"rpp";
 			char* c_str = const_cast<char*>(str.c_str());
 			for(int i = 0; i < 3 * _W * _H; ++i)
 				_pixelsInt[i] = int(pixels[i] * float(255.0));
 
 			ImageExporter::saveImage(_pixelsInt, c_str, _W, _H);
 		}
+		// Använd ctime och time:a varje sample här
 	}
 #endif
 
