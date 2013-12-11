@@ -152,18 +152,18 @@ public:
 		scene.push_back(boxFront);
 
 		Sphere* sp_glass = new Sphere(real(1.5), Vec3(real(3),real(-5),real(18.5)) );
-		sp_glass->setMaterial(CORNELL_RIGHT);
+		sp_glass->setMaterial(MIRROR);
 		scene.push_back(sp_glass);
 
 		Sphere* sp_mirror = new Sphere(real(1.5), Vec3(real(-1.),real(2),real(21.)) );
-		sp_mirror->setMaterial(CORNELL_LEFT);
+		sp_mirror->setMaterial(GLASS);
 		scene.push_back(sp_mirror);
 
 //		createLightBox(scene, CORNELL_CEIL);
 		createTallBox(scene, CORNELL_TALL_BOX);
 		createShortBox(scene, CORNELL_CEIL);
 		createLightSourceQuad(scene, LIGHT);
-		createBunny(scene, CORNELL_TALL_BOX);
+		createBunny(scene, MARBLE);
 //		createSmallObj(scene, LIGHT);
 
 		return scene;
