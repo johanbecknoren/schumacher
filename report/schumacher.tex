@@ -320,25 +320,10 @@ R(\theta) = R_0+ (1-R_0)(1-cos(\theta))^5
 \end{subequations}
 
 $R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is come from and going into respectively.
-The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector. \autoref{eq:schlicks} describes what fraction of the reflected ray should be used in computing the radiance for the intersection point. The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
+The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector. \autoref{eq:schlicks} describes what fraction of the reflected ray should be used in computing the radiance for the intersection point. 
+The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
 
-% TA EJ BORT sparar till senare :P
-%\begin{figure}
-%        \centering
-%        \begin{subfigure}[b]{0.5\textwidth}
-%           \includegraphics[width=\textwidth]{figures/2013-12-10-15-39-35-200rpp-ca2h_6-7_112.png}
-%	\caption{200 view rays per pixel}
-%	\label{fig:full}
-%        \end{subfigure}%
-%        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-%          %(or a blank line to force the subfigure onto a new line)
-%        \begin{subfigure}[b]{0.5\textwidth}
-%                \includegraphics[width=\textwidth]{figures/2013-12-10-15-39-35-200rpp-ca2h_6-7_112.png}
-%                \caption{HerpDerp view rays}
-%                \label{fig:miger}
-%        \end{subfigure}
-%        \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
-%\end{figure}
+
 
 \subsection{Reflection}
 \subsection{Refraction}
@@ -346,12 +331,50 @@ The term $cos(\theta)$ is the dot product between the halfway direction vector a
 \subsection{Shadow rays}
 Har redan tagit upp och beskrivit shadow rays under direkt illumination, tror ej det behövs repeteras igen.
 \chapter{Results and benchmarks}
-\emph{Here you show results obtained with your code. You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. You can compare in detail images computed from the same scene with different resolutions. You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. Here you can be creative and look at things you like. 
+\emph{Here you show results obtained with your code. 
+You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. 
+You can compare in detail images computed from the same scene with different resolutions. 
+You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. 
+You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. 
+Here you can be creative and look at things you like. 
 Length: about 5-6 pages .}
 \section{Shadow rays}
 \section{Recursion depth}
 \section{Samples per pixel}
+Another way of reducing the noise in the images is by sending several rays from the camera through the same pixel. 
+In stead of sending a single ray through the center of the pixel we send multiple rays placed in the pixel in a uniform random fashion. 
+The contributions from each view ray are summed up and normalized to form the final intensity value for the pixel. 
+This technique is sometimes refered to as sub-pixel sampling In \autoref{fig:vew_rays} we see a scene rendered with an increasing amount of view rays per pixel from left to right, top to bottom. 
+Notice how to noise seen on the back wall in \autoref{fig:vew_rays}a subsides rather quickly, but the noise in areas not directly visible to the light source persists much longer even though the number of samples increase.
+% TA EJ BORT sparar till senare :P
+\begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/specular_-50rpp-.png}
+	\caption{50 view rays per pixel}
+	\label{fig:50rpp}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[b]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular-100rpp-.png}
+                \caption{100 view rays per pixel}
+                \label{fig:100rpp}
+        \end{subfigure}
 
+	\begin{subfigure}[b]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_200rpp-.png}
+                \caption{200 view rays per pixel}
+                \label{fig:200rpp}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[b]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_400rpp-.png}
+                \caption{400 view rays per pixel}
+                \label{fig:400rpp}
+        \end{subfigure}
+        \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:vew_rays}
+\end{figure}
 
 \chapter{Discussion}
 Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.
