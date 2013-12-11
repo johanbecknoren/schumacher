@@ -204,14 +204,14 @@ In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per 
         \begin{subfigure}[b]{0.3\textwidth}
                 \includegraphics[width=\textwidth]{figures/aliasing_1.png}
                 \caption{1 view ray per pixel}
-                \label{fig:gull}
+                \label{fig:aliasing1}
         \end{subfigure}%
         ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
           %(or a blank line to force the subfigure onto a new line)
         \begin{subfigure}[b]{0.3\textwidth}
                 \includegraphics[width=\textwidth]{figures/aliasing_10.png}
                 \caption{10 view rays per pixel}
-                \label{fig:tiger}
+                \label{fig:aliasing10}
         \end{subfigure}
         \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
 \end{figure}
@@ -336,7 +336,7 @@ Inserting \autoref{eq:specular_indirect1} into \autoref{eq:monte_carlo_indirect}
 	&\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
 \end{align}
 \end{subequations}
-which, if $\Phi_i$ does not intersect a light source, is a recursive calls that lets the reflected ray continue through the scene.
+which, if $\Phi_i$ does not intersect a light source, is a recursive call that lets the reflected ray continue through the scene.
 
 An intersection with a specular surface can have two results. 
 For a specular material that is perfectly opaque, for example a mirror-like material, a reflected ray will be created. 
@@ -370,20 +370,109 @@ You can list benchmarks (e.g. how long it took your computer to calculate a fram
 Here you can be creative and look at things you like. 
 Length: about 5-6 pages .}
 \section{Shadow rays}
-The quality of the direct diffuse illumination is directly connected to the number of shadow rays used to sample the light source from each intersection point.
+The quality of the direct diffuse illumination is directly related to the number of shadow rays used to sample the light source from each intersection point. \autoref{fig:shadow_rays} shows images with different number of shadow rays per sample. Notice how the amount of noise on the floor decreases as the number of shadow rays increases. \autoref{tb:shadow_rays} shows the effect the number of shadow rays has on the rendering time.
 
-BILD PA OLIKA NUMMER SHADOW RAYS HAR!!
+\begin{figure}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/shadowrays-1-10rpp.png}
+	\caption{1 shadow ray}
+	\label{fig:1sr}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-10-10rpp.png}
+                \caption{10 shadow rays}
+                \label{fig:10sr}
+        \end{subfigure}
 
-A better scheme for choosing sample points on the light source could also reduce the noise produced from the direct illumination.
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-20-10rpp.png}
+                \caption{20 shadow rays}
+                \label{fig:20sr}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-80-10rpp.png}
+                \caption{80 shadow rays}
+                \label{fig:80sr}
+        \end{subfigure}
+        \caption{Number of shadow rays increasing from left to right, top to bottom.}\label{fig:shadow_rays}
+\end{figure}
+
+
+\begin{table}[h]
+\begin{center}
+
+	\begin{tabular}{| l | l |}
+		\hline
+		Shadow rays & Time \\ \hline
+		1 & 6s \\ \hline
+		10 & 20s \\ \hline
+		20 & 34s \\ \hline
+		80 & 126s \\ \hline
+	\end{tabular}
+	\caption{Rendering time for shadow rays.}
+	\label{tb:shadow_rays}
+\end{center}
+\end{table}
+
 \section{Recursion depth}
 Recursion depth refers to the number of recursive calls allowed in the algorithm, e.g. how many bounces a ray will make in the scene before terminating and returning. 
 The recursion depth affects the noise in the final image, but it also has an impact on the resulting reflections and refractions for specular objects.
+As seen in \autoref{fig:recursion_depth} a recursion depth of 0 results in only direct illumination present.
+Notice how all specular objects are void of any indirect illumination since only once bounce per ray is allowed. 
+A recursion depth of 1 yields slightly better results, we now see objects that are opaque and specular since rays are allowed to bounce once before termination.
+Notice that the glass sphere is still void of indirect illumination since a succesful refraction involves at least 3 recursive iterations.
+A depth of 2 recursions allows for a single refraction instance and the glass sphere is now better represented.
+Lastly a render depth of 6 is shown in \autoref{fig:6rd}. This is the recursion depth used for most of the images in this report.
+\autoref{tb:recursion} show the effect recursion depth has on rendering time.
+\begin{figure}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-1-100rpp.png}
+	\caption{0 recursions}
+	\label{fig:1rd}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-2-100rpp.png}
+                \caption{1 recursion}
+                \label{fig:2rd}
+        \end{subfigure}
 
-VISA BILD MED DEPTH TYP 1 - 3
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-3-100rpp.png}
+                \caption{2 recursions}
+                \label{fig:3rd}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-6-100rpp.png}
+                \caption{6 recursions}
+                \label{fig:6rd}
+        \end{subfigure}
+        \caption{Increasing recursion depth from left to right, top to bottom.}\label{fig:recursion_depth}
+\end{figure}
 
-As seen in figure DERP a recursion depth of 1 results in something similar to a raycasting operation. 
-Notice how all specular objects are blank since only once bounce per ray is allowed. 
-A recursion depth of 2 yields slightly better results, we now see objects that are specular since rays are allowed to bounce once before termination.
+\begin{table}[h]
+\begin{center}
+	\begin{tabular}{| l | l |}
+		\hline
+		Recursion depth & Time \\ \hline
+		0 & 11s \\ \hline
+		1 & 17s \\ \hline
+		2 & 24s \\ \hline
+		6 & 55s \\ \hline
+	\end{tabular}
+	\caption{Rendering time for different recursion depths.}
+	\label{tb:recursion}
+\end{center}
+\end{table}
+
+
 
 \section{Samples per pixel}
 Another way of reducing the noise in the images is by sending several rays through the same pixel from the camera. 
@@ -394,36 +483,56 @@ Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides r
 
 \begin{figure}
         \centering
-        \begin{subfigure}[b]{0.5\textwidth}
-           \includegraphics[width=\textwidth]{figures/specular_-50rpp-.png}
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/specular_50rpp-.png}
 	\caption{50 view rays per pixel}
 	\label{fig:50rpp}
         \end{subfigure}%
         ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
           %(or a blank line to force the subfigure onto a new line)
-        \begin{subfigure}[b]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{figures/specular-100rpp-.png}
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
                 \caption{100 view rays per pixel}
                 \label{fig:100rpp}
         \end{subfigure}
 
-	\begin{subfigure}[b]{0.5\textwidth}
+	\begin{subfigure}[h]{0.5\textwidth}
                 \includegraphics[width=\textwidth]{figures/specular_200rpp-.png}
                 \caption{200 view rays per pixel}
                 \label{fig:200rpp}
         \end{subfigure}%
 	~
-	\begin{subfigure}[b]{0.5\textwidth}
+	\begin{subfigure}[h]{0.5\textwidth}
                 \includegraphics[width=\textwidth]{figures/specular_600rpp-.png}
                 \caption{600 view rays per pixel}
                 \label{fig:600rpp}
         \end{subfigure}
         \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
 \end{figure}
-\section{Noise introduced by specular materials}
-Specular materials that produce refleced and to some extent refracted rays is and additional source for noise in the final image and require more samples to reach the same quality level as a scene with only diffuse samples.
 
-BILD-EXEMPEL DIFFUSE.VS.SPECULAR HAR!
+\section{Noise introduced by specular materials}
+Specular materials that produce reflected and to some extent refracted rays is and additional source for noise in the final image and require more samples to reach the same quality level as a scene with only diffuse samples.
+
+\begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.65\textwidth}
+                \includegraphics[width=\textwidth]{figures/diffuse-100rpp-.png}
+                \caption{Diffuse materials only}
+                \label{fig:diff_spec1}
+        \end{subfigure}%
+         %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+
+        \begin{subfigure}[b]{0.65\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
+                \caption{Specular and diffuse materials}
+                \label{fig:dif_spec2}
+        \end{subfigure}
+        \caption{Scene rendered with the same resolution, recursion depth, shadow rays, and a low number of samples per pixel to illustrate the increased noise when specular objects are used in a scene.}\label{fig:diff_spec_diff}
+\end{figure}
+
+Notice the increased noise on the surface of the back wall and on the box nearest to the camera in \autoref{fig:diff_spec_diff}.
+
 \chapter{Discussion}
 Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.
 \emph{Here you should repeat the key findings of your article and discuss how you could improve them. 
