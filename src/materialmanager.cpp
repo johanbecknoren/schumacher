@@ -14,7 +14,7 @@ MaterialManager::MaterialManager() {
 	MaterialManager::_materials.at(MARBLE) = new Material();
 	MaterialManager::_materials.at(MARBLE)->setMaterialType(MARBLE);
 	MaterialManager::_materials.at(MARBLE)->setDiffuseColor(Vec3(real(1.0), real(1.0),real(0.0)));
-	MaterialManager::_materials.at(MARBLE)->setSpecular(real(1.0));
+	MaterialManager::_materials.at(MARBLE)->setSpecular(real(0.8));
 	MaterialManager::_materials.at(MARBLE)->setAbsorbtion(real(0.75));
 
 	MaterialManager::_materials.at(LIGHT) = new Material();

@@ -26,7 +26,7 @@
 \setcounter{page}{2}
 \begin{abstract}
 This report describes the techniques required to approximate global illumination in a computer generated scene and is created as a result from the course TNCG15, Advanced Global Illumination and Rendering.
-The report focus on the techniques required to do a monte-carlo ray tracer and show results from our implementation using that technique.
+The report focuses on the techniques required for an implementation of a stochastic global illumination algorithm by using Monte Carlo integration to estimate a solution to the rendering equation, and presents the results from our implementation using that technique.
 It will cover topics like intersection testing, aliasing counter actions and other techniques that has been implemented during the project.
 The results presentated will evaluate these parts, both to see their contributions and to their inpact to computation time.
 
@@ -290,14 +290,14 @@ In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per 
         \centering
         \begin{subfigure}[b]{0.3\textwidth}
                 \includegraphics[width=\textwidth]{figures/aliasing_1.png}
-                \caption{1 view ray per pixel}
+                \caption{1 ray per pixel}
                 \label{fig:aliasing1}
         \end{subfigure}%
         ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
           %(or a blank line to force the subfigure onto a new line)
         \begin{subfigure}[b]{0.3\textwidth}
                 \includegraphics[width=\textwidth]{figures/aliasing_10.png}
-                \caption{10 view rays per pixel}
+                \caption{10 rays per pixel}
                 \label{fig:aliasing10}
         \end{subfigure}
         \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
@@ -450,32 +450,14 @@ $R_0$ is the reflection coefficient for light incoming parallel to the normal di
 The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector. \autoref{eq:schlicks} describes what fraction of the reflected ray should be used in computing the radiance for the intersection point. 
 The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
 
-% TA EJ BORT sparar till senare :P
-%\begin{figure}
-%        \centering
-%        \begin{subfigure}[b]{0.5\textwidth}
-%           \includegraphics[width=\textwidth]{figures/2013-12-10-15-39-35-200rpp-ca2h_6-7_112.png}
-%	\caption{200 view rays per pixel}
-%	\label{fig:full}
-%        \end{subfigure}%
-%        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-%          %(or a blank line to force the subfigure onto a new line)
-%        \begin{subfigure}[b]{0.5\textwidth}
-%                \includegraphics[width=\textwidth]{figures/2013-12-10-15-39-35-200rpp-ca2h_6-7_112.png}
-%                \caption{HerpDerp view rays}
-%                \label{fig:miger}
-%        \end{subfigure}
-%        \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
-%\end{figure}
-
 $R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is coming from and going into respectively.
 The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector.
 \autoref{eq:schlicks} describes what fraction of the reflected ray radiance should be used in computing the radiance for the intersection point. 
 The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
 
 \subsection{Reflection}
-When a ray travels trough a medium, colliding with another medium, the ray will be reflected.
-The law of reflection says that the angle of incidence $\theta_i$ is equal to the angle of reflection $ \theta_r $ is equal to each other.
+When a ray travels through a medium, colliding with another medium, the ray will be reflected.
+The law of reflection says that the angle of incidence $\theta_i$ and the angle of reflection $ \theta_r $ is equal to each other for a perfect reflection.
 The incoming ray can be divided into two different parts, the tangent part to the surface $ \mathbf{i}_\bot $ and the normal part $ \mathbf{i}_\| $.
 The tangential part can be found using orthogonal projection onto the normal using \autoref{eq:projection}. 
 The normal part is found using \autoref{eq:projectionrest}.
@@ -506,7 +488,6 @@ r =& \mathbf{i}_\| - \mathbf{i}_\bot \\
 %\end{subequations}
 
 \subsection{Refraction}
-
 When calculating refractions, Snell's law are used. 
 It states that the product of the refractive indices and sines of the angles must be equal, as stated in \autoref{eq:snell}.\\
 
@@ -515,7 +496,7 @@ It states that the product of the refractive indices and sines of the angles mus
 \end{equation}
 
 This equation has a problem, when $ sin \theta_1 > \dfrac{\eta_1}{\eta_2} $
-the other term $ sin \theta_2 $ has to be greater then 1. 
+the other term $ sin \theta_2 $ has to be greater then 1, which of course is not possible.
 This case is what is called total internal reflection.
 When calculating the refracted ray $ t $, continued calculation assumes that the condition is not satisfied.\\
 
@@ -663,7 +644,7 @@ This is the recursion depth used for most of the images in this report.
         \end{subfigure}%
 	~
 	\begin{subfigure}[h]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-6-1000rppTMP.png}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-6-1000rpp.png}
                 \caption{6 recursions}
                 \label{fig:6rd}
         \end{subfigure}
