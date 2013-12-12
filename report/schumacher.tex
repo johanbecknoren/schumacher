@@ -28,7 +28,7 @@
 This report describes the techniques required to approximate global illumination in a computer generated scene and is created as a result from the course TNCG15, Advanced Global Illumination and Rendering.
 The report focus on the techniques required to do a monte-carlo ray tracer and show results from our implementation using that technique.
 It will cover topics like intersection testing, aliasing counter actions and other techniques that has been implemented during the project.
-The results presentated will evaluate these parts, both to see their contributions and to show the time cost that is added when using them.
+The results presentated will evaluate these parts, both to see their contributions and to their inpact to computation time.
 
 \end{abstract}
 
@@ -43,7 +43,9 @@ These methods use iterations, using computer power to calculate these estimates 
 
 Most of these are so called ray tracing methods where rays are traced from the viewer into the scene.
 When rays hits surfaces in the scene, new rays for reflection and refraction is spawned.
-These are then combined using importance.
+These are then combined using importance to create the final image.
+These techniques are called global illumination methods because they take the whole scene into consideration.
+Each other primitives contribution has to be taken into consideration while calculating the illumination on a specific 
 
 \section{Whitted ray tracing}
 The Whitted ray tracing method described by Turner Whitted in \cite{Foley_animproved} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
@@ -107,7 +109,7 @@ There have also been research on methods combining the benefits of radiosity wit
 Since a radiosity method handles diffuse reflections rather well, and a ray tracing method handles specular reflections well. a lot of research has been done to find ways to combine these two methods.
 One of these methods descibed by Smits et al. \cite{importance_radiosity} works from the fact that radiosity algorithms propagate light from a light source through the scene, while a ray tracing algorithm only cares about the light that reaches the eye.
 The method in \cite{importance_radiosity} consists of splitting the rendering into two passes.
-The first pass uses a ray tracing approach to emmit importance from the eye through the scene.
+The first pass uses a ray tracing approach to emit importance from the eye through the scene.
 This importance is then used to refine the patches used for the second pass, a radiosity pass.
 By subdividing patches in parts with high importance, and ignoring patches in areas with little or no importance, great speedups can be achieved.
  
@@ -168,7 +170,7 @@ The intersection methods has to calculate the normal of surfaces to decide the d
 \end{equation}
 
 \subsection{Implicit sphere}
-A sphere is defined by a position vector $c$ of its centre and a radius scalar $r$. 
+A sphere is defined by a position vector $c$ of its center and a radius scalar $r$. 
 The goal is to find if any $t$ in \autoref{eq:ray} satisfies \autoref{eq:sphere}. By inserting \autoref{eq:ray} into \autoref{eq:sphere}, we receive an expression for solving the intersection point described by \autoref{eq:sphereray}.
 \begin{equation} \label{eq:sphere}
 (\mathbf{p} - \mathbf{c}).(\mathbf{p} - \mathbf{c}) = r^2
@@ -255,7 +257,7 @@ Triangle collisions uses the same method as the quadrilateral for finding if a r
 Collisions against the octree uses a iterative solution to traverse a ray trough the tree.
 When a ray is created, it is compared against all the top boxes.
 As the ray is evaluated, the bounding box closest to the ray are found, iterating down.
-If no collisions is found, the algorithm iterates up again, finding the smallest neighbouring bounding box that has data in it. This process is visualized in \autoref{fig:octreetraversal}. The ray first collides with bounding box 1, but no child nodes exist in it, so the ray traverse forward to the edge of bounding box 2 as it collides with the sibling to 1. 
+If no collisions is found, the algorithm iterates up again, finding the smallest neighboring bounding box that has data in it. This process is visualized in \autoref{fig:octreetraversal}. The ray first collides with bounding box 1, but no child nodes exist in it, so the ray traverse forward to the edge of bounding box 2 as it collides with the sibling to 1. 
 It now iterates down to bounding box 2 in the figure and finds that no child's are in this bounding box. 
 The ray moves forward to bounding box 3 and finds a primitive in this bounding box, collision tests are done against it but no collision is found.
 The ray traverse forward to the edge of bounding box 3 and trough bounding box 4.
@@ -305,8 +307,8 @@ L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Ph
 \end{equation}
 
 The left hand side $L(x \rightarrow \theta)$ corresponds to the radiance leaving at a point \emph{x} in the direction $\theta$.
-The right hand side consists of an emmitance part and a reflectance part.
-$ L_e(x \rightarrow \theta)$ corresponds to outgoing radiance emmited from $x$, and the integral term corresponds to reflected radiance received from all directions over a hemisphere over the point $x$.
+The right hand side consists of an emittance part and a reflectance part.
+$ L_e(x \rightarrow \theta)$ corresponds to outgoing radiance emitted from $x$, and the integral term corresponds to reflected radiance received from all directions over a hemisphere over the point $x$.
 In \cite{dutre} it is shown that \autoref{eq:rendering_eq} can be represented by separating the terms for indirect and direct illumination as in \autoref{eq:rendering_eq_split}.
 
 
@@ -388,12 +390,12 @@ Inserting \autoref{eq:diffuse_indirect1} into \autoref{eq:monte_carlo_indirect} 
 
 The random hemisphere sample direction $\Phi_i$ is created by randomly picking two angles $\theta$ and $\phi$, which will represent a sampling direction in spherical coordinates.
 The angle $\phi$ is assigned a uniform random value in the interval $[0,2\pi]$ and $\theta$ is assigned a value of $cos^{-1}(r^{ \frac{1}{1+n} })$ where \emph{r} is a uniform random number in the interval $[0,1]$ and \emph{n} is a number in the interval $[0,1]$ which dictates the sample direction's alignment within the cosine lobe around $N_x$. 
-Lastly, the sample direction is transformed to Carthesian coordinates and is rotated along $N_x$.
+Lastly, the sample direction is transformed to Cartesian coordinates and is rotated along $N_x$.
 
 \subsubsection{Specular indirect illumination}
 Perfect specular surfaces are implemented in this project.
 
-The BRDF for a specular surface is different from 0 in only a single directon, the perfect reflection direction. 
+The BRDF for a specular surface is different from 0 in only a single direction, the perfect reflection direction. 
 The BRDF and pdf are defined in equation \autoref{eq:specular_indirect1} where $\theta$ is the incident ray's angle to the surface normal and $\Phi_i$ is the reflected ray angle.
 Since we are dealing with perfectly specular materials the pdf will be equal to 1 as well, and $\Phi_i = \theta$ thus the dirac function will yield a result of 1.
 
@@ -459,7 +461,7 @@ The radiance contribution from the refracted (transmitted) ray them becomes $T=1
 When a ray travels trough a medium, colliding with another medium, the ray will be reflected.
 The law of reflection says that the angle of incidence $\theta_i$ is equal to the angle of reflection $ \theta_r $ is equal to each other.
 The incoming ray can be divided into two different parts, the tangent part to the surface $ \mathbf{i}_\bot $ and the normal part $ \mathbf{i}_\| $.
-The tangiental part can be found using orthogonal projection onto the normal using \autoref{eq:projection}. The normal part is found using \autoref{eq:projectionrest}.
+The tangential part can be found using orthogonal projection onto the normal using \autoref{eq:projection}. The normal part is found using \autoref{eq:projectionrest}.
 
 \begin{equation} \label{eq:projection}
 \mathbf{i}_\bot = \frac{\mathbf{i} \cdot \mathbf{n}} {\vert \mathbf{n}^2} \mathbf{n} = (\mathbf{v} \cdot \mathbf{n})\mathbf{n}
@@ -498,7 +500,7 @@ the other term $ sin \theta_2 $ has to be greater then 1.
 This case is what is called total internal reflection.
 When calculating the refracted ray $ t $, continued calculation assumes that the condition is not satisfied.\\
 
-The refractored vector is also divided into two parts, just the same as in \autoref{eq:projectionrest} and the norms are calculated first. By taking advantage of the fact that norms and tangents to the plane is equal to the sines in \autoref{eq:snell} it can be rewritten into \autoref{eq:refraction}.
+The refracted vector is also divided into two parts, just the same as in \autoref{eq:projectionrest} and the norms are calculated first. By taking advantage of the fact that norms and tangents to the plane is equal to the sines in \autoref{eq:snell} it can be rewritten into \autoref{eq:refraction}.
 
 \begin{equation} \label{eq:refraction}
 \mathbf{t}_\| = \frac{\eta_1}{\eta_2} \mathbf{i}_\| = \frac{\eta_1}{\eta_2} 
