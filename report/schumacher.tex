@@ -7,23 +7,11 @@
 \usepackage{titlesec, color}
 
 \definecolor{gray75}{gray}{0.75}
-\newcommand{\hsp}{\hspace{20pt}}
+\newcommand{\hsp}{\hspace{10pt}}
+
 \titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
 \titlespacing*{\chapter}
-  {0pt}{-70pt}{10pt}
-
-%
-%\makeatletter
-%% Redefine the \chapter* header macro to remove vertical space
-%\def\@makeschapterhead#1{%
-%  \vspace*{-50\p@}% Remove the vertical space
-%  {\parindent \z@ \raggedright
-%    \normalfont
-%    \interlinepenalty\@M
-%    \Huge \bfseries  #1\par\nobreak
-%    \vskip 40\p@
-%  }}
-%\makeatother
+  {0pt}{-70pt}{20pt}
 
 \begin{document}
 
@@ -191,21 +179,6 @@ C =& (\mathbf{o} - \mathbf{c}) \cdot (\mathbf{o} - \mathbf{c}) - r^2
 
 When both values of $t$ are calculated, the lowest value is used for the collision point. The normal is calculated by normalizing the point on the surface and subtracting the center of the sphere.
 
-\subsection{Axis aligned bounding box}
-Axis aligned bounding boxes are stored with two coordinates, one describing the lower left front vertex and one describing the upper right back vertex.
-When doing intersection tests against a ray, vectors are created from the ray origin to each of the two corners of the AABB, $\mathbf{P_{LB}}$ and $\mathbf{P_{UR}}$ divided by the length of each component of the ray direction vector $\mathbf{d}$ as described in \autoref{eq:aabb_t}.
-
-\begin{subequations} \label{eq:aabb_t}
-\begin{align}
-t_1 =& (P_{LB}(x) - \mathbf{o}(x)) / \mathbf{d}(x)\\
-t_2 =& (P_{UR}(x) - \mathbf{o}(x)) / \mathbf{d}(x)\\
-t_3 =& (P_{LB}(y) - \mathbf{o}(y)) / \mathbf{d}(y)\\
-t_4 =& (P_{UR}(y) - \mathbf{o}(y)) / \mathbf{d}(y)\\
-t_5 =& (P_{LB}(z) - \mathbf{o}(z)) / \mathbf{d}(z)\\
-t_6 =& (P_{UR}(z) - \mathbf{o}(z)) / \mathbf{d}(z)
-\end{align}
-\end{subequations}
-
 \subsection{Quadrilateral}
 The collision tests for quadrilaterals follows the technique presented by A. Lagae and P. Dutr\'{e} \cite{quadrilateral}.
 A quadrilateral is described by four corner points $ \mathbf{v}_{00} $, $ \mathbf{v}_{01}$, $ \mathbf{v}_{11} $ and $ \mathbf{v}_{01} $, one for each edge, listed in a counter clockwise order.
@@ -243,16 +216,21 @@ If the ray intersects the quadrilateral, \autoref{eq:ray} is inserted into \auto
 \subsection{Triangle}
 Triangle collisions uses the same method as the quadrilateral for finding if a ray intersects with the triangle, using \autoref{eq:quadtripoint} to determine if it intersects with the ray and computing $t$ by inserting \autoref{eq:ray} into that equation.
 
-\begin{wrapfigure}{r}{0.5\textwidth} 
-	\begin{center}
-		\includegraphics[width=0.48\textwidth]			
-		{figures/octreetwod.png} 
-	\end{center}
-	\caption{Visualization of the collision tests a ray traveling 			trough an octree does.}
+%\begin{wrapfigure}{r}{0.5\textwidth} 
+%	\begin{center}
+%		\includegraphics[width=0.48\textwidth]			
+%		{figures/octreetwod.png} 
+%	\end{center}
+%	\caption{Visualization of the collision tests a ray traveling 			trough an octree does.}
+%	\label{fig:octreetraversal}
+%\end{wrapfigure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/octreetwod.png}
+	\caption{Visualization of the collision tests a ray traveling trough an octree data structure.}
 	\label{fig:octreetraversal}
-	\squeezeup
-	\squeezeup
-\end{wrapfigure}
+\end{figure}
 
 \subsection{Octree}
 Collisions against the octree uses a iterative solution to traverse a ray trough the tree.
