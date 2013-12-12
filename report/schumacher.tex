@@ -1,6 +1,7 @@
 \documentclass[]{report}   % list options between brackets
-\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, amsmath, lipsum, cite, caption, subcaption}
+\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, wrapfig, amsmath, lipsum, cite, caption, subcaption}
 \graphicspath{{figures/}}
+\newcommand{\squeezeup}{\vspace{-2.5mm}}
 
 \begin{document}
 
@@ -15,8 +16,11 @@
 \setcounter{page}{2}
 \chapter{Abstract}
 \emph{ A brief and concise summary of the article. It should be limited to 1000 characters.}
-\chapter{Introduction}
-Realistic lighting in computer graphics scenes has been a problem for many years.
+\chapter{Introduction} \label{ch:introduction}
+Realistic lighting in computer graphics scenes has been a problem for many years. 
+
+In \autoref{ch:introduction}, global lightning models are described.
+
 \emph{You should describe here global lighting models and talk about Whitted ray tracing, radiosity, Monte Carlo ray-tracing, two-pass rendering, photon mapping and ray-tracing of isosurfaces, explaining how they work and what they do. 
 This description should be done mainly in words and not so much with maths. 
 Also do not go too much into detail. 
@@ -28,9 +32,6 @@ Section 3 shows some results that we have obtained with our implementation and b
 The discussion and the outlook is the section 4." 
 Length: about 3 pages.}
 
-\begin{equation} \label{eq:light}
-A=B
-\end{equation}
 
 \section{Global lightning}
 
@@ -94,7 +95,7 @@ The method has been shown to reduce rendering time as well as the noise in the f
 An iso surface is a surface described implicitly by a mathematical expression or equation. An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. Different data structures can be used to greatly increase the performace of intersection tests, such as storing surfaces in an \emph{octree} structure or using a \emph{bounding volume hierarchy} (BVH).
 
 
-\chapter{Background}
+\chapter{Background} \label{ch:background}
 
 In this section we will talk about the methods we have implemented in our Monte Carlo ray tracer using C++. 
 Although there are several approaches to some of these methods we will only talk about the methods we chose to implement in this project.
@@ -135,7 +136,7 @@ During rendering calculation, the ray tracer calls an abstract method for calcul
 Each of these methods uses an incoming ray with a direction vector $d$ and a origin $o$ described by \autoref{eq:ray}.
 The intersection methods has to calculate the normal of surfaces to decide the direction of new rays spawned at the intersection point.
 \begin{equation} \label{eq:ray}
-\mathbf{p} = \mathbf{o} + t \mathbf{d}, t \leq 0
+\mathbf{p} = \mathbf{o} + t \mathbf{d}, t \geq 0
 \end{equation}
 
 \subsection{Implicit sphere}
@@ -185,8 +186,65 @@ t_6 =& (P_{UR}(z) - \mathbf{o}(z)) / \mathbf{d}(z)
 \end{subequations}
 
 \subsection{Quadrilateral}
+The collision tests for quadrilaterals follows the technique presented by A. Lagae and P. Dutr\'{e} \cite{quadrilateral}.
+A quadrilateral is described by four corner points $ \mathbf{v}_{00} $, $ \mathbf{v}_{01}$, $ \mathbf{v}_{11} $ and $ \mathbf{v}_{01} $, one for each edge, listed in a counter clockwise order.
+These must all be on the same plane and create a convex shape.
+The method for collision uses bilinear coordinates to calculate the point on the plane, but this is an expensive operation and therefore, rejection tests are made early to make sure that these are only calculated when it is really needed.
+The quadrilateral is divided into two triangles $ T $, $ T' $ and the collision test is decided comparing the barycentric coordinates with the two triangles. \\
+
+Each point $ Q(u, v) $ in the plane $ Q $ can be described by \autoref{eq:quadplanepoint}.
+Here $ u $ and $ v $ are the bilinear coordinates of $Q(u,v)$. 
+If $ u $ and $ v $ lies in the range $ [0 .. 1] $, then $ Q(u,v) $ lies inside $ Q $.\\
+
+\begin{equation} \label{eq:quadplanepoint}
+Q(u,v) = (1 - u) (1 - v) \mathbf{V}_{00} + u (1 - v) \mathbf{V}_{10} + uv\mathbf{V}_{11} + (1 - u) v \mathbf{V}_{01}
+\end{equation}
+
+\autoref{eq:quadplanepoint} is a bilinear mapping of the unit square into a quadrilateral.
+It is computed by using linear interpolation along the top and bottom edges of the quad and then applying a linear interpolation between these two interpolated points.\\
+
+\begin{equation}
+\label{eq:quadtripoint}
+T(\alpha, \beta) = \mathbf{V}_{00} + \alpha ( \mathbf{V}_{10} - \mathbf{V}_{00}) + \beta (\mathbf{V}_{01} - \mathbf{V}_{00})
+\end{equation}
+
+Each point on in one of the triangles is described by \autoref{eq:quadtripoint} and when \autoref{eq:quadtrirange} is satisfied, the point is inside the triangle.
+If the ray intersects the quadrilateral, \autoref{eq:ray} is inserted into \autoref{eq:quadtrirange} to find $t$.
+
+\begin{subequations} \label{eq:quadtrirange}
+\begin{align}
+\alpha \ge& 0\\
+\beta \ge& 0\\
+\alpha + \beta& \le 1\\
+\end{align}
+\end{subequations}
+
+\begin{wrapfigure}{r}{0.5\textwidth} 
+	\begin{center}
+		\includegraphics[width=0.48\textwidth]{figures/octreetwod.png} 
+	\end{center}
+\caption{Visualization of the collision tests a ray traveling trough an octree does.}
+\label{fig:octreetraversal}
+\squeezeup
+\squeezeup
+\squeezeup
+\squeezeup
+\end{wrapfigure}
+
 \subsection{Triangle}
+Triangle collisions uses the same method as the quadrilateral for finding if a ray intersects with the triangle, using \autoref{eq:quadtripoint} to determine if it intersects with the ray and computing $t$ by inserting \autoref{eq:ray} into that equation.
+
 \subsection{Octree}
+Collisions against the octree uses a iterative solution to traverse a ray trough the tree.
+When a ray is created, it is compared against all the top boxes.
+As the ray is evaluated, the bounding box closest to the ray are found, iterating down.
+If no collisions is found, the algorithm iterates up again, finding the smallest neighbouring bounding box that has data in it. This process is visualized in \autoref{fig:octreetraversal}. The ray first collides with bounding box 1, but no child nodes exist in it, so the ray traverse forward to the edge of bounding box 2 as it collides with the sibling to 1. 
+It now iterates down to bounding box 2 in the figure and finds that no child's are in this bounding box. 
+The ray moves forward to bounding box 3 and finds a primitive in this bounding box, collision tests are done against it but no collision is found.
+The ray traverse forward to the edge of bounding box 3 and trough bounding box 4.
+The ray exits out of bounding box 5 and no collisions were found and therefore, no collisions between the scene and the ray were found.\\
+
+This allows for using the fast and cheap AABB intersection method instead of expensive collision tests using all primitives.
 
 \section{Anti-aliasing by sub-pixel sampling}
 To reduce aliasing effects in the final image we have implemented support for sub-pixel sampling.
@@ -239,7 +297,7 @@ In \cite{dutre} it is shown that \autoref{eq:rendering_eq} can be represented by
 
 \subsection{Direct illumination}
 The term $L_{direct}(x \rightarrow \theta)$ expresses the contribution to a point \emph{x} from light sources directly.
-Since the term $L_{direct}(x \rightarrow \theta)$ contains the emmitance term $L_e$ it is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
+Since the term $L_{direct}(x \rightarrow \theta)$ contains the emittance term $L_e$ it is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
 Or as a discrete representation as a sum over all \emph{N} light sources in the scene.
 In our implementation only a single planar light source is considered.
 For generality's sake all equations presented will be defined to handle an arbitrary number of light sources.
@@ -249,7 +307,7 @@ For generality's sake all equations presented will be defined to handle an arbit
 L_{direct}(x \rightarrow \theta) = \sum^{N}_{k=1} \int_{A_k}L_e(y \rightarrow \mathbf{yx}) f_r(x, \mathbf{xy}\leftrightarrow \theta)G(x,y)V(x,y)dA_y
 \end{equation}
 
-In \autoref{eq:rendering_eq_split}b, $A$ refers to the area of a lightsource in the scene.
+In \autoref{eq:rendering_eq_split}b, $A$ refers to the area of a light source in the scene.
 For every intersection point retrieved from the scene, that point's direct illumination is calculated in two separate ways, one for direct diffuse illumination and one for direct specular illumination.
 For diffuse direct illumination the light source is sampled.
 Each sample point $y_i$ is distributed uniformly on the surface of the light source.
@@ -264,11 +322,11 @@ Because of this these rays are often called shadow rays, and will result in soft
 as described in \cite{dutre}.
 
 A uniform probability distribution function $p(y_i)$ of $\frac{1}{A}$ is used where \emph{A} is the area of the light source.
-From \autoref{eq:monte_carlo_direct} we see that it is required to evaluate visibility, BRDF and radiance emmited for each sample point.
+From \autoref{eq:monte_carlo_direct} we see that it is required to evaluate visibility, BRDF and radiance emitted for each sample point.
 
 Direct specular illumination is handled more straight forward.
 If a ray intersects with a specular object, a new ray is traced from the intersection point in the direction of a perfect reflection of the first incoming ray.
-If this new ray intersects a lightsource the point at the initial intersection receives radiance contribution in the form of emmitance from that light source.
+If this new ray intersects a light source the point at the initial intersection receives radiance contribution in the form of emittance from that light source.
 
 \subsection{Indirect illumintaion}
 Indirect illumination corresponds to radiance received through one or more reflections against other objects in the scene.
@@ -439,7 +497,7 @@ After each time the ray hits a change in medium, it will spawn new refraction an
 All of the resulting values that are accumulated from each bounce will be added to the total value.
 The contributed values from diffuse and specular elements in 
 
-\chapter{Results and benchmarks}
+\chapter{Results and benchmarks} \label{ch:results}
 \emph{Here you show results obtained with your code. 
 You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. 
 You can compare in detail images computed from the same scene with different resolutions. 
@@ -551,13 +609,6 @@ Lastly a render depth of 6 is shown in \autoref{fig:6rd}. This is the recursion 
 \end{center}
 \end{table}
 
-\chapter{Results and benchmarks}
-\emph{Here you show results obtained with your code. You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. You can compare in detail images computed from the same scene with different resolutions. You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. Here you can be creative and look at things you like. 
-Length: about 5-6 pages .}
-\section{Shadow rays}
-\section{Recursion depth}
-\section{Samples per pixel}
-
 \begin{figure}
         \centering
         \begin{subfigure}[h]{0.5\textwidth}
@@ -610,7 +661,7 @@ Specular materials that produce reflected and to some extent refracted rays is a
 
 Notice the increased noise on the surface of the back wall and on the box nearest to the camera in \autoref{fig:diff_spec_diff}.
 
-\chapter{Discussion}
+\chapter{Discussion} \label{ch:discussion}
 Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.
 \emph{Here you should repeat the key findings of your article and discuss how you could improve them. 
 Do not go into details, but just give a general description. 
