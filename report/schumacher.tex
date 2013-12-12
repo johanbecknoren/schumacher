@@ -1,4 +1,4 @@
-\documentclass[a4paper]{report}
+\documentclass[a4paper, 12pt]{report}
 % list options between brackets
 \usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, wrapfig, amsmath, lipsum, cite, caption, subcaption}
 \graphicspath{{figures/}}
@@ -269,6 +269,12 @@ In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per 
 \end{figure}
 
 \section{Russian Roulette}
+Russian roulette is a method for ray termination that specifies a probability for continuing or terminating at each bounce. 
+How the probability is decided depends on how complex the implementation.
+A simple implementation only states a fixed threshold of probability for each ray.
+As the ray continues forward, the probability of terminating increases.
+More complex implementations could use reflectance of the surface to decide, giving a higher probability of termination for diffuse primitives.
+Light intensity could also be taken into consideration when determining the probability, giving a higher chance of termination for low intensity values.
 
 \section{Monte Carlo ray tracing}
 As described in the introduction a Monte Carlo ray tracer is similar to a Whitted ray tracer in that it is only interested in the radiance reaching the virtual camera, or the eye.
@@ -355,9 +361,9 @@ Inserting \autoref{eq:diffuse_indirect1} into \autoref{eq:monte_carlo_indirect} 
 
 \begin{subequations} \label{eq:diffuse_indirect2}
 \begin{align}
-\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
-\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
-\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+\nonumber \frac{1}{N}& \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+\nonumber \frac{1}{N}& \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
+\frac{color}{N}& \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
 \end{align}
 \end{subequations}
 
@@ -496,13 +502,6 @@ All of the resulting values that are accumulated from each bounce will be added 
 The contributed values from diffuse and specular elements in 
 
 \chapter{Results and benchmarks} \label{ch:results}
-\emph{Here you show results obtained with your code. 
-You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. 
-You can compare in detail images computed from the same scene with different resolutions. 
-You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. 
-You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. 
-Here you can be creative and look at things you like. 
-Length: about 5-6 pages .}
 \section{Shadow rays}
 The quality of the direct diffuse illumination is directly related to the number of shadow rays used to sample the light source from each intersection point. \autoref{fig:shadow_rays} shows images with different number of shadow rays per sample. Notice how the amount of noise on the floor decreases as the number of shadow rays increases. \autoref{tb:shadow_rays} shows the effect the number of shadow rays has on the rendering time.
 
