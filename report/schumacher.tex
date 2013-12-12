@@ -583,6 +583,27 @@ Notice how the amount of noise on the floor decreases as the number of shadow ra
 \end{center}
 \end{table}
 
+\section{Octree speed up}
+The octree allows for a great speedup when using a scene with a lot of primitives.
+As can be seen in \autoref{tb:octree}, even with a mesh with relatively low polygon count, the computation time is ten times faster.
+
+
+\begin{table}[h]
+\begin{center}
+
+	\begin{tabular}{| l | l | l |}
+		\hline
+		Bunny & Octree & Time \\ \hline
+		yes & yes & 37.8s \\ \hline
+		yes & no & 6m 16s \\ \hline
+		no & no & 6.6s \\ \hline
+		no & yes & 16.9s \\ \hline
+	\end{tabular}
+	\caption{Rendering time with and without octree data structure in scene. Rendered with 10 rays per pixel. Bunny consists of 4968 triangles.}
+	\label{tb:octree}
+\end{center}
+\end{table}
+
 \section{Recursion depth}
 Recursion depth refers to the number of recursive calls allowed in the algorithm, e.g. how many bounces a ray will make in the scene before terminating and returning. 
 The recursion depth affects the noise in the final image, but it also has an impact on the resulting reflections and refractions for specular objects.
@@ -730,6 +751,19 @@ Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides r
 \end{figure}
 
 \chapter{Discussion} \label{ch:discussion}
+By implementing a ray tracer, based on the monte-carlo method, it is possible to create high quality renders of the scene, given that the solution is allowed to converge long enough.
+But even with a lot of iterations, the final output still suffers from artifacts like noise.
+To remedy this, photon mapping could be implemented which would decrease the time it takes for the solution to converge.\\
+
+The created ray tracer only handles air to glass and glass to air refractions, not between any two mediums.
+This would allow us to create glass objects that are placed on other surfaces and not only floating in the air.
+To extend our solution to support this would not be too hard, because we would still be dealing with the same two cases, ray traveling to a medium with lower refractive index or ray traveling into a medium of higher refractive index.
+\\
+
+The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives.
+
+
+
 Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.
 \emph{Here you should repeat the key findings of your article and discuss how you could improve them. 
 Do not go into details, but just give a general description. 

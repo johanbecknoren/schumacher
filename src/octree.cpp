@@ -99,7 +99,7 @@ std::vector<const Renderable*> Octree::getLightList() const {
 }
 
 bool Octree::intersect(Ray &ray, IntersectionPoint &isect) const {
-	// return intersectSimple(ray, isect);
+	//return intersectSimple(ray, isect);
 	return intersectHard(ray, isect);
 }
 
@@ -213,7 +213,7 @@ bool Octree::intersectHard(Ray &ray, IntersectionPoint &isect) const {
 
 			real len = glm::distance(ray.getOrigin(), pts[i].getPoint());
 
-			if(len < min && len > 0) {
+			if(len < min && len >= 0) {
 				min = len;
 				id = i;
 			}

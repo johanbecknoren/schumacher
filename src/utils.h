@@ -8,8 +8,8 @@
 #define PI real(3.1415926535897932384626433832795) // M_PI istället
 
 // Viewport dimensions
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 100
+#define HEIGHT 100
 
 typedef double real;
 typedef glm::dvec3 Vec3;

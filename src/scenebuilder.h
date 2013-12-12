@@ -102,6 +102,7 @@ static void createMesh(std::vector<Renderable *> &scene, material_t m, Vec3 t, r
 		
 		scene.push_back(tri);
 	}
+    std::cout << triangles->size() << std::endl;
 	unsigned r = (4 < triangles->size()) ? 4 : triangles->size();
 	for (unsigned int s = 0; s < r; ++s) {
 		Triangle *tri = (*triangles)[s];
@@ -124,6 +125,39 @@ public:
 	static std::vector<Mesh *> getMeshVector() {
 		return meshVec;
 	}
+
+    static std::vector<Renderable *> createTestScene() {
+        std::vector<Renderable *> scene;
+        Quadrilateral *boxCeiling = new Quadrilateral(CornellBoxFactory::createCeil());
+		boxCeiling->setMaterial(CORNELL_CEIL);
+		scene.push_back(boxCeiling);
+		
+		Quadrilateral *boxBack = new  Quadrilateral(CornellBoxFactory::createBack());
+		boxBack->setMaterial(CORNELL_BACK);
+		scene.push_back(boxBack);
+
+		Quadrilateral *boxFloor = new Quadrilateral(CornellBoxFactory::createFloor());
+		boxFloor->setMaterial(CORNELL_FLOOR);
+		scene.push_back(boxFloor);
+		
+		Quadrilateral *boxRight = new Quadrilateral(CornellBoxFactory::createRight());
+		boxRight->setMaterial(CORNELL_RIGHT);
+		scene.push_back(boxRight);
+		
+		Quadrilateral *boxLeft = new Quadrilateral(CornellBoxFactory::createLeft());
+		boxLeft->setMaterial(CORNELL_LEFT);
+		scene.push_back(boxLeft);
+        
+        Quadrilateral *boxFront = new Quadrilateral(CornellBoxFactory::createFront());
+		boxFront->setMaterial(CORNELL_BACK);
+		scene.push_back(boxFront);
+
+        createLightSourceQuad(scene, LIGHT);
+
+        createBunny(scene, CORNELL_LEFT);
+        return scene;
+    }
+
 	static std::vector<Renderable *> createCornellBox() {
 		std::vector<Renderable *> scene;
 		Quadrilateral *boxCeiling = new Quadrilateral(CornellBoxFactory::createCeil());
