@@ -266,7 +266,7 @@ Vec3 MonteCarloRayTracer2::iterateRay(Ray &ray, const Octree &tree, int depth, b
 			Lrd *= ip.getMaterial()->getDiffuseColor() * (1.f-ip.getMaterial()->getSpecular());
 			Lrd /= real(num_diffuse_rays);
 #endif
-#if 0
+#if 1
 			// perfect direct and indirect specular reflections (refraktion here aswell)
 			int num_refr_rays = 0;
 			for(int i=0; i<num_specular_rays; ++i) {
