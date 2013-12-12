@@ -1,7 +1,29 @@
-\documentclass[]{report}   % list options between brackets
+\documentclass[a4paper]{report}
+% list options between brackets
 \usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, wrapfig, amsmath, lipsum, cite, caption, subcaption}
 \graphicspath{{figures/}}
 \newcommand{\squeezeup}{\vspace{-2.5mm}}
+
+\usepackage{titlesec, color}
+
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{20pt}}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+\titlespacing*{\chapter}
+  {0pt}{-70pt}{10pt}
+
+%
+%\makeatletter
+%% Redefine the \chapter* header macro to remove vertical space
+%\def\@makeschapterhead#1{%
+%  \vspace*{-50\p@}% Remove the vertical space
+%  {\parindent \z@ \raggedright
+%    \normalfont
+%    \interlinepenalty\@M
+%    \Huge \bfseries  #1\par\nobreak
+%    \vskip 40\p@
+%  }}
+%\makeatother
 
 \begin{document}
 
@@ -14,30 +36,25 @@
 \maketitle
 
 \setcounter{page}{2}
-\chapter{Abstract}
+\begin{abstract}
+
+\end{abstract}
+
+\tableofcontents
+
 \emph{ A brief and concise summary of the article. It should be limited to 1000 characters.}
 \chapter{Introduction} \label{ch:introduction}
 Realistic lighting in computer graphics scenes has been a problem for many years. 
+The equation describing light propagation trough a scene is both recursive and infinite which is definitely something that computers can not currently handle.
+Therefore, researchers has found different methods to estimate the analytic solution.
+These methods use iterations, using computer power to calculate these estimates that converge towards the real solution.\\
 
-In \autoref{ch:introduction}, global lightning models are described.
-
-\emph{You should describe here global lighting models and talk about Whitted ray tracing, radiosity, Monte Carlo ray-tracing, two-pass rendering, photon mapping and ray-tracing of isosurfaces, explaining how they work and what they do. 
-This description should be done mainly in words and not so much with maths. 
-Also do not go too much into detail. 
-The explanations should be done with the help of the papers above that were presented during the seminar. 
-You should reference these papers in the introduction. 
-The introduction is concluded by a paragraph, that describes the structure of the paper like: "The first section is the introduction. 
-In section 2, we discuss in more detail the techniques regarding (raytracing, Monte Carlo raytracing, depending on what you have implemented), which we have implemented. 
-Section 3 shows some results that we have obtained with our implementation and benchmarks. 
-The discussion and the outlook is the section 4." 
-Length: about 3 pages.}
-
-
-\section{Global lightning}
-
+Most of these are so called ray tracing methods where rays are traced from the viewer into the scene.
+When rays hits surfaces in the scene, new rays for reflection and refraction is spawned.
+These are then combined using importance.
 
 \section{Whitted ray tracing}
-The Whitted ray tracing method described by Turner Whitted in \cite{} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
+The Whitted ray tracing method described by Turner Whitted in \cite{Foley_animproved} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
 In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuser or the Phong model. \\
 
 \begin{equation} \label{eq:phong}
@@ -55,6 +72,11 @@ The specular term uses the direction that a perfect reflection $ \bar{V} $ from 
 Whitted extended the previous techniques and allowed for rays to bounce in the scene and thus creating the basis for global illumination.
 The solution he presented allowed for true reflections, shadows and refractions.
 By using the Phong model on each ray hit and spawning new rays recursively for reflections, shadow rays and refractions a method for simulating global lightning is created.
+
+When using several rays in the scene, a term importance is introduced.
+It states that the total importance of all rays for each pixels is one. 
+If multi sampling is used, importance is divided among the rays.
+The importance flows in the opposite direction as the light, from the camera and into the scene.
 
 \section{Radiosity}
 Radiosity is an algorithm for global illumination which only handles diffusely reflected light, and is therefore not dependent on any camera position or direction. This means that the solution converges toward a steady state, and can for example be pre-computed for use in static scenes. The algorithm works by splitting the scene geometry into a number of finite area elements called patches, and solves the rendering equation for surfaces that diffusely reflects light. A visibility factor, called \emph{form factor}, is used to describe a patch's visibility toward all other patches in the scene. The size of a view factor is dependent on the distance between any two patches, their orientation in relation to each other, partial or total occlusion etc. and describes the amount of radiance leaving a patch $j$ arriving at patch $i$ for all patches $j \in N$ for a scene consisting of $N$ number of patches. The form factors make up a system of linear equations, which when solved produces the radiosity for each patch. The process can be iterated to perform several passes and allowing for multiple bounces to be computed.
@@ -93,7 +115,6 @@ The method has been shown to reduce rendering time as well as the noise in the f
   
 \section{Iso surface ray tracing}
 An iso surface is a surface described implicitly by a mathematical expression or equation. An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. Different data structures can be used to greatly increase the performace of intersection tests, such as storing surfaces in an \emph{octree} structure or using a \emph{bounding volume hierarchy} (BVH).
-
 
 \chapter{Background} \label{ch:background}
 
@@ -219,20 +240,19 @@ If the ray intersects the quadrilateral, \autoref{eq:ray} is inserted into \auto
 \end{align}
 \end{subequations}
 
-\begin{wrapfigure}{r}{0.5\textwidth} 
-	\begin{center}
-		\includegraphics[width=0.48\textwidth]{figures/octreetwod.png} 
-	\end{center}
-\caption{Visualization of the collision tests a ray traveling trough an octree does.}
-\label{fig:octreetraversal}
-\squeezeup
-\squeezeup
-\squeezeup
-\squeezeup
-\end{wrapfigure}
-
 \subsection{Triangle}
 Triangle collisions uses the same method as the quadrilateral for finding if a ray intersects with the triangle, using \autoref{eq:quadtripoint} to determine if it intersects with the ray and computing $t$ by inserting \autoref{eq:ray} into that equation.
+
+\begin{wrapfigure}{r}{0.5\textwidth} 
+	\begin{center}
+		\includegraphics[width=0.48\textwidth]			
+		{figures/octreetwod.png} 
+	\end{center}
+	\caption{Visualization of the collision tests a ray traveling 			trough an octree does.}
+	\label{fig:octreetraversal}
+	\squeezeup
+	\squeezeup
+\end{wrapfigure}
 
 \subsection{Octree}
 Collisions against the octree uses a iterative solution to traverse a ray trough the tree.
