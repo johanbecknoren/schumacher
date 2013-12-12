@@ -13,15 +13,20 @@ public:
 													working(true),
 													_rayCounter(0),
 													_meanRayDepth(0),
-													_maxDepth(6),
-													_minDepth(5),
-													_raysPerPixel(200),
+													_maxDepth(8),
+													_minDepth(6),
+													_raysPerPixel(1000),
 													_lightQuad(lightQuad)
-	{};
+	{
+		_buffer = new float[W*H*3];
+		_pixelsInt = new int[W*H*3];
+	};
 	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 
 private:
-	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
+	Vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
+	Vec3 iterateGlassToAir(Ray &ray, const Octree &tree, int depth, bool kill);
+	Vec3 iterateAirToGlass(Ray &ray, const Octree &tree, int depth, bool kill);
 	
 	struct Rng
 	{
@@ -67,6 +72,8 @@ private:
 	int _minDepth;
 	int _raysPerPixel;
 	Quadrilateral _lightQuad;
+	float *_buffer;
+	int *_pixelsInt;
 	};
 
 

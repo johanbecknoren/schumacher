@@ -15,8 +15,8 @@ void SimpleRaycaster::render(float* pixels, Octree *tree, Camera *cam){
 		for(int v=0; v<_H; ++v) {
 			rayCounter++;
 
-			float x;
-			float y;			
+			real x;
+			real y;			
 			calculateXnY(u, v, x, y);
 			// TODO: Lägg detta i en funktion som returnerar intensitet (floats) och som
 			// kan anropas rekursivt. Spawna nya strålar (reflekterade och brutna) till

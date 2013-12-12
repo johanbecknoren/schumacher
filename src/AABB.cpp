@@ -2,49 +2,49 @@
 #include <vector>
 
 AABB::AABB() {
-	this->_lowerLeftBack = glm::vec3(-1.0f);
-	this->_upperRightFront = glm::vec3(1.0f);
+	this->_lowerLeftBack = Vec3(real(-1));
+	this->_upperRightFront = Vec3(real(1));
 }
 
-AABB::AABB(const glm::vec3& lLB, const glm::vec3& uRF, const glm::vec3& trash) : _lowerLeftBack(lLB),
-																				 _upperRightFront(uRF)
+AABB::AABB(const Vec3& lLB, const Vec3& uRF, const Vec3& trash) :	_lowerLeftBack(lLB),
+																	_upperRightFront(uRF)
 {
-	this->_origin = (_lowerLeftBack + _upperRightFront)/2.0f;
+	this->_origin = (_lowerLeftBack + _upperRightFront)/real(2);
 }
 
 // Check if point is inside AABB
-bool AABB::isInside(const glm::vec3& p) const {
+bool AABB::isInside(const Vec3& p) const {
 	return (p[0] >= _lowerLeftBack[0] && p[0] < _upperRightFront[0])
 			&& (p[1] >= _lowerLeftBack[1] && p[1] < _upperRightFront[1])
 			&& (p[2] >= _lowerLeftBack[2] && p[2] < _upperRightFront[2]);
 }
 
-int AABB::getQuadrant(const glm::vec3& p) const {
-	glm::vec3 diff = p - this->_origin; // vector from origin to point p;
+int AABB::getQuadrant(const Vec3& p) const {
+	Vec3 diff = p - this->_origin; // vector from origin to point p;
 
 	if(!isInside(p))
 		return -1;
 	
-	if(diff.x < 0.0f) {
-		if(diff.y < 0.0f) {
-			if(diff.z < 0.0f)
+	if(diff.x < real(0)) {
+		if(diff.y < real(0)) {
+			if(diff.z < real(0))
 				return 0;
 			else
 				return 2;
 		} else { // y >= 0.0
-			if(diff.z < 0.0f)
+			if(diff.z < real(0))
 				return 4;
 			else
 				return 6;
 		}
 	} else { // x >= 0.0
-		if(diff.y < 0.0f) {
-			if(diff.z < 0.0f)
+		if(diff.y < real(0)) {
+			if(diff.z < real(0))
 				return 1;
 			else
 				return 3;
 		} else { // y >= 0.0
-			if(diff.z < 0.0f)
+			if(diff.z < real(0))
 				return 5;
 			else
 				return 7;
@@ -54,13 +54,13 @@ int AABB::getQuadrant(const glm::vec3& p) const {
 	return 0;
 }
 
-bool AABB::IntersectT(Ray *ray, float *tmin, float *tmax) const {
-	float t0 = ray->getTMin();
-	float t1 = ray->getTMax();
+bool AABB::IntersectT(Ray *ray, real *tmin, real *tmax) const {
+	real t0 = ray->getTMin();
+	real t1 = ray->getTMax();
 	for(int i = 0; i < 3; ++i) {
-		float invRayDir = 1.0f / ray->getDirection()[i];
-		float tNear = (_lowerLeftBack[i] - ray->getOrigin()[i]) * invRayDir;
-		float tFar = (_upperRightFront[i] - ray->getOrigin()[i]) * invRayDir;
+		real invRayDir = real(1) / ray->getDirection()[i];
+		real tNear = (_lowerLeftBack[i] - ray->getOrigin()[i]) * invRayDir;
+		real tFar = (_upperRightFront[i] - ray->getOrigin()[i]) * invRayDir;
 		if (tNear > tFar) std::swap(tNear, tFar);
 		
 		t0 = tNear > t0 ? tNear : t0;
@@ -76,25 +76,25 @@ bool AABB::IntersectT(Ray *ray, float *tmin, float *tmax) const {
 
 bool AABB::getIntersection(Ray& ray, IntersectionPoint &ip, bool getIntersectionNormal)  const {
 	/* Algorithm from http://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms */
-	glm::vec3 direction = glm::normalize(ray.getDirection());
-	glm::vec3 dirfrac;
-	float t;
+	Vec3 direction = glm::normalize(ray.getDirection());
+	Vec3 dirfrac;
+	real t;
 
-	dirfrac.x = 1.0f / direction.x;
-	dirfrac.y = 1.0f / direction.y;
-	dirfrac.z = 1.0f / direction.z;
+	dirfrac.x = real(1) / direction.x;
+	dirfrac.y = real(1) / direction.y;
+	dirfrac.z = real(1) / direction.z;
 
-	float t1 = (_lowerLeftBack.x - ray.getOrigin().x)*dirfrac.x;
-	float t2 = (_upperRightFront.x - ray.getOrigin().x)*dirfrac.x;
-	float t3 = (_lowerLeftBack.y - ray.getOrigin().y)*dirfrac.y;
-	float t4 = (_upperRightFront.y - ray.getOrigin().y)*dirfrac.y;
-	float t5 = (_lowerLeftBack.z - ray.getOrigin().z)*dirfrac.z;
-	float t6 = (_upperRightFront.z - ray.getOrigin().z)*dirfrac.z;
+	real t1 = (_lowerLeftBack.x - ray.getOrigin().x)*dirfrac.x;
+	real t2 = (_upperRightFront.x - ray.getOrigin().x)*dirfrac.x;
+	real t3 = (_lowerLeftBack.y - ray.getOrigin().y)*dirfrac.y;
+	real t4 = (_upperRightFront.y - ray.getOrigin().y)*dirfrac.y;
+	real t5 = (_lowerLeftBack.z - ray.getOrigin().z)*dirfrac.z;
+	real t6 = (_upperRightFront.z - ray.getOrigin().z)*dirfrac.z;
 
-	float tmin = glm::max( glm::max( glm::min(t1,t2), glm::min(t3,t4)), glm::min(t5,t6) );
-	float tmax = glm::min( glm::min( glm::max(t1,t2), glm::max(t3,t4)), glm::max(t5,t6) );
+	real tmin = glm::max( glm::max( glm::min(t1,t2), glm::min(t3,t4)), glm::min(t5,t6) );
+	real tmax = glm::min( glm::min( glm::max(t1,t2), glm::max(t3,t4)), glm::max(t5,t6) );
 
-	if(tmax < 0.0f) { // Ray intersection, but whole AABB is behind us
+	if(tmax < real(0)) { // Ray intersection, but whole AABB is behind us
 		t = tmax;
 		//std::cout<<"AABB.cpp - Intersection, but AABB behind us\n";
 		return false;
@@ -108,18 +108,18 @@ bool AABB::getIntersection(Ray& ray, IntersectionPoint &ip, bool getIntersection
 
 	t = tmin; // Store length of ray until intersection in t
 	
-	glm::vec3 intP = ray.getOrigin() + direction*t; // intersection point
-	glm::vec3 surfNormal = glm::vec3(0.0f);
+	Vec3 intP = ray.getOrigin() + direction*t; // intersection point
+	Vec3 surfNormal = Vec3(real(0));
 	
 	if(getIntersectionNormal) {
 	// Räkna ut korrekt normal för kollisionen.
-		std::vector<glm::vec3> midpoints; // Store all normals for AABB
-		midpoints.push_back( glm::vec3(0.0f, _lowerLeftBack.y, 0.0f) - _origin );
-		midpoints.push_back( glm::vec3(0.0f, _upperRightFront.y, 0.0f) - _origin );
-		midpoints.push_back( glm::vec3(_lowerLeftBack.x, 0.0f, 0.0f) - _origin );
-		midpoints.push_back( glm::vec3(_upperRightFront.x, 0.0f, 0.0f) - _origin );
-		midpoints.push_back( glm::vec3(0.0f, 0.0f, _lowerLeftBack.z) - _origin );
-		midpoints.push_back( glm::vec3(0.0f, 0.0f, _upperRightFront.z) - _origin );
+		std::vector<Vec3> midpoints; // Store all normals for AABB
+		midpoints.push_back( Vec3(real(0), _lowerLeftBack.y, real(0)) - _origin );
+		midpoints.push_back( Vec3(real(0), _upperRightFront.y, real(0)) - _origin );
+		midpoints.push_back( Vec3(_lowerLeftBack.x, real(0), real(0)) - _origin );
+		midpoints.push_back( Vec3(_upperRightFront.x, real(0), real(0)) - _origin );
+		midpoints.push_back( Vec3(real(0),real(0), _lowerLeftBack.z) - _origin );
+		midpoints.push_back( Vec3(real(0),real(0), _upperRightFront.z) - _origin );
 
 		for(size_t i=0; i<midpoints.size(); ++i) { // Remove impossible normal results
 			if(glm::dot(intP, midpoints.at(i)) <= 0.0f) {
@@ -130,7 +130,7 @@ bool AABB::getIntersection(Ray& ray, IntersectionPoint &ip, bool getIntersection
 		if(midpoints.size() == 1) // Onödig, kommer typ aldrig ske :P
 			surfNormal = midpoints.at(0);
 		else {	// midpoints borde vara <=3 stor här
-			float t_max = FLT_MIN;
+			float t_max = real(FLT_MIN);
 			int t_max_index = 0;
 			for(size_t i=0; i<midpoints.size(); ++i) {
 				float nom = glm::dot(midpoints.at(i), midpoints.at(i));

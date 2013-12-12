@@ -8,32 +8,32 @@
 class Ray {
 public:
 	Ray();
-	Ray(const glm::vec3& origin, const glm::vec3& dir, const float rInd = REFRACTION_AIR);
+	Ray(const Vec3& origin, const Vec3& dir, const real rInd = REFRACTION_AIR);
 	~Ray(){};
-	float getTMin() const { return _tmin; }
-	float getTMax() const { return _tmax; }
-	void setTMax(float tmax) { _tmax = tmax; }
-	glm::vec3 getOrigin() const { return _origin; } ;
-	glm::vec3 getPosition() const { return _origin * _tmin; };
-	glm::vec3 getDirection() const { return _direction; };
-	float getRefractionIndex() const { return _refractionIndex; }
-	void setOrigin(const glm::vec3 o) { _origin = o; };
-	void setDirection(const glm::vec3 d) { _direction = glm::normalize(d); };
-	void setRefractionIndex(const float r) { _refractionIndex = r; };
-	void updateT(const float tmin, const float tmax);	
-	glm::vec3 getPosition(const float t) const {
-		return glm::vec3(_origin.x + t, _origin.y + t, _origin.z + t);
+	real getTMin() const { return _tmin; }
+	real getTMax() const { return _tmax; }
+	void setTMax(real tmax) { _tmax = tmax; }
+	Vec3 getOrigin() const { return _origin; } ;
+	Vec3 getPosition() const { return _origin * _tmin; };
+	Vec3 getDirection() const { return glm::normalize(_direction); };
+	real getRefractionIndex() const { return _refractionIndex; }
+	void setOrigin(const Vec3 o) { _origin = o; };
+	void setDirection(const Vec3 d) { _direction = glm::normalize(d); };
+	void setRefractionIndex(const real r) { _refractionIndex = r; };
+	void updateT(const real tmin, const real tmax);	
+	Vec3 getPosition(const real t) const {
+		return Vec3(_origin.x + t, _origin.y + t, _origin.z + t);
 	}
 	void print () {
 		std::cout << "Ray - Origin: " << glm::to_string(_origin) << 
 			"\nRay - Direction: " << glm::to_string(_direction) <<"\n";
 	};
 private:
-	glm::vec3 _origin;
-	float _tmin;
-	float _tmax;
-	float _refractionIndex;
-	glm::vec3 _direction;
+	Vec3 _origin;
+	real _tmin;
+	real _tmax;
+	real _refractionIndex;
+	Vec3 _direction;
 };
 
 #endif

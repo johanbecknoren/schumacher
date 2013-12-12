@@ -48,8 +48,8 @@ void ImageExporter::saveImage(int image[], char filename[], int width, int heigh
 #else
 	char folder[] = "export/";
 #endif
-
-	char *fend = merge(buffer, (char*)".png");
+	char *new_buffer = merge(buffer, filename);
+	char *fend = merge(new_buffer, (char*)".png");
 // 	fend = merge(filename, fend);
 	//char *fend = merge(filename, (char*)".png");
 	char *file = merge(folder, fend);

@@ -10,13 +10,13 @@ Mesh::Mesh() {
 	
 }
 
-glm::vec3 Mesh::getCenter() {
+Vec3 Mesh::getCenter() {
 	return _bbox.getOrigin();
 }
 
 void Mesh::updateBbox() {
-	glm::vec3 minv = verts[0];
-	glm::vec3 maxv = verts[0];
+	Vec3 minv = verts[0];
+	Vec3 maxv = verts[0];
 	for (unsigned int i = 0; i < verts.size(); ++i) {
 		minv.x = glm::min(verts[i].x, minv.x);
 		minv.y = glm::min(verts[i].y, minv.y);
@@ -35,7 +35,7 @@ void Mesh::printBbox() {
 
 std::vector<Triangle*> *Mesh::createTriangles(std::string objName) {
 	triangles = new std::vector<Triangle*>();
-	verts = std::vector<glm::vec3>();
+	verts = std::vector<Vec3>();
 
     std::vector<tinyobj::shape_t> shapes;
     std::string err = tinyobj::LoadObj(shapes, objName.c_str());
@@ -50,7 +50,7 @@ std::vector<Triangle*> *Mesh::createTriangles(std::string objName) {
         unsigned int numVerts = shapes[n].mesh.positions.size() / 3;
 
 		for (unsigned int i = 0; i < numVerts; ++i) {
-            verts.push_back(glm::vec3(shapes[n].mesh.positions[i * 3],
+            verts.push_back(Vec3(shapes[n].mesh.positions[i * 3],
 									  shapes[n].mesh.positions[i * 3 + 1],
 									  shapes[n].mesh.positions[i * 3 + 2]));
 			
@@ -64,9 +64,9 @@ std::vector<Triangle*> *Mesh::createTriangles(std::string objName) {
                val[u] = shapes[n].mesh.indices[i * 3 + u + vertOffset];
 			}
 
-			glm::vec3 v0 = verts[val[0]];
-			glm::vec3 v1 = verts[val[1]];
-			glm::vec3 v2 = verts[val[2]];
+			Vec3 v0 = verts[val[0]];
+			Vec3 v1 = verts[val[1]];
+			Vec3 v2 = verts[val[2]];
 			
 			Triangle *t = new Triangle(v0, v1, v2);
 			triangles->push_back(t);

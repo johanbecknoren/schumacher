@@ -5,18 +5,18 @@
 
 class PointLight {
 public:
-	PointLight(const glm::vec3 pos, 
-					const float& intensity, 
-					const glm::vec3 color);
+	PointLight(const Vec3 pos, 
+					const real& intensity, 
+					const Vec3 color);
 
 	~PointLight() {};
-	glm::vec3 getPosition() const { return _position; }
-	glm::vec3 getColor() const { return _color; }
-	glm::vec3 getIntensity() const { return _color; }
+	Vec3 getPosition() const { return _position; }
+	Vec3 getColor() const { return _color; }
+	Vec3 getIntensity() const { return _color; }
 private:
-	glm::vec3 _position;
-	float _intensity;
-	glm::vec3 _color;
+	Vec3 _position;
+	real _intensity;
+	Vec3 _color;
 };
 
 #endif

@@ -1,19 +1,19 @@
 #include "Ray.h"
 
 Ray::Ray() {
-	this->_origin = glm::vec3(0.0f);
-	this->_direction = glm::vec3(0.0f);
+	this->_origin = Vec3(real(0));
+	this->_direction = Vec3(real(0));
 }
 
-Ray::Ray(const glm::vec3& o, const glm::vec3 &dir, const float rInd) {
+Ray::Ray(const Vec3& o, const Vec3 &dir, const real rInd) {
 	this->_origin = o;
 	this->_direction = glm::normalize(dir);
-	_tmin = -100000;
-	_tmax = 10000;
+	_tmin = real(-100000);
+	_tmax = real(10000);
 	_refractionIndex = rInd;
 }
 
-void Ray::updateT(const float tmin, const float tmax) { 
+void Ray::updateT(const real tmin, const real tmax) { 
 	_tmin = tmin; 
 	_tmax = tmax; 
 }

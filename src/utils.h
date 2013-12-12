@@ -3,20 +3,24 @@
 #include <string>
 #include <cstring>
 #include <iostream>
-#define EPSILON 0.00001f//float(1e06)
-#define PI 3.1415926535897932384626433832795f
+#include "glm/glm.hpp"
+#define EPSILON real(0.00001)//float(1e06)
+#define PI real(3.1415926535897932384626433832795) // M_PI istället
 
 // Viewport dimensions
-#define WIDTH 400
-#define HEIGHT 400
+#define WIDTH 512
+#define HEIGHT 512
+
+typedef double real;
+typedef glm::dvec3 Vec3;
 
 
 // Refractive indices (en.wikipedia.org/wiki/Refractive_index)
 #ifndef REFRACTION_AIR
-#define REFRACTION_AIR 1.000293f
+#define REFRACTION_AIR real(1.000293)
 #endif
 #ifndef REFRACTION_GLASS
-#define REFRACTION_GLASS 1.52f
+#define REFRACTION_GLASS real(1.52)
 #endif
 
 inline char* merge(char *folder, char* filename) {

@@ -21,7 +21,7 @@ public:
 	void render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring);	
 
 private:
-	glm::vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
+	Vec3 iterateRay(Ray &ray, const Octree &tree, int depth, bool kill);
 	
 	struct Rng
 	{

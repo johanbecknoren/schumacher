@@ -6,7 +6,7 @@
 
 \title{Monte Carlo-based ray tracer\\ Project Report}   % type title between braces
 \author{
-	Johan Beck Nor\'{e}n, johbe559@student.liu.se
+	Johan Beck-Nor\'{e}n, johbe559@student.liu.se
 	\\Andreas Valter , andva287@student.liu.se
 	}
 \date{\today}    % type date between braces
@@ -95,15 +95,9 @@ An iso surface is a surface described implicitly by a mathematical expression or
 
 
 \chapter{Background}
-In this section we will talk about the methods we have implemented in our Mone Carlo ray tracer using C++. Although there are several approches to some of these methods we will only talk about the methods we chose to implement in this project.
-\emph{Here you describe the techniques you use in your code. 
-Describe how you do ray-surface intersections, how you launch reflected and refracted rays, how you compute the intensities, what are shadow rays, etc. No C++ code. 
-You may use pseudocode, but it is better do discuss the techniques only from a theoretical point of view. 
-These descriptions should be accompanied by figures. 
-The figures are numbered consecutively in order of appearance. 
-Each figure must have a caption with a brief description of what you see in it. 
-The figures must be referred to from the text and described and interpreted in more detail in the text.
-Length: about 5-6 pages.}
+
+In this section we will talk about the methods we have implemented in our Monte Carlo ray tracer using C++. 
+Although there are several approaches to some of these methods we will only talk about the methods we chose to implement in this project.
 
 \section{Scene storage}
 When calculating global lightning for the scene, all objects need to be taken into consideration when calculating the illumination for one part of the scene due to the recursive nature of \autoref{eq:rendering_eq}.
@@ -206,20 +200,21 @@ In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per 
         \begin{subfigure}[b]{0.3\textwidth}
                 \includegraphics[width=\textwidth]{figures/aliasing_1.png}
                 \caption{1 view ray per pixel}
-                \label{fig:gull}
+                \label{fig:aliasing1}
         \end{subfigure}%
         ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
           %(or a blank line to force the subfigure onto a new line)
         \begin{subfigure}[b]{0.3\textwidth}
                 \includegraphics[width=\textwidth]{figures/aliasing_10.png}
                 \caption{10 view rays per pixel}
-                \label{fig:tiger}
+                \label{fig:aliasing10}
         \end{subfigure}
         \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
 \end{figure}
 
+\section{Russian Roulette}
+
 \section{Monte Carlo ray tracing}
-Beskriv rendering equation här, och hur denna kan delas in i direkt/indirekt del
 As described in the introduction a Monte Carlo ray tracer is similar to a Whitted ray tracer in that it is only interested in the radiance reaching the virtual camera, or the eye.
 It is a complete global illumination algorithm, and solves the rendering equation \autoref{eq:rendering_eq}, repeated below for convenience, by random sampling.
 
@@ -236,17 +231,17 @@ In \cite{dutre} it is shown that \autoref{eq:rendering_eq} can be represented by
 
 \begin{subequations} \label{eq:rendering_eq_split}
 \begin{align} 
-L(x \rightarrow \theta) = L_{direct}+L_{indirect} \\
-L_{direct}(x \rightarrow \theta) = \int_A L_e(y \rightarrow \mathbf{yx})f_r(x, \mathbf{xy}\rightarrow \theta)G(x,y)V(x,y)dA_y \\
-L_{indirect}(x \rightarrow \theta) = \int_{\Omega_x} L_i(x \leftarrow \Phi) f_r(x, \Phi \rightarrow \theta)cos(N_x, \Phi)d\omega_{\Phi}
+&L(x \rightarrow \theta) = L_{direct}+L_{indirect} \\
+&L_{direct}(x \rightarrow \theta) = \int_A L_e(y \rightarrow \mathbf{yx})f_r(x, \mathbf{xy}\rightarrow \theta)G(x,y)V(x,y)dA_y \\
+&L_{indirect}(x \rightarrow \theta) = \int_{\Omega_x} L_r(x \leftarrow \Phi) f_r(x, \Phi \rightarrow \theta)cos(N_x, \Phi)d\omega_{\Phi}
 \end{align}
 \end{subequations}
 
 \subsection{Direct illumination}
-The term $L_{direct}(x \rightarrow \theta)$ expresses the contribution from light sources directly.
-Since the term $L_{direct}(x \rightarrow \theta)$ is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
-Or in a discrete representation as a sum over all \emph{N} light sources in the scene.
-In our implementation though, only a single planar light source is used.
+The term $L_{direct}(x \rightarrow \theta)$ expresses the contribution to a point \emph{x} from light sources directly.
+Since the term $L_{direct}(x \rightarrow \theta)$ contains the emmitance term $L_e$ it is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
+Or as a discrete representation as a sum over all \emph{N} light sources in the scene.
+In our implementation only a single planar light source is considered.
 For generality's sake all equations presented will be defined to handle an arbitrary number of light sources.
 
 \begin{equation}
@@ -257,33 +252,363 @@ L_{direct}(x \rightarrow \theta) = \sum^{N}_{k=1} \int_{A_k}L_e(y \rightarrow \m
 In \autoref{eq:rendering_eq_split}b, $A$ refers to the area of a lightsource in the scene.
 For every intersection point retrieved from the scene, that point's direct illumination is calculated in two separate ways, one for direct diffuse illumination and one for direct specular illumination.
 For diffuse direct illumination the light source is sampled.
-Each sample point $y_i$ is distributed randomly uniform on the surface of the light source.
-The visibility function $V(x,y)$ makes sure that only sample points visible from \emph{x} will contribute to the direct illumination by checking if \emph{x} is in line of sight of $y_i$.
+Each sample point $y_i$ is distributed uniformly on the surface of the light source.
+The visibility function $V(x,y)$ makes sure that only sample points visible from \emph{x} will contribute to the direct illumination by checking if $y_i$ is in line of sight of \emph{x}.
 Because of this these rays are often called shadow rays, and will result in soft shadows if enough samples $y_i$ are taken. \\
 \\For a single planar area light source sampled with $N_s$ shadow rays the Monte Carlo estimator becomes
 
 \begin{equation}
 \label{eq:monte_carlo_direct}
-\langle L_{direct}(x \rightarrow \theta) \rangle = \frac{1}{N_s} \sum^{N_s}_{i=1} \frac{L_e(y_i \rightarrow \mathbf{y_ix}) f_r(x, \theta \leftrightarrow \mathbf{xy_i})G(x,y_i)V(x,y_i)}{pdf(y_i)}
+\langle L_{direct}(x \rightarrow \theta) \rangle = \frac{1}{N_s} \sum^{N_s}_{i=1} \frac{L_e(y_i \rightarrow \mathbf{y_ix}) f_r(x, \theta \leftrightarrow \mathbf{xy_i})G(x,y_i)V(x,y_i)}{p(y_i)}
 \end{equation}
+as described in \cite{dutre}.
 
-A uniform probability distribution function of $\frac{1}{A}$ is used where \emph{A} is the area of the light source.
-From \autoref{eq:monte_carlo_direct} we see that it is required to evaluate visibility, BRDF and radiance emmited for each sample point
+A uniform probability distribution function $p(y_i)$ of $\frac{1}{A}$ is used where \emph{A} is the area of the light source.
+From \autoref{eq:monte_carlo_direct} we see that it is required to evaluate visibility, BRDF and radiance emmited for each sample point.
 
-Direct specular illumination is more straight forward to handle.
-If a ray intersects with a specular object, a new ray is traced in the direction of a perfect reflection of that first incoming ray.
+Direct specular illumination is handled more straight forward.
+If a ray intersects with a specular object, a new ray is traced from the intersection point in the direction of a perfect reflection of the first incoming ray.
 If this new ray intersects a lightsource the point at the initial intersection receives radiance contribution in the form of emmitance from that light source.
 
 \subsection{Indirect illumintaion}
+Indirect illumination corresponds to radiance received through one or more reflections against other objects in the scene.
+The contribution from indirect illumination for a point \emph{x} is done by evaluating the integral over the hemisphere in \autoref{eq:rendering_eq_split}c. Unfortunately we cannot transform this expression into an integral over a smaller domain as we did for direct illumination since the reflectance term $L_r$, which in turn contains radiance from other points in the scene, appears on both sides of the equation.
+The recursive nature of this algorithm is evident and it is clear that an exact solution is cannot be found.
+We instead use a Monte Carlo estimator as presented in \cite{dutre}.
+
+\begin{equation}
+\label{eq:monte_carlo_indirect}
+\langle L_{indirect}(x \rightarrow \theta) \rangle = \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)}
+\end{equation}
+
+In \autoref{eq:monte_carlo_indirect} \emph{N} is the number of rays used to sample indirect radiance, $L_r$ is the reflected radiance, $\Phi_i$ is the hemisphere direction of the \emph{i}:th sampled ray, $f_r$ is the BRDF of the surface material of \emph{x}, $N_x$ is the surface normal, and finally $p(\Phi_i)$ is the probability distribution function.
+Specular indirect illumination och diffuse indirect illumination are handled separately.
+
+\subsubsection{Diffuse indirect illumination}
+In this project all diffuse surfaces are of Lambertian type.
+Since a Lambertian diffuse surface per definition reflect equal amounts of radiance in every direction, the BRDF and the pdf for such a surface can both be treated as constants.
+We define the BRDF and the pdf for all diffuse surfaces as  in \autoref{eq:diffuse_indirect1}.
+\begin{subequations} \label{eq:diffuse_indirect1}
+\begin{align} 
+BRDF &= \frac{color}{\pi} \\
+p(\Phi_i) &= \frac{cos(\Phi_i, N_x)}{\pi}
+\end{align}
+\end{subequations}
+
+Inserting \autoref{eq:diffuse_indirect1} into \autoref{eq:monte_carlo_indirect} and reducing and realising that constants can be placed outside the sum produces \autoref{eq:diffuse_indirect2}.
+
+\begin{subequations} \label{eq:diffuse_indirect2}
+\begin{align}
+\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
+\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+\end{align}
+\end{subequations}
+
+The random hemisphere sample direction $\Phi_i$ is created by randomly picking two angles $\theta$ and $\phi$, which will represent a sampling direction in spherical coordinates.
+The angle $\phi$ is assigned a uniform random value in the interval $[0,2\pi]$ and $\theta$ is assigned a value of $cos^{-1}(r^{ \frac{1}{1+n} })$ where \emph{r} is a uniform random number in the interval $[0,1]$ and \emph{n} is a number in the interval $[0,1]$ which dictates the sample direction's alignment within the cosine lobe around $N_x$. 
+Finally, the sample direction is rotated along $N_x$.
+
+\subsubsection{Specular indirect illumination}
+Perfect specular surfaces are implemented in this project.
+
+The BRDF for a specular surface is different from 0 in only a single directon, the perfect reflection direction. 
+The BRDF and pdf are defined in equation \autoref{eq:specular_indirect1} where $\theta$ is the incident ray's angle to the surface normal and $\Phi_i$ is the reflected ray angle.
+Since we are dealing with perfectly specular materials the pdf will be equal to 1 as well, and $\Phi_i = \theta$ thus the dirac function will yield a result of 1.
+
+\begin{subequations} \label{eq:specular_indirect1}
+\begin{align}
+	&BRDF = \frac{color}{cos(\Phi_i, N_x)}\delta(\Phi_i - \theta) = \frac{color}{cos(\Phi_i, N_x)} \\
+	&pdf = 1
+\end{align}
+\end{subequations}
+
+Inserting \autoref{eq:specular_indirect1} into \autoref{eq:monte_carlo_indirect} yields
+
+\begin{subequations} \label{eq:specular_indirect2}
+\begin{align}
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) \dfrac{color}{cos(\Phi_i,N_x)} cos(\Phi_i, N_x)}{1} \rightarrow \\
+	&\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+\end{align}
+\end{subequations}
+which, if $\Phi_i$ does not intersect a light source, is a recursive call that lets the reflected ray continue through the scene.
+
+An intersection with a specular surface can have two results. 
+For a specular material that is perfectly opaque, for example a mirror-like material, a reflected ray will be created. 
+If the reflected ray in turn does not intersect with a light source it will be recursively iterated and continue through the scene.
+If the material instead is not perfectly opaque two rays will be created.
+One reflected ray created in the same fashion as described above, and one refracted (transmitted) ray that will continue into the object.
+To decide how much of the radiance should be contributed from the reflected ray an approximation of Fresnel's equation as presented by Schlick et al. \cite{schlick} in \autoref{eq:schlicks} is used.
+
+\begin{subequations} \label{eq:schlicks}
+\begin{align}
+R_0 = \left( \frac{n_1-n_2}{n_1+n_2} \right) ^2 \rightarrow \\
+R(\theta) = R_0+ (1-R_0)(1-cos(\theta))^5
+\end{align}
+\end{subequations}
+
+$R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is come from and going into respectively.
+The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector. \autoref{eq:schlicks} describes what fraction of the reflected ray should be used in computing the radiance for the intersection point. The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
+
+% TA EJ BORT sparar till senare :P
+%\begin{figure}
+%        \centering
+%        \begin{subfigure}[b]{0.5\textwidth}
+%           \includegraphics[width=\textwidth]{figures/2013-12-10-15-39-35-200rpp-ca2h_6-7_112.png}
+%	\caption{200 view rays per pixel}
+%	\label{fig:full}
+%        \end{subfigure}%
+%        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+%          %(or a blank line to force the subfigure onto a new line)
+%        \begin{subfigure}[b]{0.5\textwidth}
+%                \includegraphics[width=\textwidth]{figures/2013-12-10-15-39-35-200rpp-ca2h_6-7_112.png}
+%                \caption{HerpDerp view rays}
+%                \label{fig:miger}
+%        \end{subfigure}
+%        \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
+%\end{figure}
+
+$R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is coming from and going into respectively.
+The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector.
+\autoref{eq:schlicks} describes what fraction of the reflected ray radiance should be used in computing the radiance for the intersection point. 
+The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
+
 \subsection{Reflection}
+When a ray travels trough a medium, colliding with another medium, the ray will be reflected.
+The law of reflection says that the angle of incidence $\theta_i$ is equal to the angle of reflection $ \theta_r $ is equal to each other.
+The incoming ray can be divided into two different parts, the tangent part to the surface $ \mathbf{i}_\bot $ and the normal part $ \mathbf{i}_\| $.
+The tangiental part can be found using orthogonal projection onto the normal using \autoref{eq:projection}. The normal part is found using \autoref{eq:projectionrest}.
+
+\begin{equation} \label{eq:projection}
+\mathbf{i}_\bot = \frac{\mathbf{i} \cdot \mathbf{n}} {\vert \mathbf{n}^2} \mathbf{n} = (\mathbf{v} \cdot \mathbf{n})\mathbf{n}
+\end{equation}
+
+\begin{equation} \label{eq:projectionrest}
+\mathbf{i}_\| = \mathbf{i} - \mathbf{i}_\bot
+\end{equation}
+By doing a dot product between these two rays, it is possible to prove that the result is zero and thus proving that these two are orthogonal and that $ \mathbf{i}_\bot $ is an orthogonal projection on $ \mathbf{n} $. By combining \autoref{eq:projectionrest} and \autoref{eq:projection} the reflected ray $ \mathbf{r} $ can be calculated using \autoref{eq:reflectioncalc}.
+
+\begin{subequations}\label{eq:reflectioncalc}
+\begin{align}
+r =& \mathbf{i}_\| - \mathbf{i}_\bot \\
+  =& [\mathbf{i} - (\mathbf{i} \cdot \mathbf{n})\mathbf{n}] - (\mathbf{i} \cdot \mathbf{n}) \mathbf{n} \\
+  =& \mathbf{i} - 2 ( \mathbf{i} \cdot \mathbf{n} ) \mathbf{n}
+\end{align}
+\end{subequations}
+
+%\begin{subequations} \label{eq:refl}
+%\begin{align}
+%\vert \mathbf{r}_\bot \vert =& cos \theta_r = \theta_i = \vert \mathbf{i} \bot \vert \\ 
+%\vert \mathbf{r}_\| \vert =& sin \theta_r = sin \theta_i = \vert \mathbf{i}_\| \vert
+%\end{align}
+%\end{subequations}
+
 \subsection{Refraction}
+
+When calculating refractions, Snell's law are used. It states that the product of the refractive indices and sines of the angles must be equal, as stated in \autoref{eq:snell}.\\
+
+\begin{equation} \label{eq:snell}
+\eta_1 sin \theta_i = \eta_2 sin \theta_t
+\end{equation}
+
+This equation has a problem, when $ sin \theta_1 > \dfrac{\eta_1}{\eta_2} $
+the other term $ sin \theta_2 $ has to be greater then 1. 
+This case is what is called total internal reflection.
+When calculating the refracted ray $ t $, continued calculation assumes that the condition is not satisfied.\\
+
+The refractored vector is also divided into two parts, just the same as in \autoref{eq:projectionrest} and the norms are calculated first. By taking advantage of the fact that norms and tangents to the plane is equal to the sines in \autoref{eq:snell} it can be rewritten into \autoref{eq:refraction}.
+
+\begin{equation} \label{eq:refraction}
+\mathbf{t}_\| = \frac{\eta_1}{\eta_2} \mathbf{i}_\| = \frac{\eta_1}{\eta_2} 
+[\mathbf{i} + cos \theta_i \mathbf{n}]
+\end{equation}
+
+The tangential calculation uses Pythagoras which gives \autoref{eq:refractiontan}. The combination of these two, described in \autoref{eq:refractiontot} is all that is needed to calculate the refraction vector 
+
+\begin{equation} \label{eq:refractiontan}
+\mathbf{t}_\bot = - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2}\mathbf{n}
+\end{equation}
+
+\begin{equation} \label{eq:refractiontot}
+\mathbf{t} = \frac{\eta_1}{\eta_2} \mathbf{i} + (\frac{\eta_1}{\eta_2} cos \theta_i - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2})\mathbf{n}
+\end{equation}
+
 \subsection{Intensity calculations}
-\subsection{Shadow rays}
+After each time the ray hits a change in medium, it will spawn new refraction and reflection rays.
+All of the resulting values that are accumulated from each bounce will be added to the total value.
+The contributed values from diffuse and specular elements in 
+
+\chapter{Results and benchmarks}
+\emph{Here you show results obtained with your code. 
+You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. 
+You can compare in detail images computed from the same scene with different resolutions. 
+You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. 
+You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. 
+Here you can be creative and look at things you like. 
+Length: about 5-6 pages .}
+\section{Shadow rays}
+The quality of the direct diffuse illumination is directly related to the number of shadow rays used to sample the light source from each intersection point. \autoref{fig:shadow_rays} shows images with different number of shadow rays per sample. Notice how the amount of noise on the floor decreases as the number of shadow rays increases. \autoref{tb:shadow_rays} shows the effect the number of shadow rays has on the rendering time.
+
+\begin{figure}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/shadowrays-1-10rpp.png}
+	\caption{1 shadow ray}
+	\label{fig:1sr}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-10-10rpp.png}
+                \caption{10 shadow rays}
+                \label{fig:10sr}
+        \end{subfigure}
+
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-20-10rpp.png}
+                \caption{20 shadow rays}
+                \label{fig:20sr}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/shadowrays-80-10rpp.png}
+                \caption{80 shadow rays}
+                \label{fig:80sr}
+        \end{subfigure}
+        \caption{Number of shadow rays increasing from left to right, top to bottom.}\label{fig:shadow_rays}
+\end{figure}
+
+
+\begin{table}[h]
+\begin{center}
+
+	\begin{tabular}{| l | l |}
+		\hline
+		Shadow rays & Time \\ \hline
+		1 & 6s \\ \hline
+		10 & 20s \\ \hline
+		20 & 34s \\ \hline
+		80 & 126s \\ \hline
+	\end{tabular}
+	\caption{Rendering time for shadow rays.}
+	\label{tb:shadow_rays}
+\end{center}
+\end{table}
+
+\section{Recursion depth}
+Recursion depth refers to the number of recursive calls allowed in the algorithm, e.g. how many bounces a ray will make in the scene before terminating and returning. 
+The recursion depth affects the noise in the final image, but it also has an impact on the resulting reflections and refractions for specular objects.
+As seen in \autoref{fig:recursion_depth} a recursion depth of 0 results in only direct illumination present.
+Notice how all specular objects are void of any indirect illumination since only once bounce per ray is allowed. 
+A recursion depth of 1 yields slightly better results.
+We now see objects that are opaque and specular since rays are allowed to bounce once before termination.
+Notice that the glass sphere is still void of indirect illumination since a refraction occurrence involves at least 2 recursive iterations.
+A depth of 2 recursions allows for a single refraction instance and the glass sphere is now better represented.
+Lastly a render depth of 6 is shown in \autoref{fig:6rd}. This is the recursion depth used for most of the images in this report.
+\autoref{tb:recursion} show the effect recursion depth has on rendering time.
+\begin{figure}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-1-100rpp.png}
+	\caption{0 recursions}
+	\label{fig:1rd}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-2-100rpp.png}
+                \caption{1 recursion}
+                \label{fig:2rd}
+        \end{subfigure}
+
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-3-100rpp.png}
+                \caption{2 recursions}
+                \label{fig:3rd}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-6-1000rppTMP.png}
+                \caption{6 recursions}
+                \label{fig:6rd}
+        \end{subfigure}
+        \caption{Increasing recursion depth from left to right, top to bottom.}\label{fig:recursion_depth}
+\end{figure}
+
+\begin{table}[h]
+\begin{center}
+	\begin{tabular}{| l | l |}
+		\hline
+		Recursion depth & Time \\ \hline
+		0 & 11s \\ \hline
+		1 & 17s \\ \hline
+		2 & 24s \\ \hline
+		6 & 55s \\ \hline
+	\end{tabular}
+	\caption{Rendering time for different recursion depths.}
+	\label{tb:recursion}
+\end{center}
+\end{table}
 
 \chapter{Results and benchmarks}
 \emph{Here you show results obtained with your code. You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. You can compare in detail images computed from the same scene with different resolutions. You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. Here you can be creative and look at things you like. 
 Length: about 5-6 pages .}
+\section{Shadow rays}
+\section{Recursion depth}
+\section{Samples per pixel}
 
+\begin{figure}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/specular_50rpp-.png}
+	\caption{50 view rays per pixel}
+	\label{fig:50rpp}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
+                \caption{100 view rays per pixel}
+                \label{fig:100rpp}
+        \end{subfigure}
+
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_600rpp-.png}
+                \caption{600 view rays per pixel}
+                \label{fig:600rpp}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_1000rpp.png}
+                \caption{1000 view rays per pixel}
+                \label{fig:1000rpp}
+        \end{subfigure}
+        \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
+\end{figure}
+
+\section{Noise introduced by specular materials}
+Specular materials that produce reflected and to some extent refracted rays is and additional source for noise in the final image and require more samples to reach the same quality level as a scene with only diffuse samples.
+
+\begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.65\textwidth}
+                \includegraphics[width=\textwidth]{figures/diffuse-100rpp-.png}
+                \caption{Diffuse materials only}
+                \label{fig:diff_spec1}
+        \end{subfigure}%
+         %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+
+        \begin{subfigure}[b]{0.65\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
+                \caption{Specular and diffuse materials}
+                \label{fig:dif_spec2}
+        \end{subfigure}
+        \caption{Scene rendered with the same resolution, recursion depth, shadow rays, and a low number of samples per pixel to illustrate the increased noise when specular objects are used in a scene.}\label{fig:diff_spec_diff}
+\end{figure}
+
+Notice the increased noise on the surface of the back wall and on the box nearest to the camera in \autoref{fig:diff_spec_diff}.
 
 \chapter{Discussion}
 Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.

@@ -5,21 +5,21 @@
 class Camera {
 public:
 	Camera() {
-		_up = glm::vec3(0.0f,1.0f,0.0f);
-		_direction = glm::vec3(0.0f,0.0f,1.0f);
-		_position = glm::vec3(0.0f,0.0f,-1.f);
+		_up = Vec3(real(0),real(1),real(0));
+		_direction = Vec3(real(0),real(0),real(1));
+		_position = Vec3(real(0),real(0),real(-1));
 	}
 
 	~Camera() {};
-	glm::vec3 getUp() const { return _up; }
-	glm::vec3 getDirection() const { return _direction; }
-	glm::vec3 getPosition() const { return _position; }
-	Ray createRay(float &x, float &y) const { return Ray( _position, glm::vec3(x, y, _direction.z)); }
+	Vec3 getUp() const { return _up; }
+	Vec3 getDirection() const { return _direction; }
+	Vec3 getPosition() const { return _position; }
+	Ray createRay(real &x, real &y) const { return Ray( _position, Vec3(x, y, _direction.z)); }
 	
 private:
-	glm::vec3 _up;
-	glm::vec3 _direction;
-	glm::vec3 _position;	
+	Vec3 _up;
+	Vec3 _direction;
+	Vec3 _position;	
 };
 
 #endif
