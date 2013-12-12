@@ -670,35 +670,6 @@ This is the recursion depth used for most of the images in this report.
 \end{center}
 \end{table}
 
-\begin{figure}
-        \centering
-        \begin{subfigure}[h]{0.5\textwidth}
-           \includegraphics[width=\textwidth]{figures/specular_50rpp-.png}
-	\caption{50 view rays per pixel}
-	\label{fig:50rpp}
-        \end{subfigure}%
-        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-          %(or a blank line to force the subfigure onto a new line)
-        \begin{subfigure}[h]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
-                \caption{100 view rays per pixel}
-                \label{fig:100rpp}
-        \end{subfigure}
-
-	\begin{subfigure}[h]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{figures/specular_600rpp-.png}
-                \caption{600 view rays per pixel}
-                \label{fig:600rpp}
-        \end{subfigure}%
-	~
-	\begin{subfigure}[h]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{figures/specular_1000rpp.png}
-                \caption{1000 view rays per pixel}
-                \label{fig:1000rpp}
-        \end{subfigure}
-        \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
-\end{figure}
-
 \section{Noise introduced by specular materials}
 Specular materials that produce reflected and to some extent refracted rays is and additional source for noise in the final image and require more samples to reach the same quality level as a scene with only diffuse samples.
 
@@ -732,31 +703,31 @@ Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides r
 
 
 \begin{figure}
-         \centering
-         \begin{subfigure}[b]{0.5\textwidth}
-            \includegraphics[width=\textwidth]{figures/specular_50rpp-.png}
-   \caption{50 view rays per pixel}
-   \label{fig:50rpp}
-         \end{subfigure}%
-         ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-           %(or a blank line to force the subfigure onto a new line)
-         \begin{subfigure}[b]{0.5\textwidth}
-                 \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
-                 \caption{100 view rays per pixel}
-                 \label{fig:100rpp}
-         \end{subfigure}
- 
-   \begin{subfigure}[b]{0.5\textwidth}
-                 \includegraphics[width=\textwidth]{figures/specular_200rpp-.png}
-                 \caption{200 view rays per pixel}
-                 \label{fig:200rpp}
-         \end{subfigure}%
-  ~
-  \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \begin{subfigure}[h]{0.5\textwidth}
+           \includegraphics[width=\textwidth]{figures/specular_50rpp-.png}
+	\caption{50 view rays per pixel}
+	\label{fig:50rpp}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
+                \caption{100 view rays per pixel}
+                \label{fig:100rpp}
+        \end{subfigure}
+
+	\begin{subfigure}[h]{0.5\textwidth}
                 \includegraphics[width=\textwidth]{figures/specular_600rpp-.png}
                 \caption{600 view rays per pixel}
                 \label{fig:600rpp}
-       \end{subfigure}
+        \end{subfigure}%
+	~
+	\begin{subfigure}[h]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_1000rpp.png}
+                \caption{1000 view rays per pixel}
+                \label{fig:1000rpp}
+        \end{subfigure}
         \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
 \end{figure}
 
