@@ -503,7 +503,7 @@ void MonteCarloRayTracer2::glRender(float *pixels) {
  
 void MonteCarloRayTracer2::render(float *pixels, Octree *tree, Camera *cam, bool singleThread, bool renderDuring) {
 	Timer::getInstance()->start("Carlo");
-	int NUM_THREADS = std::thread::hardware_concurrency();
+	int NUM_THREADS = 1;//std::thread::hardware_concurrency();
 	std::cout << "Starting carlo tracer with ";
 	if (singleThread) {
 		NUM_THREADS = 1;

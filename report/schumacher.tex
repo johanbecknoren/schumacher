@@ -163,6 +163,13 @@ When each primitive is added, the scene bounding box is subdivided into eight su
 The primitive is then added to the level above that as a leaf.
 Using this structure, it is possible to traverse the ray through the volume and, just as when using the BVH tree, large parts of the tree can be ignored by checking only parent nodes for intersection.
 
+\section{Multi threading}
+Multi threading were implemented using C++11 threads.
+The application spawns a number of threads $ n $ equal to the number of CPU cores in the computer, each is responsible for a part of the computation.
+The image is divided so that each thread is responsible for every $n$:th column in the image which counteracts work load issues where parts of an image might be harder to compute then others.
+To support rendering while calculating, the threads are joined after each row and a new image is rendered.
+This gives a small overhead of spawning and joining threads but the benefit of seeing progress is to high, and it is only noticeable when dealing with a small computation time per row and this is not common when doing ray tracing.
+
 \section{Intersection}
 The implementation needs to be able to handle several different intersection algorithms, one for each type of primitive in the scene.
 To make sure that all kinds of primitives are supported, inheritance is used where each primitive inherits from an abstract class.
@@ -583,10 +590,11 @@ Notice how the amount of noise on the floor decreases as the number of shadow ra
 \end{center}
 \end{table}
 
-\section{Octree speed up}
+\section{Octree}
 The octree allows for a great speedup when using a scene with a lot of primitives.
 As can be seen in \autoref{tb:octree}, even with a mesh with relatively low polygon count, the computation time is ten times faster.
-
+The same table also shows the problem with the octree structure.
+It does require a lot of extra collision tests and when the scene is simple, time is lost instead of gained.
 
 \begin{table}[h]
 \begin{center}
@@ -601,6 +609,23 @@ As can be seen in \autoref{tb:octree}, even with a mesh with relatively low poly
 	\end{tabular}
 	\caption{Rendering time with and without octree data structure in scene. Rendered with 10 rays per pixel. Bunny consists of 4968 triangles.}
 	\label{tb:octree}
+\end{center}
+\end{table}
+
+\section{Threads}
+\begin{table}[h]
+\begin{center}
+
+	\begin{tabular}{| l | l |}
+		\hline
+		Threads & Time \\ \hline
+		1 & 37.1s \\ \hline
+		2 & 50.4s \\ \hline
+		3 & 56.5s \\ \hline
+		4 & 116s \\ \hline
+	\end{tabular}
+	\caption{Rendering time using different number of threads. }
+	\label{tb:threads}
 \end{center}
 \end{table}
 
@@ -760,7 +785,7 @@ This would allow us to create glass objects that are placed on other surfaces an
 To extend our solution to support this would not be too hard, because we would still be dealing with the same two cases, ray traveling to a medium with lower refractive index or ray traveling into a medium of higher refractive index.
 \\
 
-The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives.
+The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives. For real scenes that consists of an even higher polygon count, a technique like this is crucial.
 
 
 
