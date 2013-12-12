@@ -1,6 +1,17 @@
-\documentclass[]{report}   % list options between brackets
-\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, amsmath, lipsum, cite, caption, subcaption}
+\documentclass[a4paper, 12pt]{report}
+% list options between brackets
+\usepackage{graphicx, url, placeins, algorithm, algorithmic, hyperref, wrapfig, amsmath, lipsum, cite, caption, subcaption}
 \graphicspath{{figures/}}
+\newcommand{\squeezeup}{\vspace{-2.5mm}}
+
+\usepackage{titlesec, color}
+
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{10pt}}
+
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+\titlespacing*{\chapter}
+  {0pt}{-70pt}{20pt}
 
 \begin{document}
 
@@ -13,30 +24,29 @@
 \maketitle
 
 \setcounter{page}{2}
-\chapter{Abstract}
-\emph{ A brief and concise summary of the article. It should be limited to 1000 characters.}
-\chapter{Introduction}
-Realistic lighting in computer graphics scenes has been a problem for many years.
-\emph{You should describe here global lighting models and talk about Whitted ray tracing, radiosity, Monte Carlo ray-tracing, two-pass rendering, photon mapping and ray-tracing of isosurfaces, explaining how they work and what they do. 
-This description should be done mainly in words and not so much with maths. 
-Also do not go too much into detail. 
-The explanations should be done with the help of the papers above that were presented during the seminar. 
-You should reference these papers in the introduction. 
-The introduction is concluded by a paragraph, that describes the structure of the paper like: "The first section is the introduction. 
-In section 2, we discuss in more detail the techniques regarding (raytracing, Monte Carlo raytracing, depending on what you have implemented), which we have implemented. 
-Section 3 shows some results that we have obtained with our implementation and benchmarks. 
-The discussion and the outlook is the section 4." 
-Length: about 3 pages.}
+\begin{abstract}
+This report describes the techniques required to approximate global illumination in a computer generated scene and is created as a result from the course TNCG15, Advanced Global Illumination and Rendering.
+The report focus on the techniques required to do a monte-carlo ray tracer and show results from our implementation using that technique.
+It will cover topics like intersection testing, aliasing counter actions and other techniques that has been implemented during the project.
+The results presentated will evaluate these parts, both to see their contributions and to show the time cost that is added when using them.
 
-\begin{equation} \label{eq:light}
-A=B
-\end{equation}
+\end{abstract}
 
-\section{Global lightning}
+\tableofcontents
 
+
+\chapter{Introduction} \label{ch:introduction}
+Realistic lighting in computer graphics scenes has been a problem for many years. 
+The equation describing light propagation trough a scene is both recursive and infinite which is definitely something that computers can not currently handle.
+Therefore, researchers has found different methods to estimate the analytic solution.
+These methods use iterations, using computer power to calculate these estimates that converge towards the real solution.\\
+
+Most of these are so called ray tracing methods where rays are traced from the viewer into the scene.
+When rays hits surfaces in the scene, new rays for reflection and refraction is spawned.
+These are then combined using importance.
 
 \section{Whitted ray tracing}
-The Whitted ray tracing method described by Turner Whitted in \cite{} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
+The Whitted ray tracing method described by Turner Whitted in \cite{Foley_animproved} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
 In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuser or the Phong model. \\
 
 \begin{equation} \label{eq:phong}
@@ -55,6 +65,11 @@ Whitted extended the previous techniques and allowed for rays to bounce in the s
 The solution he presented allowed for true reflections, shadows and refractions.
 By using the Phong model on each ray hit and spawning new rays recursively for reflections, shadow rays and refractions a method for simulating global lightning is created.
 
+When using several rays in the scene, a term importance is introduced.
+It states that the total importance of all rays for each pixels is one. 
+If multi sampling is used, importance is divided among the rays.
+The importance flows in the opposite direction as the light, from the camera and into the scene.
+
 \section{Radiosity}
 Radiosity is an algorithm for global illumination which only handles diffusely reflected light, and is therefore not dependent on any camera position or direction. This means that the solution converges toward a steady state, and can for example be pre-computed for use in static scenes. The algorithm works by splitting the scene geometry into a number of finite area elements called patches, and solves the rendering equation for surfaces that diffusely reflects light. A visibility factor, called \emph{form factor}, is used to describe a patch's visibility toward all other patches in the scene. The size of a view factor is dependent on the distance between any two patches, their orientation in relation to each other, partial or total occlusion etc. and describes the amount of radiance leaving a patch $j$ arriving at patch $i$ for all patches $j \in N$ for a scene consisting of $N$ number of patches. The form factors make up a system of linear equations, which when solved produces the radiosity for each patch. The process can be iterated to perform several passes and allowing for multiple bounces to be computed.
 
@@ -67,22 +82,26 @@ L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + L_r(x \rightarrow \theta) 
 L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Phi \rightarrow \theta)L(x \leftarrow \Phi)cos(N_x, \Phi)d\omega_{\Phi}
 \end{split}
 \end{equation}
-The Monte Carlo integration method introduces a method for calculating an estimated value for an integral expression. 
-This is especially useful for solving integrals which may be hard or impossible to solve analytically. 
-This is done by sampling the integral function by random discreet numbers according to a probability distribution function, pdf, and as the number of samples increase the produced solution's accuracy increases as well.
+The Monte Carlo integration method introduces a method for calculating an estimated value for an integral expression. This is done by sampling the integral function by random discreet numbers, and as the number of samples increase the produced solution's accuracy increases as well.
 
 \begin{equation}
-\label{eq:monte_carlo_example1}
-I = \int f(x) dx
-\end{equation}
-\begin{equation}
-\label{eq:monte_carlo_example2}
-\langle I \rangle = \frac{1}{N} \sum^N_i \frac{f(x_i)}{p(x_i)} dx
-\end{equation}
-The intergral in \autoref{eq:monte_carlo_example1} with a value of \emph{I} can me \emph{estimated} as in equation \autoref{eq:monte_carlo_example2} as $\langle I \rangle$ by $N$ number of samples distibuted according to the pdf $p(x_i)$. 
-This method will later be used to estimate the solution to \autoref{eq:rendering_eq}.
-\\ \\
-Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. One difference is that Monte Carlo ray tracing handles diffuse interreflections and specular-diffuse surface interreflections, color bleeding between objects, and soft shadows by sampling area light source surfaces for each ray intersection. As the number of samples increase the more accurate the integral estimation will be, and the algorithm produces noise if the number of samples are too low. There are several ways to reduce the noise. One could separate the calculations for direct and indirect illumination, using shadow rays to more quickly compute direct diffuse illumination and soft shadows. Sampling directions for diffuse indirect illumination could be chosen in more informed ways to reduce the noise. There have also been research on methods combining the benefits of radiosity with the benefits of ray tracing.
+ \label{eq:monte_carlo_example1}
+ I = \int f(x) dx
+ \end{equation}
+ \begin{equation}
+ \label{eq:monte_carlo_example2}
+ \langle I \rangle = \frac{1}{N} \sum^N_i \frac{f(x_i)}{p(x_i)} dx
+ \end{equation}
+ The intergral in \autoref{eq:monte_carlo_example1} with a value of \emph{I} can me \emph{estimated} as in equation \autoref{eq:monte_carlo_example2} as $\langle I \rangle$ by $N$ number of samples distibuted according to the pdf $p(x_i)$. 
+ This method will later be used to estimate the solution to \autoref{eq:rendering_eq}.\\
+
+-Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. 
+One difference is that Monte Carlo ray tracing handles diffuse interreflections and specular-diffuse surface interreflections, color bleeding between objects, and soft shadows by sampling area light source surfaces for each ray intersection. 
+As the number of samples increase the more accurate the integral estimation will be, and the algorithm produces noise if the number of samples are too low. 
+There are several ways to reduce the noise. 
+One could separate the calculations for direct and indirect illumination, using shadow rays to more quickly compute direct diffuse illumination and soft shadows. 
+Sampling directions for diffuse indirect illumination could be chosen in more informed ways to reduce the noise. 
+There have also been research on methods combining the benefits of radiosity with the benefits of ray tracing.
 
 \section{Two-pass rendering}
 Since a radiosity method handles diffuse reflections rather well, and a ray tracing method handles specular reflections well. a lot of research has been done to find ways to combine these two methods.
@@ -104,16 +123,10 @@ The method has been shown to reduce rendering time as well as the noise in the f
 \section{Iso surface ray tracing}
 An iso surface is a surface described implicitly by a mathematical expression or equation. An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. 
 
-\chapter{Background}
-In this section we will talk about the methods we have implemented in our Monte Carlo ray tracer using C++. Although there are several approaches to some of these methods we will only talk about the methods we chose to implement in this project.
-\emph{Here you describe the techniques you use in your code. 
-Describe how you do ray-surface intersections, how you launch reflected and refracted rays, how you compute the intensities, what are shadow rays, etc. No C++ code. 
-You may use pseudocode, but it is better do discuss the techniques only from a theoretical point of view. 
-These descriptions should be accompanied by figures. 
-The figures are numbered consecutively in order of appearance. 
-Each figure must have a caption with a brief description of what you see in it. 
-The figures must be referred to from the text and described and interpreted in more detail in the text.
-Length: about 5-6 pages.}
+\chapter{Background} \label{ch:background}
+
+In this section we will talk about the methods we have implemented in our Monte Carlo ray tracer using C++. 
+Although there are several approaches to some of these methods we will only talk about the methods we chose to implement in this project.
 
 \section{Scene storage}
 When calculating global illumination for the scene, all objects need to be taken into consideration when calculating the illumination for one part of the scene due to the recursive nature of \autoref{eq:rendering_eq}.
@@ -151,7 +164,7 @@ During rendering calculation, the ray tracer calls an abstract method for calcul
 Each of these methods uses an incoming ray with a direction vector $d$ and a origin $o$ described by \autoref{eq:ray}.
 The intersection methods has to calculate the normal of surfaces to decide the direction of new rays spawned at the intersection point.
 \begin{equation} \label{eq:ray}
-\mathbf{p} = \mathbf{o} + t \mathbf{d}, t \leq 0
+\mathbf{p} = \mathbf{o} + t \mathbf{d}, t \geq 0
 \end{equation}
 
 \subsection{Implicit sphere}
@@ -185,12 +198,70 @@ C =& (\mathbf{o} - \mathbf{c}) \cdot (\mathbf{o} - \mathbf{c}) - r^2
 
 When both values of $t$ are calculated, the lowest value is used for the collision point. The normal is calculated by normalizing the point on the surface and subtracting the center of the sphere.
 
-\subsection{Axis aligned bounding box}
-
-
 \subsection{Quadrilateral}
+The collision tests for quadrilaterals follows the technique presented by A. Lagae and P. Dutr\'{e} \cite{quadrilateral}.
+A quadrilateral is described by four corner points $ \mathbf{v}_{00} $, $ \mathbf{v}_{01}$, $ \mathbf{v}_{11} $ and $ \mathbf{v}_{01} $, one for each edge, listed in a counter clockwise order.
+These must all be on the same plane and create a convex shape.
+The method for collision uses bilinear coordinates to calculate the point on the plane, but this is an expensive operation and therefore, rejection tests are made early to make sure that these are only calculated when it is really needed.
+The quadrilateral is divided into two triangles $ T $, $ T' $ and the collision test is decided comparing the barycentric coordinates with the two triangles. \\
+
+Each point $ Q(u, v) $ in the plane $ Q $ can be described by \autoref{eq:quadplanepoint}.
+Here $ u $ and $ v $ are the bilinear coordinates of $Q(u,v)$. 
+If $ u $ and $ v $ lies in the range $ [0 .. 1] $, then $ Q(u,v) $ lies inside $ Q $.\\
+
+\begin{equation} \label{eq:quadplanepoint}
+Q(u,v) = (1 - u) (1 - v) \mathbf{V}_{00} + u (1 - v) \mathbf{V}_{10} + uv\mathbf{V}_{11} + (1 - u) v \mathbf{V}_{01}
+\end{equation}
+
+\autoref{eq:quadplanepoint} is a bilinear mapping of the unit square into a quadrilateral.
+It is computed by using linear interpolation along the top and bottom edges of the quad and then applying a linear interpolation between these two interpolated points.\\
+
+\begin{equation}
+\label{eq:quadtripoint}
+T(\alpha, \beta) = \mathbf{V}_{00} + \alpha ( \mathbf{V}_{10} - \mathbf{V}_{00}) + \beta (\mathbf{V}_{01} - \mathbf{V}_{00})
+\end{equation}
+
+Each point on in one of the triangles is described by \autoref{eq:quadtripoint} and when \autoref{eq:quadtrirange} is satisfied, the point is inside the triangle.
+If the ray intersects the quadrilateral, \autoref{eq:ray} is inserted into \autoref{eq:quadtrirange} to find $t$.
+
+\begin{subequations} \label{eq:quadtrirange}
+\begin{align}
+\alpha \ge& 0\\
+\beta \ge& 0\\
+\alpha + \beta& \le 1\\
+\end{align}
+\end{subequations}
+
 \subsection{Triangle}
+Triangle collisions uses the same method as the quadrilateral for finding if a ray intersects with the triangle, using \autoref{eq:quadtripoint} to determine if it intersects with the ray and computing $t$ by inserting \autoref{eq:ray} into that equation.
+
+%\begin{wrapfigure}{r}{0.5\textwidth} 
+%	\begin{center}
+%		\includegraphics[width=0.48\textwidth]			
+%		{figures/octreetwod.png} 
+%	\end{center}
+%	\caption{Visualization of the collision tests a ray traveling 			trough an octree does.}
+%	\label{fig:octreetraversal}
+%\end{wrapfigure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{figures/octreetwod.png}
+	\caption{Visualization of the collision tests a ray traveling trough an octree data structure.}
+	\label{fig:octreetraversal}
+\end{figure}
+
 \subsection{Octree}
+Collisions against the octree uses a iterative solution to traverse a ray trough the tree.
+When a ray is created, it is compared against all the top boxes.
+As the ray is evaluated, the bounding box closest to the ray are found, iterating down.
+If no collisions is found, the algorithm iterates up again, finding the smallest neighbouring bounding box that has data in it. This process is visualized in \autoref{fig:octreetraversal}. The ray first collides with bounding box 1, but no child nodes exist in it, so the ray traverse forward to the edge of bounding box 2 as it collides with the sibling to 1. 
+It now iterates down to bounding box 2 in the figure and finds that no child's are in this bounding box. 
+The ray moves forward to bounding box 3 and finds a primitive in this bounding box, collision tests are done against it but no collision is found.
+The ray traverse forward to the edge of bounding box 3 and trough bounding box 4.
+The ray exits out of bounding box 5 and no collisions were found and therefore, no collisions between the scene and the ray were found.\\
+
+This allows for using the fast and cheap AABB intersection method instead of expensive collision tests using all primitives.
 
 \section{Anti-aliasing by sub-pixel sampling}
 To reduce aliasing effects in the final image we have implemented support for sub-pixel sampling.
@@ -217,6 +288,12 @@ In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per 
 \end{figure}
 
 \section{Russian Roulette}
+Russian roulette is a method for ray termination that specifies a probability for continuing or terminating at each bounce. 
+How the probability is decided depends on how complex the implementation.
+A simple implementation only states a fixed threshold of probability for each ray.
+As the ray continues forward, the probability of terminating increases.
+More complex implementations could use reflectance of the surface to decide, giving a higher probability of termination for diffuse primitives.
+Light intensity could also be taken into consideration when determining the probability, giving a higher chance of termination for low intensity values.
 
 \section{Monte Carlo ray tracing}
 As described in the introduction a Monte Carlo ray tracer is similar to a Whitted ray tracer in that it is only interested in the radiance reaching the virtual camera, or the eye.
@@ -243,7 +320,7 @@ In \cite{dutre} it is shown that \autoref{eq:rendering_eq} can be represented by
 
 \subsection{Direct illumination}
 The term $L_{direct}(x \rightarrow \theta)$ expresses the contribution to a point \emph{x} from light sources directly.
-Since the term $L_{direct}(x \rightarrow \theta)$ contains the emmitance term $L_e$ it is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
+Since the term $L_{direct}(x \rightarrow \theta)$ contains the emittance term $L_e$ it is only non-zero for light sources, we can describe the direct illumination contribution as in \autoref{eq:rendering_eq_split}b, which is an integral over the area of the light sources in the scene instead of an integral over the hemisphere.
 Or as a discrete representation as a sum over all \emph{N} light sources in the scene.
 In our implementation only a single planar light source is considered.
 For generality's sake all equations presented will be defined to handle an arbitrary number of light sources.
@@ -253,13 +330,12 @@ For generality's sake all equations presented will be defined to handle an arbit
 L_{direct}(x \rightarrow \theta) = \sum^{N}_{k=1} \int_{A_k}L_e(y \rightarrow \mathbf{yx}) f_r(x, \mathbf{xy}\leftrightarrow \theta)G(x,y)V(x,y)dA_y
 \end{equation}
 
-In \autoref{eq:rendering_eq_split}b, $A$ refers to the area of a lightsource in the scene.
+In \autoref{eq:rendering_eq_split}b, $A$ refers to the area of a light source in the scene.
 For every intersection point retrieved from the scene, that point's direct illumination is calculated in two separate ways, one for direct diffuse illumination and one for direct specular illumination.
 For diffuse direct illumination the light source is sampled.
 Each sample point $y_i$ is distributed uniformly on the surface of the light source.
 The visibility function $V(x,y)$ makes sure that only sample points visible from \emph{x} will contribute to the direct illumination by checking if $y_i$ is in line of sight of \emph{x}.
 Because of this these rays are often called shadow rays, and will result in soft shadows if enough samples $y_i$ are taken.
-
 For a single planar area light source sampled with $N_s$ shadow rays the Monte Carlo estimator becomes
 
 \begin{equation}
@@ -269,11 +345,11 @@ For a single planar area light source sampled with $N_s$ shadow rays the Monte C
 as described in \cite{dutre}.
 
 A uniform probability distribution function $p(y_i)$ of $\frac{1}{A}$ is used where \emph{A} is the area of the light source.
-From \autoref{eq:monte_carlo_direct} we see that it is required to evaluate visibility, BRDF and radiance emmited for each sample point.
+From \autoref{eq:monte_carlo_direct} we see that it is required to evaluate visibility, BRDF and radiance emitted for each sample point.
 
 Direct specular illumination is handled more straight forward.
 If a ray intersects with a specular object, a new ray is traced from the intersection point in the direction of a perfect reflection of the first incoming ray.
-If this new ray intersects a lightsource the point at the initial intersection receives radiance contribution in the form of emmitance from that light source.
+If this new ray intersects a light source the point at the initial intersection receives radiance contribution in the form of emittance from that light source.
 
 \subsection{Indirect illumintaion}
 Indirect illumination corresponds to radiance received through one or more reflections against other objects in the scene.
@@ -295,8 +371,8 @@ Since a Lambertian diffuse surface per definition reflect equal amounts of radia
 We define the BRDF and the pdf for all diffuse surfaces as  in \autoref{eq:diffuse_indirect1}.
 \begin{subequations} \label{eq:diffuse_indirect1}
 \begin{align} 
-	&BRDF = \frac{color}{\pi} \\
-	&p(\Phi_i) = \frac{cos(\Phi_i, N_x)}{\pi}
+&BRDF = \frac{color}{\pi} \\
+&p(\Phi_i) = \frac{cos(\Phi_i, N_x)}{\pi}
 \end{align}
 \end{subequations}
 
@@ -304,9 +380,9 @@ Inserting \autoref{eq:diffuse_indirect1} into \autoref{eq:monte_carlo_indirect} 
 
 \begin{subequations} \label{eq:diffuse_indirect2}
 \begin{align}
-	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
-	&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
-	&\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
+&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i) f_r(x, \theta \leftrightarrow \Phi_i)cos(\Phi_i, N_x)}{p(\Phi_i)} \rightarrow \\
+&\nonumber \frac{1}{N} \sum^{N}_{i=1} \frac{L_r(r(x,\Phi_i) \rightarrow -\Phi_i)  \dfrac{color}{\pi} cos(\Phi_i, N_x)}{\frac{cos(\Phi_i, N_x)}{\pi}} \rightarrow \\
+&\frac{color}{N} \sum^{N}_{i=1} L_r(r(x,\Phi_i) \rightarrow -\Phi_i)
 \end{align}
 \end{subequations}
 
@@ -316,6 +392,7 @@ Lastly, the sample direction is transformed to Carthesian coordinates and is rot
 
 \subsubsection{Specular indirect illumination}
 Perfect specular surfaces are implemented in this project.
+
 The BRDF for a specular surface is different from 0 in only a single directon, the perfect reflection direction. 
 The BRDF and pdf are defined in equation \autoref{eq:specular_indirect1} where $\theta$ is the incident ray's angle to the surface normal and $\Phi_i$ is the reflected ray angle.
 Since we are dealing with perfectly specular materials the pdf will be equal to 1 as well, and $\Phi_i = \theta$ thus the dirac function will yield a result of 1.
@@ -347,10 +424,31 @@ To decide how much of the radiance should be contributed from the reflected ray 
 
 \begin{subequations} \label{eq:schlicks}
 \begin{align}
-	&R_0 = \left( \frac{n_1-n_2}{n_1+n_2} \right) ^2 \\
-	&R(\theta) = R_0+ (1-R_0)(1-cos(\theta))^5
+R_0 = \left( \frac{n_1-n_2}{n_1+n_2} \right) ^2 \rightarrow \\
+R(\theta) = R_0+ (1-R_0)(1-cos(\theta))^5
 \end{align}
 \end{subequations}
+
+$R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is come from and going into respectively.
+The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector. \autoref{eq:schlicks} describes what fraction of the reflected ray should be used in computing the radiance for the intersection point. The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
+
+% TA EJ BORT sparar till senare :P
+%\begin{figure}
+%        \centering
+%        \begin{subfigure}[b]{0.5\textwidth}
+%           \includegraphics[width=\textwidth]{figures/2013-12-10-15-39-35-200rpp-ca2h_6-7_112.png}
+%	\caption{200 view rays per pixel}
+%	\label{fig:full}
+%        \end{subfigure}%
+%        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+%          %(or a blank line to force the subfigure onto a new line)
+%        \begin{subfigure}[b]{0.5\textwidth}
+%                \includegraphics[width=\textwidth]{figures/2013-12-10-15-39-35-200rpp-ca2h_6-7_112.png}
+%                \caption{HerpDerp view rays}
+%                \label{fig:miger}
+%        \end{subfigure}
+%        \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
+%\end{figure}
 
 $R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is coming from and going into respectively.
 The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector.
@@ -358,16 +456,72 @@ The term $cos(\theta)$ is the dot product between the halfway direction vector a
 The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
 
 \subsection{Reflection}
+When a ray travels trough a medium, colliding with another medium, the ray will be reflected.
+The law of reflection says that the angle of incidence $\theta_i$ is equal to the angle of reflection $ \theta_r $ is equal to each other.
+The incoming ray can be divided into two different parts, the tangent part to the surface $ \mathbf{i}_\bot $ and the normal part $ \mathbf{i}_\| $.
+The tangiental part can be found using orthogonal projection onto the normal using \autoref{eq:projection}. The normal part is found using \autoref{eq:projectionrest}.
+
+\begin{equation} \label{eq:projection}
+\mathbf{i}_\bot = \frac{\mathbf{i} \cdot \mathbf{n}} {\vert \mathbf{n}^2} \mathbf{n} = (\mathbf{v} \cdot \mathbf{n})\mathbf{n}
+\end{equation}
+
+\begin{equation} \label{eq:projectionrest}
+\mathbf{i}_\| = \mathbf{i} - \mathbf{i}_\bot
+\end{equation}
+By doing a dot product between these two rays, it is possible to prove that the result is zero and thus proving that these two are orthogonal and that $ \mathbf{i}_\bot $ is an orthogonal projection on $ \mathbf{n} $. By combining \autoref{eq:projectionrest} and \autoref{eq:projection} the reflected ray $ \mathbf{r} $ can be calculated using \autoref{eq:reflectioncalc}.
+
+\begin{subequations}\label{eq:reflectioncalc}
+\begin{align}
+r =& \mathbf{i}_\| - \mathbf{i}_\bot \\
+  =& [\mathbf{i} - (\mathbf{i} \cdot \mathbf{n})\mathbf{n}] - (\mathbf{i} \cdot \mathbf{n}) \mathbf{n} \\
+  =& \mathbf{i} - 2 ( \mathbf{i} \cdot \mathbf{n} ) \mathbf{n}
+\end{align}
+\end{subequations}
+
+%\begin{subequations} \label{eq:refl}
+%\begin{align}
+%\vert \mathbf{r}_\bot \vert =& cos \theta_r = \theta_i = \vert \mathbf{i} \bot \vert \\ 
+%\vert \mathbf{r}_\| \vert =& sin \theta_r = sin \theta_i = \vert \mathbf{i}_\| \vert
+%\end{align}
+%\end{subequations}
+
 \subsection{Refraction}
+
+When calculating refractions, Snell's law are used. It states that the product of the refractive indices and sines of the angles must be equal, as stated in \autoref{eq:snell}.\\
+
+\begin{equation} \label{eq:snell}
+\eta_1 sin \theta_i = \eta_2 sin \theta_t
+\end{equation}
+
+This equation has a problem, when $ sin \theta_1 > \dfrac{\eta_1}{\eta_2} $
+the other term $ sin \theta_2 $ has to be greater then 1. 
+This case is what is called total internal reflection.
+When calculating the refracted ray $ t $, continued calculation assumes that the condition is not satisfied.\\
+
+The refractored vector is also divided into two parts, just the same as in \autoref{eq:projectionrest} and the norms are calculated first. By taking advantage of the fact that norms and tangents to the plane is equal to the sines in \autoref{eq:snell} it can be rewritten into \autoref{eq:refraction}.
+
+\begin{equation} \label{eq:refraction}
+\mathbf{t}_\| = \frac{\eta_1}{\eta_2} \mathbf{i}_\| = \frac{\eta_1}{\eta_2} 
+[\mathbf{i} + cos \theta_i \mathbf{n}]
+\end{equation}
+
+The tangential calculation uses Pythagoras which gives \autoref{eq:refractiontan}. The combination of these two, described in \autoref{eq:refractiontot} is all that is needed to calculate the refraction vector 
+
+\begin{equation} \label{eq:refractiontan}
+\mathbf{t}_\bot = - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2}\mathbf{n}
+\end{equation}
+
+\begin{equation} \label{eq:refractiontot}
+\mathbf{t} = \frac{\eta_1}{\eta_2} \mathbf{i} + (\frac{\eta_1}{\eta_2} cos \theta_i - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2})\mathbf{n}
+\end{equation}
+
 \subsection{Intensity calculations}
-\chapter{Results and benchmarks}
-\emph{Here you show results obtained with your code. 
-You can do series of computations, where you vary the pixel resolution, the number of ray iterations, the number and type of the objects in the scene (transparent vs opaque) etc. 
-You can compare in detail images computed from the same scene with different resolutions. 
-You can discuss figures and effects in the figures, like color bleeding, noise, aliasing artifacts etc. 
-You can list benchmarks (e.g. how long it took your computer to calculate a frame with a given resolution) in a table etc. 
-Here you can be creative and look at things you like. 
-Length: about 5-6 pages .}
+After each time the ray hits a change in medium, it will spawn new refraction and reflection rays.
+All of the resulting values that are accumulated from each bounce will be added to the total value.
+The contributed values from diffuse and specular elements in 
+
+\chapter{Results and benchmarks} \label{ch:results}
+
 \section{Shadow rays}
 The quality of the direct diffuse illumination is directly related to the number of shadow rays used to sample the light source from each intersection point. \autoref{fig:shadow_rays} shows images with different number of shadow rays per sample. Notice how the amount of noise on the floor decreases as the number of shadow rays increases. \autoref{tb:shadow_rays} shows the effect the number of shadow rays has on the rendering time.
 
@@ -399,7 +553,6 @@ The quality of the direct diffuse illumination is directly related to the number
         \end{subfigure}
         \caption{Number of shadow rays increasing from left to right, top to bottom.}\label{fig:shadow_rays}
 \end{figure}
-
 
 \begin{table}[h]
 \begin{center}
@@ -450,7 +603,7 @@ Lastly a render depth of 6 is shown in \autoref{fig:6rd}. This is the recursion 
         \end{subfigure}%
 	~
 	\begin{subfigure}[h]{0.5\textwidth}
-                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-6-1000rpp.png}
+                \includegraphics[width=\textwidth]{figures/recursive_depth/recursion-6-1000rppTMP.png}
                 \caption{6 recursions}
                 \label{fig:6rd}
         \end{subfigure}
@@ -471,15 +624,6 @@ Lastly a render depth of 6 is shown in \autoref{fig:6rd}. This is the recursion 
 	\label{tb:recursion}
 \end{center}
 \end{table}
-
-
-
-\section{Samples per pixel}
-Another way of reducing the noise in the images is by sending several rays through the same pixel from the camera. 
-Instead of sending a single ray through the center of the pixel we send multiple rays placed in the pixel in a uniform random fashion. 
-The contributions from each view ray are summed up and normalized to form the final intensity value for the pixel. 
-This technique is sometimes referred to as sub-pixel sampling. In \autoref{fig:vew_rays} we see a scene rendered with an increasing amount of view rays per pixel from left to right, top to bottom. 
-Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides rather quickly, while the noise in areas not directly visible to the light source persists much longer even though the number of samples increase.
 
 \begin{figure}
         \centering
@@ -533,7 +677,44 @@ Specular materials that produce reflected and to some extent refracted rays is a
 
 Notice the increased noise on the surface of the back wall and on the box nearest to the camera in \autoref{fig:diff_spec_diff}.
 
-\chapter{Discussion}
+\section{Samples per pixel}
+Another way of reducing the noise in the images is by sending several rays through the same pixel from the camera. 
+Instead of sending a single ray through the center of the pixel we send multiple rays placed in the pixel in a uniform random fashion. 
+The contributions from each view ray are summed up and normalized to form the final intensity value for the pixel. 
+This technique is sometimes referred to as sub-pixel sampling. In \autoref{fig:vew_rays} we see a scene rendered with an increasing amount of view rays per pixel from left to right, top to bottom. 
+Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides rather quickly, while the noise in areas not directly visible to the light source persists much longer even though the number of samples increase.
+
+
+\begin{figure}
+         \centering
+         \begin{subfigure}[b]{0.5\textwidth}
+            \includegraphics[width=\textwidth]{figures/specular_50rpp-.png}
+   \caption{50 view rays per pixel}
+   \label{fig:50rpp}
+         \end{subfigure}%
+         ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+           %(or a blank line to force the subfigure onto a new line)
+         \begin{subfigure}[b]{0.5\textwidth}
+                 \includegraphics[width=\textwidth]{figures/specular_100rpp-.png}
+                 \caption{100 view rays per pixel}
+                 \label{fig:100rpp}
+         \end{subfigure}
+ 
+   \begin{subfigure}[b]{0.5\textwidth}
+                 \includegraphics[width=\textwidth]{figures/specular_200rpp-.png}
+                 \caption{200 view rays per pixel}
+                 \label{fig:200rpp}
+         \end{subfigure}%
+  ~
+  \begin{subfigure}[b]{0.5\textwidth}
+                \includegraphics[width=\textwidth]{figures/specular_600rpp-.png}
+                \caption{600 view rays per pixel}
+                \label{fig:600rpp}
+       \end{subfigure}
+        \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
+\end{figure}
+
+\chapter{Discussion} \label{ch:discussion}
 Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.
 \emph{Here you should repeat the key findings of your article and discuss how you could improve them. 
 Do not go into details, but just give a general description. 
