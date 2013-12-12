@@ -53,9 +53,7 @@ std::vector<Triangle*> *Mesh::createTriangles(std::string objName) {
             verts.push_back(Vec3(shapes[n].mesh.positions[i * 3],
 									  shapes[n].mesh.positions[i * 3 + 1],
 									  shapes[n].mesh.positions[i * 3 + 2]));
-			
 		}
-
 
         for (unsigned int i = 0; i < numFaces; ++i) {
 			
@@ -74,7 +72,7 @@ std::vector<Triangle*> *Mesh::createTriangles(std::string objName) {
 		vertOffset += numVerts;
 	}
 
-
+    std::cout << triangles->size() << std::flush << std::endl;
 	
 	return triangles;
 }

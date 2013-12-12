@@ -28,7 +28,7 @@
 This report describes the techniques required to approximate global illumination in a computer generated scene and is created as a result from the course TNCG15, Advanced Global Illumination and Rendering.
 The report focuses on the techniques required for an implementation of a stochastic global illumination algorithm by using Monte Carlo integration to estimate a solution to the rendering equation, and presents the results from our implementation using that technique.
 It will cover topics like intersection testing, aliasing counter actions and other techniques that has been implemented during the project.
-The results presentated will evaluate these parts, both to see their contributions and to show the time cost that is added when using them.
+The results presentated will evaluate these parts, both to see their contributions and to their inpact to computation time.
 
 \end{abstract}
 
@@ -43,7 +43,9 @@ These methods use iterations, using computer power to calculate these estimates 
 
 Most of these are so called ray tracing methods where rays are traced from the viewer into the scene.
 When rays hits surfaces in the scene, new rays for reflection and refraction is spawned.
-These are then combined using importance.
+These are then combined using importance to create the final image.
+These techniques are called global illumination methods because they take the whole scene into consideration.
+Each other primitives contribution has to be taken into consideration while calculating the illumination on a specific 
 
 \section{Whitted ray tracing}
 The Whitted ray tracing method described by Turner Whitted in \cite{Foley_animproved} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
@@ -107,21 +109,24 @@ There have also been research on methods combining the benefits of radiosity wit
 Since a radiosity method handles diffuse reflections rather well, and a ray tracing method handles specular reflections well. a lot of research has been done to find ways to combine these two methods.
 One of these methods descibed by Smits et al. \cite{importance_radiosity} works from the fact that radiosity algorithms propagate light from a light source through the scene, while a ray tracing algorithm only cares about the light that reaches the eye.
 The method in \cite{importance_radiosity} consists of splitting the rendering into two passes.
-The first pass uses a ray tracing approach to emmit importance from the eye through the scene.
+The first pass uses a ray tracing approach to emit importance from the eye through the scene.
 This importance is then used to refine the patches used for the second pass, a radiosity pass.
 By subdividing patches in parts with high importance, and ignoring patches in areas with little or no importance, great speedups can be achieved.
  
 
 \section{Photon mapping}
 Monte carlo methods for ray tracing suffers from noise in the final results if not enough samples are used when calculating radiance from diffuse indirect illumination.
-Photon mapping is two-pass global illumination method presented by Jensen \cite{photon_maps} which computes diffuse indirect illumination faster than a Monte Carlo solution.
+Photon mapping is a two-pass global illumination method presented by Jensen \cite{photon_maps} which computes diffuse indirect illumination faster than a Monte Carlo solution.
 The method works by emitting packets of energy (light) from the light sources toward different objects in the scene.
 Different packets can be used for different materials, e.g. a high resolution photon map can be used for caustics that are visualized directly, while a lower resolution map can be stored for later use in the ray tracing step.
 Shadow photons can be used to more efficiently compute shadows, and be used as directional information to produce more accurate sampling directions during the rendering step.
 The method has been shown to reduce rendering time as well as the noise in the final image when used in a Monte Carlo ray tracer algorithm.
   
 \section{Iso surface ray tracing}
-An iso surface is a surface described implicitly by a mathematical expression or equation. An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. 
+An iso surface is a surface described implicitly by a mathematical expression or equation. 
+An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. 
+They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. 
+From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. 
 
 \chapter{Background} \label{ch:background}
 
@@ -134,7 +139,8 @@ When calculating global illumination for the scene, all objects need to be taken
 For ray tracing solutions, this means that as rays bounce inside the scene the first intersecting object needs to be located.
 A na\"{\i}ve solution would be to store all objects without any information about where in the scene they are located.
 When traversing a ray through the scene, the algorithm would have to check against all objects, even if almost all of the checks would be misses.
-For a simple scene with only a few implicit objects this is a good solution. The overhead when dealing with an more complex storage method would make it slower than simply checking against all objects in the scene.
+For a simple scene with only a few implicit objects this is a good solution. 
+The overhead when dealing with an more complex storage method would make it slower than simply checking against all objects in the scene.
 But when using a more complex scene consisting of models with hundreds of thousands of elements, it is possible to take advantage of the spatial information of each element to subtract a small subset and only do collision tests against those.
 
 There are several methods for storing the scene using different techniques.
@@ -168,8 +174,9 @@ The intersection methods has to calculate the normal of surfaces to decide the d
 \end{equation}
 
 \subsection{Implicit sphere}
-A sphere is defined by a position vector $c$ of its centre and a radius scalar $r$. 
-The goal is to find if any $t$ in \autoref{eq:ray} satisfies \autoref{eq:sphere}. By inserting \autoref{eq:ray} into \autoref{eq:sphere}, we receive an expression for solving the intersection point described by \autoref{eq:sphereray}.
+A sphere is defined by a position vector $c$ of its center and a radius scalar $r$. 
+The goal is to find if any $t$ in \autoref{eq:ray} satisfies \autoref{eq:sphere}. 
+By inserting \autoref{eq:ray} into \autoref{eq:sphere}, we receive an expression for solving the intersection point described by \autoref{eq:sphereray}.
 \begin{equation} \label{eq:sphere}
 (\mathbf{p} - \mathbf{c}).(\mathbf{p} - \mathbf{c}) = r^2
 \end{equation}
@@ -196,7 +203,8 @@ C =& (\mathbf{o} - \mathbf{c}) \cdot (\mathbf{o} - \mathbf{c}) - r^2
 \end{align}
 \end{subequations}
 
-When both values of $t$ are calculated, the lowest value is used for the collision point. The normal is calculated by normalizing the point on the surface and subtracting the center of the sphere.
+When both values of $t$ are calculated, the lowest value is used for the collision point. 
+The normal is calculated by normalizing the point on the surface and subtracting the center of the sphere.
 
 \subsection{Quadrilateral}
 The collision tests for quadrilaterals follows the technique presented by A. Lagae and P. Dutr\'{e} \cite{quadrilateral}.
@@ -255,7 +263,8 @@ Triangle collisions uses the same method as the quadrilateral for finding if a r
 Collisions against the octree uses a iterative solution to traverse a ray trough the tree.
 When a ray is created, it is compared against all the top boxes.
 As the ray is evaluated, the bounding box closest to the ray are found, iterating down.
-If no collisions is found, the algorithm iterates up again, finding the smallest neighbouring bounding box that has data in it. This process is visualized in \autoref{fig:octreetraversal}. The ray first collides with bounding box 1, but no child nodes exist in it, so the ray traverse forward to the edge of bounding box 2 as it collides with the sibling to 1. 
+If no collisions is found, the algorithm iterates up again, finding the smallest neighboring bounding box that has data in it. This process is visualized in \autoref{fig:octreetraversal}. 
+The ray first collides with bounding box 1, but no child nodes exist in it, so the ray traverse forward to the edge of bounding box 2 as it collides with the sibling to 1. 
 It now iterates down to bounding box 2 in the figure and finds that no child's are in this bounding box. 
 The ray moves forward to bounding box 3 and finds a primitive in this bounding box, collision tests are done against it but no collision is found.
 The ray traverse forward to the edge of bounding box 3 and trough bounding box 4.
@@ -305,8 +314,8 @@ L(x \rightarrow \theta) = L_e(x \rightarrow \theta) + \int_{\Omega_x} f_r(x, \Ph
 \end{equation}
 
 The left hand side $L(x \rightarrow \theta)$ corresponds to the radiance leaving at a point \emph{x} in the direction $\theta$.
-The right hand side consists of an emmitance part and a reflectance part.
-$ L_e(x \rightarrow \theta)$ corresponds to outgoing radiance emmited from $x$, and the integral term corresponds to reflected radiance received from all directions over a hemisphere over the point $x$.
+The right hand side consists of an emittance part and a reflectance part.
+$ L_e(x \rightarrow \theta)$ corresponds to outgoing radiance emitted from $x$, and the integral term corresponds to reflected radiance received from all directions over a hemisphere over the point $x$.
 In \cite{dutre} it is shown that \autoref{eq:rendering_eq} can be represented by separating the terms for indirect and direct illumination as in \autoref{eq:rendering_eq_split}.
 
 
@@ -353,7 +362,8 @@ If this new ray intersects a light source the point at the initial intersection 
 
 \subsection{Indirect illumintaion}
 Indirect illumination corresponds to radiance received through one or more reflections against other objects in the scene.
-The contribution from indirect illumination for a point \emph{x} is done by evaluating the integral over the hemisphere in \autoref{eq:rendering_eq_split}c. Unfortunately we cannot transform this expression into an integral over a smaller domain as we did for direct illumination since the reflectance term $L_r$, which in turn contains radiance from other points in the scene, appears on both sides of the equation.
+The contribution from indirect illumination for a point \emph{x} is done by evaluating the integral over the hemisphere in \autoref{eq:rendering_eq_split}c. 
+Unfortunately we cannot transform this expression into an integral over a smaller domain as we did for direct illumination since the reflectance term $L_r$, which in turn contains radiance from other points in the scene, appears on both sides of the equation.
 The recursive nature of this algorithm is evident and it is clear that an exact solution is cannot be found.
 We instead use a Monte Carlo estimator as presented in \cite{dutre}.
 
@@ -388,12 +398,12 @@ Inserting \autoref{eq:diffuse_indirect1} into \autoref{eq:monte_carlo_indirect} 
 
 The random hemisphere sample direction $\Phi_i$ is created by randomly picking two angles $\theta$ and $\phi$, which will represent a sampling direction in spherical coordinates.
 The angle $\phi$ is assigned a uniform random value in the interval $[0,2\pi]$ and $\theta$ is assigned a value of $cos^{-1}(r^{ \frac{1}{1+n} })$ where \emph{r} is a uniform random number in the interval $[0,1]$ and \emph{n} is a number in the interval $[0,1]$ which dictates the sample direction's alignment within the cosine lobe around $N_x$. 
-Lastly, the sample direction is transformed to Carthesian coordinates and is rotated along $N_x$.
+Lastly, the sample direction is transformed to Cartesian coordinates and is rotated along $N_x$.
 
 \subsubsection{Specular indirect illumination}
 Perfect specular surfaces are implemented in this project.
 
-The BRDF for a specular surface is different from 0 in only a single directon, the perfect reflection direction. 
+The BRDF for a specular surface is different from 0 in only a single direction, the perfect reflection direction. 
 The BRDF and pdf are defined in equation \autoref{eq:specular_indirect1} where $\theta$ is the incident ray's angle to the surface normal and $\Phi_i$ is the reflected ray angle.
 Since we are dealing with perfectly specular materials the pdf will be equal to 1 as well, and $\Phi_i = \theta$ thus the dirac function will yield a result of 1.
 
@@ -430,7 +440,8 @@ R(\theta) = R_0+ (1-R_0)(1-cos(\theta))^5
 \end{subequations}
 
 $R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is come from and going into respectively.
-The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector. \autoref{eq:schlicks} describes what fraction of the reflected ray should be used in computing the radiance for the intersection point. The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
+The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector. \autoref{eq:schlicks} describes what fraction of the reflected ray should be used in computing the radiance for the intersection point. 
+The radiance contribution from the refracted (transmitted) ray them becomes $T=1-R$.
 
 $R_0$ is the reflection coefficient for light incoming parallel to the normal direction of the surface, $n1$ and $n2$ are the refractive indices for the mediums the ray is coming from and going into respectively.
 The term $cos(\theta)$ is the dot product between the halfway direction vector and the viewing direction vector.
@@ -441,7 +452,8 @@ The radiance contribution from the refracted (transmitted) ray them becomes $T=1
 When a ray travels through a medium, colliding with another medium, the ray will be reflected.
 The law of reflection says that the angle of incidence $\theta_i$ and the angle of reflection $ \theta_r $ is equal to each other for a perfect reflection.
 The incoming ray can be divided into two different parts, the tangent part to the surface $ \mathbf{i}_\bot $ and the normal part $ \mathbf{i}_\| $.
-The tangiental part can be found using orthogonal projection onto the normal using \autoref{eq:projection}. The normal part is found using \autoref{eq:projectionrest}.
+The tangential part can be found using orthogonal projection onto the normal using \autoref{eq:projection}. 
+The normal part is found using \autoref{eq:projectionrest}.
 
 \begin{equation} \label{eq:projection}
 \mathbf{i}_\bot = \frac{\mathbf{i} \cdot \mathbf{n}} {\vert \mathbf{n}^2} \mathbf{n} = (\mathbf{v} \cdot \mathbf{n})\mathbf{n}
@@ -450,7 +462,8 @@ The tangiental part can be found using orthogonal projection onto the normal usi
 \begin{equation} \label{eq:projectionrest}
 \mathbf{i}_\| = \mathbf{i} - \mathbf{i}_\bot
 \end{equation}
-By doing a dot product between these two rays, it is possible to prove that the result is zero and thus proving that these two are orthogonal and that $ \mathbf{i}_\bot $ is an orthogonal projection on $ \mathbf{n} $. By combining \autoref{eq:projectionrest} and \autoref{eq:projection} the reflected ray $ \mathbf{r} $ can be calculated using \autoref{eq:reflectioncalc}.
+By doing a dot product between these two rays, it is possible to prove that the result is zero and thus proving that these two are orthogonal and that $ \mathbf{i}_\bot $ is an orthogonal projection on $ \mathbf{n} $. 
+By combining \autoref{eq:projectionrest} and \autoref{eq:projection} the reflected ray $ \mathbf{r} $ can be calculated using \autoref{eq:reflectioncalc}.
 
 \begin{subequations}\label{eq:reflectioncalc}
 \begin{align}
@@ -468,8 +481,8 @@ r =& \mathbf{i}_\| - \mathbf{i}_\bot \\
 %\end{subequations}
 
 \subsection{Refraction}
-
-When calculating refractions, Snell's law is used. It states that the product of the refractive indices and sines of the angles must be equal, as stated in \autoref{eq:snell}.\\
+When calculating refractions, Snell's law are used. 
+It states that the product of the refractive indices and sines of the angles must be equal, as stated in \autoref{eq:snell}.\\
 
 \begin{equation} \label{eq:snell}
 \eta_1 sin \theta_i = \eta_2 sin \theta_t
@@ -480,14 +493,16 @@ the other term $ sin \theta_2 $ has to be greater then 1, which of course is not
 This case is what is called total internal reflection.
 When calculating the refracted ray $ t $, continued calculation assumes that the condition is not satisfied.\\
 
-The refractored vector is also divided into two parts, just the same as in \autoref{eq:projectionrest} and the norms are calculated first. By taking advantage of the fact that norms and tangents to the plane is equal to the sines in \autoref{eq:snell} it can be rewritten into \autoref{eq:refraction}.
+The refracted vector is also divided into two parts, just the same as in \autoref{eq:projectionrest} and the norms are calculated first. 
+By taking advantage of the fact that norms and tangents to the plane is equal to the sines in \autoref{eq:snell} it can be rewritten into \autoref{eq:refraction}.
 
 \begin{equation} \label{eq:refraction}
 \mathbf{t}_\| = \frac{\eta_1}{\eta_2} \mathbf{i}_\| = \frac{\eta_1}{\eta_2} 
 [\mathbf{i} + cos \theta_i \mathbf{n}]
 \end{equation}
 
-The tangential calculation uses Pythagoras which gives \autoref{eq:refractiontan}. The combination of these two, described in \autoref{eq:refractiontot} is all that is needed to calculate the refraction vector 
+The tangential calculation uses Pythagoras which gives \autoref{eq:refractiontan}. 
+The combination of these two, described in \autoref{eq:refractiontot} is all that is needed to calculate the refraction vector 
 
 \begin{equation} \label{eq:refractiontan}
 \mathbf{t}_\bot = - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2}\mathbf{n}
@@ -497,15 +512,12 @@ The tangential calculation uses Pythagoras which gives \autoref{eq:refractiontan
 \mathbf{t} = \frac{\eta_1}{\eta_2} \mathbf{i} + (\frac{\eta_1}{\eta_2} cos \theta_i - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2})\mathbf{n}
 \end{equation}
 
-\subsection{Intensity calculations}
-After each time the ray hits a change in medium, it will spawn new refraction and reflection rays.
-All of the resulting values that are accumulated from each bounce will be added to the total value.
-The contributed values from diffuse and specular elements in 
-
 \chapter{Results and benchmarks} \label{ch:results}
 
 \section{Shadow rays}
-The quality of the direct diffuse illumination is directly related to the number of shadow rays used to sample the light source from each intersection point. \autoref{fig:shadow_rays} shows images with different number of shadow rays per sample. Notice how the amount of noise on the floor decreases as the number of shadow rays increases. \autoref{tb:shadow_rays} shows the effect the number of shadow rays has on the rendering time.
+The quality of the direct diffuse illumination is directly related to the number of shadow rays used to sample the light source from each intersection point. 
+\autoref{fig:shadow_rays} shows images with different number of shadow rays per sample. 
+Notice how the amount of noise on the floor decreases as the number of shadow rays increases. \autoref{tb:shadow_rays} shows the effect the number of shadow rays has on the rendering time.
 
 \begin{figure}
         \centering
@@ -552,6 +564,27 @@ The quality of the direct diffuse illumination is directly related to the number
 \end{center}
 \end{table}
 
+\section{Octree speed up}
+The octree allows for a great speedup when using a scene with a lot of primitives.
+As can be seen in \autoref{tb:octree}, even with a mesh with relatively low polygon count, the computation time is ten times faster.
+
+
+\begin{table}[h]
+\begin{center}
+
+	\begin{tabular}{| l | l | l |}
+		\hline
+		Bunny & Octree & Time \\ \hline
+		yes & yes & 37.8s \\ \hline
+		yes & no & 6m 16s \\ \hline
+		no & no & 6.6s \\ \hline
+		no & yes & 16.9s \\ \hline
+	\end{tabular}
+	\caption{Rendering time with and without octree data structure in scene. Rendered with 10 rays per pixel. Bunny consists of 4968 triangles.}
+	\label{tb:octree}
+\end{center}
+\end{table}
+
 \section{Recursion depth}
 Recursion depth refers to the number of recursive calls allowed in the algorithm, e.g. how many bounces a ray will make in the scene before terminating and returning. 
 The recursion depth affects the noise in the final image, but it also has an impact on the resulting reflections and refractions for specular objects.
@@ -561,7 +594,8 @@ A recursion depth of 1 yields slightly better results.
 We now see objects that are opaque and specular since rays are allowed to bounce once before termination.
 Notice that the glass sphere is still void of indirect illumination since a refraction occurrence involves at least 2 recursive iterations.
 A depth of 2 recursions allows for a single refraction instance and the glass sphere is now better represented.
-Lastly a render depth of 6 is shown in \autoref{fig:6rd}. This is the recursion depth used for most of the images in this report.
+Lastly a render depth of 6 is shown in \autoref{fig:6rd}. 
+This is the recursion depth used for most of the images in this report.
 \autoref{tb:recursion} show the effect recursion depth has on rendering time.
 \begin{figure}
         \centering
@@ -663,7 +697,8 @@ Notice the increased noise on the surface of the back wall and on the box neares
 Another way of reducing the noise in the images is by sending several rays through the same pixel from the camera. 
 Instead of sending a single ray through the center of the pixel we send multiple rays placed in the pixel in a uniform random fashion. 
 The contributions from each view ray are summed up and normalized to form the final intensity value for the pixel. 
-This technique is sometimes referred to as sub-pixel sampling. In \autoref{fig:vew_rays} we see a scene rendered with an increasing amount of view rays per pixel from left to right, top to bottom. 
+This technique is sometimes referred to as sub-pixel sampling. 
+In \autoref{fig:vew_rays} we see a scene rendered with an increasing amount of view rays per pixel from left to right, top to bottom. 
 Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides rather quickly, while the noise in areas not directly visible to the light source persists much longer even though the number of samples increase.
 
 
@@ -697,6 +732,19 @@ Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides r
 \end{figure}
 
 \chapter{Discussion} \label{ch:discussion}
+By implementing a ray tracer, based on the monte-carlo method, it is possible to create high quality renders of the scene, given that the solution is allowed to converge long enough.
+But even with a lot of iterations, the final output still suffers from artifacts like noise.
+To remedy this, photon mapping could be implemented which would decrease the time it takes for the solution to converge.\\
+
+The created ray tracer only handles air to glass and glass to air refractions, not between any two mediums.
+This would allow us to create glass objects that are placed on other surfaces and not only floating in the air.
+To extend our solution to support this would not be too hard, because we would still be dealing with the same two cases, ray traveling to a medium with lower refractive index or ray traveling into a medium of higher refractive index.
+\\
+
+The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives.
+
+
+
 Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.
 \emph{Here you should repeat the key findings of your article and discuss how you could improve them. 
 Do not go into details, but just give a general description. 

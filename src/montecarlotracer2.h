@@ -15,7 +15,7 @@ public:
 													_meanRayDepth(0),
 													_maxDepth(6),
 													_minDepth(6),
-													_raysPerPixel(1000),
+													_raysPerPixel(10),
 													_lightQuad(lightQuad)
 	{
 		_buffer = new float[W*H*3];
