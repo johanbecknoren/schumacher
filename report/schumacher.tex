@@ -15,37 +15,41 @@
 
 \begin{document}
 
-\title{Monte Carlo-based ray tracer\\ Project Report}   % type title between braces
+\title{\Huge{Monte Carlo Ray Tracer}\\[1.cm] \Large{TNCG15 - Link\"oping University} }   % type title between braces
 \author{
 	Johan Beck-Nor\'{e}n, johbe559@student.liu.se
 	\\Andreas Valter , andva287@student.liu.se
 	}
+
 \date{\today}    % type date between braces
 \maketitle
 
 \setcounter{page}{2}
 \begin{abstract}
-This report describes the techniques required to approximate global illumination in a computer generated scene and is created as a result from the course TNCG15, Advanced Global Illumination and Rendering.
+This report begins by outlining an introduction to the field of global illumination for computer graphics and discussing some basic concepts.
+The background section goes on and describes algorithms and techniques implemented for this project in more detail, specifically what methods and techniques were used to approximate global illumination in a computer generated scene.
 The report focuses on the techniques required for an implementation of a stochastic global illumination algorithm by using Monte Carlo integration to estimate a solution to the rendering equation, and presents the results from our implementation using that technique.
-It will cover topics like intersection testing, aliasing counter actions and other techniques that has been implemented during the project.
-The results presentated will evaluate these parts, both to see their contributions and to their inpact to computation time.
-
+It will cover topics like intersection testing, anti-aliasing, seperating the rendering equation into direct and indirect illumination integrals, as well as and other techniques that has been implemented during the project.
+Results are presented in the form of images rendered with varying settings and evaluated, along with data tables describing variable values compared to rendering times.
+The report is concluded by a discussion section where we discuss our implementation along with possible improvements that could be the subject of further work.
 \end{abstract}
 
 \tableofcontents
 
 
 \chapter{Introduction} \label{ch:introduction}
-Realistic lighting in computer graphics scenes has been a problem for many years. 
-The equation describing light propagation trough a scene is both recursive and infinite which is definitely something that computers can not currently handle.
-Therefore, researchers has found different methods to estimate the analytic solution.
-These methods use iterations, using computer power to calculate these estimates that converge towards the real solution.\\
+Realistic lighting in computer graphics scenes has been a challenge and a big area of research for many years. 
+The equation commonly used describing light propagation through a scene is recursive in nature and infinite, which is something that computers can not handle.
+Researchers has found different methods to estimate the analytic solution.
+These methods are iterative and use computing power to calculate these estimates that converge towards the real solution.\\
 
-Most of these are so called ray tracing methods where rays are traced from the viewer into the scene.
-When rays hits surfaces in the scene, new rays for reflection and refraction is spawned.
+Many of these are so called ray tracing methods where rays are traced from the viewer into the scene.
+When rays hits surfaces in the scene, new rays for reflection and refraction are spawned.
+If a ray hits a light source or reaches a given recursion depth it terminates.
 These are then combined using importance to create the final image.
-These techniques are called global illumination methods because they take the whole scene into consideration.
-Each other primitives contribution has to be taken into consideration while calculating the illumination on a specific 
+Other methods start from the light source and from there propagate through the scene.
+Both of these methods are called global illumination methods because they take the whole scene into consideration.
+In this section we will give a short overview of some of the different approaches and techniques in global illumination.
 
 \section{Whitted ray tracing}
 The Whitted ray tracing method described by Turner Whitted in \cite{Foley_animproved} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
@@ -274,10 +278,10 @@ This allows for using the fast and cheap AABB intersection method instead of exp
 
 \section{Anti-aliasing by sub-pixel sampling}
 To reduce aliasing effects in the final image we have implemented support for sub-pixel sampling.
-This means that instead of sending one view ray from the virtual camera through the center of a pixel on the view plane, we send several view rays distributed on the pixel and average their results.
-The view ray distribution on a pixel area can be done in a uniform random fashion or simply placed linearly evenly spaced.
-For all rendered images in this report, the uniform random distribution was used.
-In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per pixel on the left, and 10 view rays per pixel on the right.
+This means that instead of sending one ray from the virtual camera through the center of a pixel on the view plane, we send several rays distributed on the pixel and average their results.
+The view ray distribution on the pixel area is done in a uniform fashion, placed evenly spaced on the pixel.
+For all rendered images in this report this anti-aliasing method was used.
+In  \autoref{fig:antialiasing} we see a comparison between using 1 ray per pixel on the left which is equivalent to no sub-pixel sampling, and 10 rays per pixel on the right.
 
 \begin{figure}
         \centering
@@ -293,7 +297,7 @@ In  \autoref{fig:antialiasing} we see a comparison between using 1 view ray per 
                 \caption{10 rays per pixel}
                 \label{fig:aliasing10}
         \end{subfigure}
-        \caption{Antialising by randomly distributed sub-pixel sampling}\label{fig:antialiasing}
+        \caption{Antialising by sub-pixel sampling}\label{fig:antialiasing}
 \end{figure}
 
 \section{Russian Roulette}
@@ -732,25 +736,27 @@ Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides r
 \end{figure}
 
 \chapter{Discussion} \label{ch:discussion}
-By implementing a ray tracer, based on the monte-carlo method, it is possible to create high quality renders of the scene, given that the solution is allowed to converge long enough.
-But even with a lot of iterations, the final output still suffers from artifacts like noise.
+The beginning of the project consisted of lots of reading and researching different methods used in a ray tracers.
+Initially a simple ray caster and later a Whitted ray tracer were implemented to allow us to familiarize ourselves with scene set-up, equations for path tracing, reflections, ray versus primitive intersections and so on.
+Moving on to a Monte Carlo ray tracer introduced a number of new variables to take into consideration, as well as other challenges compared to a Whitted ray tracer.
+We implemented multi-threading early on in the project and we are happy with doing so.
+Ray tracing suits parallel computing very well since every pixel is solved for completely independant from other pixels, and we achieved an almost linear speedup when running the rendering on a multicore CPU.\\
+
+By implementing a ray tracer based on the Monte Carlo method it is possible to create high quality renders of the scene, given that the solution is allowed to converge enough.
+But even with a lot of iterations and samples the final output result still suffers from artifacts like noise.
 To remedy this, photon mapping could be implemented which would decrease the time it takes for the solution to converge.\\
 
 The created ray tracer only handles air to glass and glass to air refractions, not between any two mediums.
-This would allow us to create glass objects that are placed on other surfaces and not only floating in the air.
+Implementing this would allow us to create glass objects that are placed on other surfaces and not only floating in the air.
 To extend our solution to support this would not be too hard, because we would still be dealing with the same two cases, ray traveling to a medium with lower refractive index or ray traveling into a medium of higher refractive index.
 \\
 
-The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives.
+The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives, but might not be worth it for very simple scenes considering the overhead of setting it up. \\
 
-
-
-Prata t.ex om olika källor för noise. For shadowrays sa skapar var pdf av 1/A en del noise, las om det i boken t.ex.
-\emph{Here you should repeat the key findings of your article and discuss how you could improve them. 
-Do not go into details, but just give a general description. 
-Do not use bullet points. 
-You can also give an outlook on how your renderer could be improved etc. 
-Length: about 1 page .}
+When computing direct diffuse illumination, smarter methods for sampling the light source could be employed.
+Using a pdf of $1/A$ e.g uniform sampling of the light source area as in this report is not ideal.
+This approach means for example that points far away from the light source uses the same amount of shadow rays as points close to the light source.
+Importance sampling could instead be used to use more shadow rays for points close the light source, as vice verse for points far away.
 
 \bibliographystyle{abbrv}
 \bibliography{bibl}
