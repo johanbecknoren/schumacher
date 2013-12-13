@@ -735,6 +735,12 @@ Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides r
         \caption{Reducing noise by increasing the number of view rays.}\label{fig:vew_rays}
 \end{figure}
 
+\begin{figure}[h]
+	\includegraphics[width=\textwidth]{figures/final_render_512_512-640rpp.png}
+	\caption{Final render of Monte Carlo ray tracer.}
+	\label{fig:the_end}
+\end{figure}
+
 \chapter{Discussion} \label{ch:discussion}
 The beginning of the project consisted of lots of reading and researching different methods used in a ray tracers.
 Initially a simple ray caster and later a Whitted ray tracer were implemented to allow us to familiarize ourselves with scene set-up, equations for path tracing, reflections, ray versus primitive intersections and so on.
@@ -754,9 +760,9 @@ To extend our solution to support this would not be too hard, because we would s
 
 The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives. 
 For life-like scenes that consists of an even higher polygon count, a technique like this is crucial.
-We have also shown that this structure does implies a overhead for images that is too simple.
+We have also shown that this structure implies an overhead for scenes that are very simple.
 A method for deciding if an Octree would be beneficial could be implemented where the decision of collision method is decided depending on the complexity of the scene.
-But because the speed gained from complex scenes is far greater then the time lost when dealing with complex scenes, this is still acceptable for us.\\
+But because the speed gained from complex scenes is far greater than the time lost when dealing with complex scenes, this is still acceptable for us.\\
 
 When computing direct diffuse illumination, smarter methods for sampling the light source could be employed.
 Using a pdf of $1/A$ e.g uniform sampling of the light source area as in this report is not ideal.
