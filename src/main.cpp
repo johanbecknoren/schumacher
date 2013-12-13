@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 	/*PointLight *l2 = new PointLight(Vec3(real(5), real(1.4), real(-0.4)), 1, Vec3(real(0.3)));
 	tree->addPointLight(l2);*/
 	
-    std::vector<Renderable *> scene = SceneBuilder::createTestScene(); //SceneBuilder::createCornellBox();
+    std::vector<Renderable *> scene = SceneBuilder::createCornellBox();
 	tree->addObject(scene);
 
 	// tree->print(false);
