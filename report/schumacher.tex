@@ -69,18 +69,18 @@ The specular term uses the direction that a perfect reflection $ \bar{V} $ from 
 
 Whitted extended the previous techniques and allowed for rays to bounce in the scene and thus creating the basis for global illumination.
 The solution he presented allowed for true reflections, shadows and refractions.
-By using the Phong model on each ray hit and spawning new rays recursively for reflections, shadow rays and refractions a method for simulating global lightning is created.
+By using the Phong model on each ray hit and spawning new rays recursively for reflections, shadow rays and refractions, a method for simulating global lightning is created.
 
-When using several rays in the scene, a term importance is introduced.
+When using several rays in the scene, a term called importance is introduced.
 It states that the total importance of all rays for each pixels is one. 
 If multi sampling is used, importance is divided among the rays.
 The importance flows in the opposite direction as the light, from the camera and into the scene.
 
 \section{Radiosity}
-Radiosity is an algorithm for global illumination which only handles diffusely reflected light, and is therefore not dependent on any camera position or direction. This means that the solution converges toward a steady state, and can for example be pre-computed for use in static scenes. The algorithm works by splitting the scene geometry into a number of finite area elements called patches, and solves the rendering equation for surfaces that diffusely reflects light. A visibility factor, called \emph{form factor}, is used to describe a patch's visibility toward all other patches in the scene. The size of a view factor is dependent on the distance between any two patches, their orientation in relation to each other, partial or total occlusion etc. and describes the amount of radiance leaving a patch $j$ arriving at patch $i$ for all patches $j \in N$ for a scene consisting of $N$ number of patches. The form factors make up a system of linear equations, which when solved produces the radiosity for each patch. The process can be iterated to perform several passes and allowing for multiple bounces to be computed.
+Radiosity is an algorithm for global illumination which only handles diffusely reflected light, and is therefore not dependent on any camera position or direction. This means that the solution converges toward a steady state and can for example be pre-computed for use in static scenes. The algorithm works by splitting the scene geometry into a number of finite area elements called patches and solves the rendering equation for surfaces that diffusely reflects light. A visibility factor, called \emph{form factor}, is used to describe a patch's visibility toward all other patches in the scene. The size of a view factor is dependent on the distance between any two patches, their orientation in relation to each other, partial or total occlusion etc. and describes the amount of radiance leaving a patch $j$ arriving at patch $i$ for all patches $j \in N$ for a scene consisting of $N$ number of patches. The form factors make up a system of linear equations, which when solved produces the radiosity for each patch. The process can be iterated to perform several passes and allowing for multiple bounces to be computed.
 
 \section{Monte Carlo ray tracing}
-A rendering equation (\ref{eq:rendering_eq}) presented by Kajiya in \cite{kajiya} describes a full global illumination solution for a given scene. It is an integral equation called a Fredholm equation of the second kind because of the unknown radiance quantity, $L(...)$, appears on both sides of the equation. This makes the equation a recursive one, corresponding to a ray's multiple bounces through a scene. It is described below using the same notation as Dutr\'{e} et al. in \cite{dutre}, and we will use this notation throughout this report.
+A rendering equation (\ref{eq:rendering_eq}) presented by Kajiya in \cite{kajiya} describes a full global illumination solution for a given scene. It is an integral equation called a Fredholm equation of the second kind because of the unknown radiance quantity, $L(...)$, appears on both sides of the equation. This makes the equation recursive, corresponding to a ray's multiple bounces through a scene. It is described below using the same notation as Dutr\'{e} et al. in \cite{dutre}, and we will use this notation throughout this report.
 \begin{equation}
 \label{eq:rendering_eq}
 \begin{split}
@@ -103,7 +103,7 @@ The Monte Carlo integration method introduces a method for calculating an estima
 
 -Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. 
 One difference is that Monte Carlo ray tracing handles diffuse interreflections and specular-diffuse surface interreflections, color bleeding between objects, and soft shadows by sampling area light source surfaces for each ray intersection. 
-As the number of samples increase the more accurate the integral estimation will be, and the algorithm produces noise if the number of samples are too low. 
+As the number of samples increase the more accurate the integral estimation will be and the algorithm produces noise if the number of samples are too low. 
 There are several ways to reduce the noise. 
 One could separate the calculations for direct and indirect illumination, using shadow rays to more quickly compute direct diffuse illumination and soft shadows. 
 Sampling directions for diffuse indirect illumination could be chosen in more informed ways to reduce the noise. 
@@ -130,7 +130,7 @@ The method has been shown to reduce rendering time as well as the noise in the f
 An iso surface is a surface described implicitly by a mathematical expression or equation. 
 An iso surface representation of a scene is preferable over polygonal objects in a ray tracing context for a few reasons. Implicitly described primitives and objects usually scale well if the resolution or precision of the illumination algorithm should increase, since they are not bound by a finite number of triangles, but rather a mathematical description. 
 They are also easy to define and describe, and are rather straight-forward to calculate ray intersections against. 
-From an intersection calculation we need to decide weather a ray is intersecting the surface, and if so at what position, and what is the normal vector for the surface at that position. 
+From an intersection calculation we need to decide weather a ray is intersecting the surface and if so at what position. The surface normal for that position is also needed.
 
 \chapter{Background} \label{ch:background}
 
@@ -139,7 +139,6 @@ Although there are several approaches to some of these methods we will only talk
 
 \section{Scene storage}
 When calculating global illumination for the scene, all objects need to be taken into consideration when calculating the illumination for one part of the scene due to the recursive nature of \autoref{eq:rendering_eq}.
-
 For ray tracing solutions, this means that as rays bounce inside the scene the first intersecting object needs to be located.
 A na\"{\i}ve solution would be to store all objects without any information about where in the scene they are located.
 When traversing a ray through the scene, the algorithm would have to check against all objects, even if almost all of the checks would be misses.
@@ -147,12 +146,14 @@ For a simple scene with only a few implicit objects this is a good solution.
 The overhead when dealing with an more complex storage method would make it slower than simply checking against all objects in the scene.
 But when using a more complex scene consisting of models with hundreds of thousands of elements, it is possible to take advantage of the spatial information of each element to subtract a small subset and only do collision tests against those.
 
-There are several methods for storing the scene using different techniques.
-
 \subsection{Bounding box}
 An axis aligned bounding box is an essential part of most scene storage methods.
 This is the smallest box with its axes aligned to the Cartesian coordinates axes that can encapsulate the primitive that owns the bounding box.
-The bounding box will not be the smallest box that can encapsulate the primitive but the intersection tests are much simpler compared to doing collision tests against arbitrarily rotated primitives.
+The bounding box will not be the smallest box that can encapsulate the primitive but the intersection tests are much simpler compared to doing collision tests against arbitrarily rotated primitives.\\
+
+In reality, any simple shape could be used to define the bounding box of another object.
+The general rule is that it should be much simpler to calculate intersections against that, compared to the primitive that it surrounds.
+The choise of bounding box is usually dependent on the encapsulated primitives shape, the importance of ammount of extra volume in the bounding box or constraints in the storage algotithm.
 
 \subsection{Bounding volume hierarchy}
 Bounding volume hierarchy (BVH) uses a tree structure with bounding volumes like axis aligned bounding boxes. 
@@ -500,7 +501,7 @@ It states that the product of the refractive indices and sines of the angles mus
 \end{equation}
 
 This equation has a problem, when $ sin \theta_1 > \dfrac{\eta_1}{\eta_2} $
-the other term $ sin \theta_2 $ has to be greater then 1, which of course is not possible.
+the other term $ sin \theta_2 $ has to be greater then 1, which of course is impossible.
 This case is what is called total internal reflection.
 When calculating the refracted ray $ t $, continued calculation assumes that the condition is not satisfied.\\
 
@@ -598,18 +599,21 @@ It does require a lot of extra collision tests and when the scene is simple, tim
 \end{table}
 
 \section{Threads}
+The number of threads used in the solution is dependent on how many cores the CPU of the rendering computer has.
+By allowing several threads to divide the work, the algorithm is allowed to compute several parts of the image in parallel.
+As can be seen in \autoref{tb:threads} a speedup of almost 70 percent is gained when using four threads, compared to using only one.
 \begin{table}[h]
 \begin{center}
 
-	\begin{tabular}{| l | l |}
+	\begin{tabular}{| l | l | l |}
 		\hline
-		Threads & Time \\ \hline
-		1 & 37.1s \\ \hline
-		2 & 50.4s \\ \hline
-		3 & 56.5s \\ \hline
-		4 & 116s \\ \hline
+		Threads & Time & \% decrease \\ \hline
+		1 & 116s & 0 \\ \hline
+		2 & 56.5s & 51 \\ \hline
+		3 & 50.4s & 57 \\ \hline
+		4 & 37.1s & 68 \\ \hline
 	\end{tabular}
-	\caption{Rendering time using different number of threads. }
+	\caption{Rendering time using different number of threads also showing percentage decrease when adding more threads. Rendered with 10 rays per pixel, with only walls and bunny.}
 	\label{tb:threads}
 \end{center}
 \end{table}
@@ -736,7 +740,8 @@ The beginning of the project consisted of lots of reading and researching differ
 Initially a simple ray caster and later a Whitted ray tracer were implemented to allow us to familiarize ourselves with scene set-up, equations for path tracing, reflections, ray versus primitive intersections and so on.
 Moving on to a Monte Carlo ray tracer introduced a number of new variables to take into consideration, as well as other challenges compared to a Whitted ray tracer.
 We implemented multi-threading early on in the project and we are happy with doing so.
-Ray tracing suits parallel computing very well since every pixel is solved for completely independant from other pixels, and we achieved an almost linear speedup when running the rendering on a multicore CPU.\\
+Ray tracing suits parallel computing very well since every pixel is solved completely independant on the calculations for other pixels, and we achieved an almost linear speedup when running the rendering on a multicore CPU.
+One additional improvement that could be done would be to implement a cluster where several computers can work on different parts of the same image.\\
 
 By implementing a ray tracer based on the Monte Carlo method it is possible to create high quality renders of the scene, given that the solution is allowed to converge enough.
 But even with a lot of iterations and samples the final output result still suffers from artifacts like noise.
@@ -744,10 +749,14 @@ To remedy this, photon mapping could be implemented which would decrease the tim
 
 The created ray tracer only handles air to glass and glass to air refractions, not between any two mediums.
 Implementing this would allow us to create glass objects that are placed on other surfaces and not only floating in the air.
-To extend our solution to support this would not be too hard, because we would still be dealing with the same two cases, ray traveling to a medium with lower refractive index or ray traveling into a medium of higher refractive index.
+To extend our solution to support this would not be too hard, because we would still be dealing with the same two cases, ray travelling to a medium with lower refractive index or ray travelling into a medium of higher refractive index.
 \\
 
-The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives. For life-like scenes that consists of an even higher polygon count, a technique like this is crucial.
+The implementation of the Octree data structure allowed for a large decrease in computation time for scenes with a high number of primitives. 
+For life-like scenes that consists of an even higher polygon count, a technique like this is crucial.
+We have also shown that this structure does implies a overhead for images that is too simple.
+A method for deciding if an Octree would be beneficial could be implemented where the decision of collision method is decided depending on the complexity of the scene.
+But because the speed gained from complex scenes is far greater then the time lost when dealing with complex scenes, this is still acceptable for us.\\
 
 When computing direct diffuse illumination, smarter methods for sampling the light source could be employed.
 Using a pdf of $1/A$ e.g uniform sampling of the light source area as in this report is not ideal.
