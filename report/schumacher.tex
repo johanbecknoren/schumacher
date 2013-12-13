@@ -53,16 +53,16 @@ In this section we will give a short overview of some of the different approache
 
 \section{Whitted ray tracing}
 The Whitted ray tracing method described by Turner Whitted in \cite{Foley_animproved} was the first global illumination method that took the whole scene into consideration when calculating intensity values.
-In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuser or the Phong model. \\
+In previous so called ray marching solutions, the calculations stopped as a ray hit a surface and local lightning models like Lambert's cosine rule to model perfectly diffuse reflections, or the Phong model. \\
 
 \begin{equation} \label{eq:phong}
 \emph{I} = \emph{I}_{a} + \emph{k}_{d} \sum_{j=1}^{j=ls} (  \mathbf{N} \cdot \mathbf{L}_j) + \emph{k}_{s} \sum_{j=1}^{j=ls} (  \mathbf{R}_j \cdot \mathbf{V})^n
 \end{equation}
 
-The Phong model given by \autoref{eq:phong} is a local light model.
+The Phong model given by \autoref{eq:phong} is a local lighting model.
 It assumes that each light source $\emph{L}_j$ is located at a point with infinite distance to the objects in the scene. 
-The total reflected intensity $\emph{I}$ is calculated using the reflection due to ambient light $\emph{I}_{a}$ together with two terms, one term for diffuse light and one specular term.
-The two constants $\emph{k}_{d}$ and $\emph{k}_{s}$ is reflection constants that regulates their contributions.
+The total reflected intensity $\emph{I}$ is calculated using the contribution by ambient light $\emph{I}_{a}$ together with two terms, one term for diffuse light and one specular term.
+The two constants $\emph{k}_{d}$ and $\emph{k}_{s}$ are reflection constants that regulate their contributions.
 The diffuse term uses the Lamberts cosine law to describe the color using a dot product between the normal and the light direction to calculate if that part of the surface is directed towards the light source.
 
 The specular term uses the direction that a perfect reflection $ \bar{V} $ from the light source would take on the surface together with a ray towards the viewer $\bar{V}$.\\
@@ -80,7 +80,7 @@ The importance flows in the opposite direction as the light, from the camera and
 Radiosity is an algorithm for global illumination which only handles diffusely reflected light, and is therefore not dependent on any camera position or direction. This means that the solution converges toward a steady state and can for example be pre-computed for use in static scenes. The algorithm works by splitting the scene geometry into a number of finite area elements called patches and solves the rendering equation for surfaces that diffusely reflects light. A visibility factor, called \emph{form factor}, is used to describe a patch's visibility toward all other patches in the scene. The size of a view factor is dependent on the distance between any two patches, their orientation in relation to each other, partial or total occlusion etc. and describes the amount of radiance leaving a patch $j$ arriving at patch $i$ for all patches $j \in N$ for a scene consisting of $N$ number of patches. The form factors make up a system of linear equations, which when solved produces the radiosity for each patch. The process can be iterated to perform several passes and allowing for multiple bounces to be computed.
 
 \section{Monte Carlo ray tracing}
-A rendering equation (\ref{eq:rendering_eq}) presented by Kajiya in \cite{kajiya} describes a full global illumination solution for a given scene. It is an integral equation called a Fredholm equation of the second kind because of the unknown radiance quantity, $L(...)$, appears on both sides of the equation. This makes the equation recursive, corresponding to a ray's multiple bounces through a scene. It is described below using the same notation as Dutr\'{e} et al. in \cite{dutre}, and we will use this notation throughout this report.
+A rendering equation (\ref{eq:rendering_eq}) presented by Kajiya in \cite{kajiya} describes a full global illumination solution for a given scene. It is an integral equation called a Fredholm equation of the second kind because of the unknown radiance quantity, $L(...)$, appears on both sides of the equation. This makes the equation recursive, corresponding to a ray's multiple bounces through a scene, and makes the equation very hard to solve analytically. It is described below using the same notation as Dutr\'{e} et al. in \cite{dutre}, and we will use this notation throughout this report.
 \begin{equation}
 \label{eq:rendering_eq}
 \begin{split}
@@ -98,10 +98,10 @@ The Monte Carlo integration method introduces a method for calculating an estima
  \label{eq:monte_carlo_example2}
  \langle I \rangle = \frac{1}{N} \sum^N_i \frac{f(x_i)}{p(x_i)} dx
  \end{equation}
- The intergral in \autoref{eq:monte_carlo_example1} with a value of \emph{I} can me \emph{estimated} as in equation \autoref{eq:monte_carlo_example2} as $\langle I \rangle$ by $N$ number of samples distibuted according to the pdf $p(x_i)$. 
+ The intergral in \autoref{eq:monte_carlo_example1} with a value of \emph{I} can me \emph{estimated} as in equation \autoref{eq:monte_carlo_example2} as $\langle I \rangle$ by $N$ number of samples distributed according to the pdf (probability distribution function) $p(x_i)$. 
  This method will later be used to estimate the solution to \autoref{eq:rendering_eq}.\\
 
--Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. 
+Similar to a Whitted ray tracer, a Monte Carlo ray tracer starts by shooting rays from a virtual camera through a view plane into the scene. 
 One difference is that Monte Carlo ray tracing handles diffuse interreflections and specular-diffuse surface interreflections, color bleeding between objects, and soft shadows by sampling area light source surfaces for each ray intersection. 
 As the number of samples increase the more accurate the integral estimation will be and the algorithm produces noise if the number of samples are too low. 
 There are several ways to reduce the noise. 
