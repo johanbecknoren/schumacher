@@ -153,7 +153,7 @@ The bounding box will not be the smallest box that can encapsulate the primitive
 
 In reality, any simple shape could be used to define the bounding box of another object.
 The general rule is that it should be much simpler to calculate intersections against that, compared to the primitive that it surrounds.
-The choise of bounding box is usually dependent on the encapsulated primitives shape, the importance of ammount of extra volume in the bounding box or constraints in the storage algotithm.
+The choise of bounding box is usually dependent on the encapsulated primitives shape, the importance of amount of extra volume in the bounding box or constraints in the storage algotithm.
 
 \subsection{Bounding volume hierarchy}
 Bounding volume hierarchy (BVH) uses a tree structure with bounding volumes like axis aligned bounding boxes. 
@@ -167,13 +167,6 @@ The scene is encapsulated into a large bounding box.
 When each primitive is added, the scene bounding box is subdivided into eight sub-volumes recursively until the current level of bounding boxes are to small to fit the primitive.
 The primitive is then added to the level above that as a leaf.
 Using this structure, it is possible to traverse the ray through the volume and, just as when using the BVH tree, large parts of the tree can be ignored by checking only parent nodes for intersection.
-
-\section{Multi threading}
-Multi threading were implemented using C++11 threads.
-The application spawns a number of threads $ n $ equal to the number of CPU cores in the computer, each is responsible for a part of the computation.
-The image is divided so that each thread is responsible for every $n$:th column in the image which counteracts work load issues where parts of an image might be harder to compute then others.
-To support rendering while calculating, the threads are joined after each row and a new image is rendered.
-This gives a small overhead of spawning and joining threads but the benefit of seeing progress is to high, and it is only noticeable when dealing with a small computation time per row and this is not common when doing ray tracing.
 
 \section{Intersection}
 The implementation needs to be able to handle several different intersection algorithms, one for each type of primitive in the scene.
@@ -524,6 +517,13 @@ The combination of these two, described in \autoref{eq:refractiontot} is all tha
 \mathbf{t} = \frac{\eta_1}{\eta_2} \mathbf{i} + (\frac{\eta_1}{\eta_2} cos \theta_i - \sqrt{1 - \vert \mathbf{t}_\| \vert ^2})\mathbf{n}
 \end{equation}
 
+\section{Multi-threading}
+Multi-threading was implemented using C++11 threads.
+The application spawns a number of threads $ n $ equal to the number of CPU cores in the computer, each is responsible for a part of the computation.
+The image is divided so that each thread is responsible for every $n$:th column in the image which counteracts work load issues where parts of an image might be harder to compute then others.
+To support rendering while calculating, the threads are joined after each row and a new image is rendered.
+This gives a small overhead of spawning and joining threads but the benefit of seeing progress in real time is high, and the overhead is only noticeable when dealing with a small computation time per row which is not common when doing ray tracing computations.
+
 \chapter{Results and benchmarks} \label{ch:results}
 
 \section{Shadow rays}
@@ -578,7 +578,7 @@ Notice how the amount of noise on the floor decreases as the number of shadow ra
 
 \section{Octree}
 The octree allows for a great speedup when using a scene with a lot of primitives.
-As can be seen in \autoref{tb:octree}, even with a mesh with relatively low polygon count, the computation time is ten times faster.
+As can be seen in \autoref{tb:octree}, even with a mesh with relatively low polygon count the computation time is decreased by a factor of 10.
 The same table also shows the problem with the octree structure.
 It does require a lot of extra collision tests and when the scene is simple, time is lost instead of gained.
 
@@ -742,7 +742,7 @@ Notice how the noise seen on the back wall in \autoref{fig:vew_rays}a subsides r
 \end{figure}
 
 \chapter{Discussion} \label{ch:discussion}
-The beginning of the project consisted of lots of reading and researching different methods used in a ray tracers.
+The beginning of the project consisted of lots of reading and researching different methods used in a ray tracer.
 Initially a simple ray caster and later a Whitted ray tracer were implemented to allow us to familiarize ourselves with scene set-up, equations for path tracing, reflections, ray versus primitive intersections and so on.
 Moving on to a Monte Carlo ray tracer introduced a number of new variables to take into consideration, as well as other challenges compared to a Whitted ray tracer.
 We implemented multi-threading early on in the project and we are happy with doing so.
